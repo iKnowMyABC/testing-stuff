@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Season 2 Tactical Map</title>
+  <title>Season 2 Live Server Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; }
@@ -15,13 +15,9 @@
       overflow: hidden;
     }
 
-    #map {
-      width: 100%;
-      height: 100vh;
-      background: #090d12;
-    }
+    #map { width: 100%; height: 100vh; background: #090d12; }
 
-    /* Top HUD / Coordinate Input */
+    /* Top HUD */
     .top-panel {
       position: absolute;
       top: 14px;
@@ -70,17 +66,29 @@
       outline: none;
     }
 
-    .btn-submit {
+    .btn-action {
       background: #238636;
       border: 1px solid #2ea043;
       color: #fff;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 4px;
       font-weight: 600;
       font-size: 12px;
       cursor: pointer;
     }
-    .btn-submit:hover { background: #2ea043; }
+    .btn-action:hover { background: #2ea043; }
+
+    .btn-secondary {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-secondary:hover { background: #30363d; color: #fff; }
 
     .hud-coords {
       position: absolute;
@@ -112,18 +120,43 @@
     }
     .msg-error { background: #da3633; color: #fff; border: 1px solid #f85149; }
     .msg-info { background: #1f6feb; color: #fff; }
+    .msg-success { background: #238636; color: #fff; border: 1px solid #2ea043; }
 
-    /* Radar dot markers */
+    /* Radar Pins */
     .stronghold-pin {
       border-radius: 50%;
       border: 1.5px solid #ffffff;
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.95);
-      transition: transform 0.1s ease;
+      transition: transform 0.1s ease, opacity 0.2s ease;
     }
     .stronghold-pin:hover {
       transform: scale(1.6);
       z-index: 9999 !important;
     }
+
+    /* Globally Marked as Found */
+    .stronghold-pin.is-found {
+      opacity: 0.22 !important;
+      border-color: #484f58 !important;
+      filter: grayscale(100%);
+    }
+
+    /* Popup Action Button */
+    .popup-found-btn {
+      display: inline-block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 6px 0;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-mark { background: #238636; color: #fff; }
+    .btn-mark:hover { background: #2ea043; }
+    .btn-view { background: #30363d; color: #58a6ff; }
   </style>
 </head>
 <body>
@@ -149,7 +182,8 @@
       <option value="Custom Spot">Custom Spot</option>
     </select>
 
-    <button class="btn-submit" onclick="submitCoordinate()">Mark / Go</button>
+    <button class="btn-action" onclick="submitCoordinate()">Submit / Mark</button>
+    <button class="btn-secondary" id="toggle-found-btn" onclick="toggleHideFound()">Hide Found</button>
   </div>
 
   <div class="hud-coords" id="hud-coords">X: 0 | Y: 0</div>
@@ -158,12 +192,14 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // --- Repository Settings ---
-    const REPO_OWNER = "iKnowMyABC"; // <-- Put your GitHub username here
+    const REPO_OWNER = "iKnowMyABC"; // <-- Your GitHub handle
     const REPO_NAME = "testing-stuff";
     const MAP_LIMIT = 1000;
 
     const registeredCoords = new Map();
+    const markerInstances = new Map(); 
+    const globalFoundCoords = new Map();
+    let hideFoundActive = false;
 
     const map = L.map('map', {
       crs: L.CRS.Simple,
@@ -175,12 +211,9 @@
     });
 
     const bounds = [[0, 0], [MAP_LIMIT, MAP_LIMIT]];
-
-    // --- Load your uploaded PNG map ---
     L.imageOverlay('season-2-grid.png', bounds).addTo(map);
     map.fitBounds(bounds);
 
-    // Live mouse position tracker
     map.on('mousemove', (e) => {
       const x = Math.round(e.latlng.lng);
       const y = Math.round(e.latlng.lat);
@@ -189,34 +222,106 @@
       }
     });
 
-    function showStatus(text, isError = false) {
+    function showStatus(text, type = 'info') {
       const box = document.getElementById('status-msg');
-      box.className = isError ? 'msg-error' : 'msg-info';
+      box.className = type === 'error' ? 'msg-error' : (type === 'success' ? 'msg-success' : 'msg-info');
       box.textContent = text;
       box.style.display = 'block';
-      setTimeout(() => { box.style.display = 'none'; }, 4000);
+      setTimeout(() => { box.style.display = 'none'; }, 4500);
     }
 
-    function createPin(x, y, label, color, subtitle = "") {
+    function generateFoundUrl(data) {
+      const title = `[FOUND] ${data.label} at (${data.x}, ${data.y})`;
+      const rawData = JSON.stringify({ x: data.x, y: data.y, type: data.label });
+      const body = `Marking supply found for global server.\n\n<!--DATA:${rawData}-->\n\n- **X:** ${data.x}\n- **Y:** ${data.y}\n- **Supply:** ${data.label}`;
+      return `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=supply-found`;
+    }
+
+    function updateMarkerVisual(marker, key, data) {
+      const isFound = globalFoundCoords.has(key);
+      const foundData = globalFoundCoords.get(key);
+
       const icon = L.divIcon({
-        className: 'stronghold-pin',
-        html: `<div style="width:100%;height:100%;background:${color};border-radius:50%;"></div>`,
+        className: `stronghold-pin ${isFound ? 'is-found' : ''}`,
+        html: `<div style="width:100%;height:100%;background:${data.color};border-radius:50%;"></div>`,
         iconSize: [11, 11],
         iconAnchor: [5.5, 5.5]
       });
+      marker.setIcon(icon);
 
-      const marker = L.marker([y, x], { icon }).addTo(map);
-      marker.bindPopup(`
-        <div style="color: #111; font-size: 12px; font-family: -apple-system, sans-serif;">
-          <strong style="color:${color === '#00FF00' ? '#008800' : color}; font-size:13px;">${label}</strong><br/>
-          <span>Coordinates: <b>(${x}, ${y})</b></span>
-          ${subtitle ? `<br/><small style="color:#666;">${subtitle}</small>` : ''}
+      let actionBtn = "";
+      if (isFound) {
+        actionBtn = `
+          <div style="margin-top:6px; color:#3fb950; font-weight:700;">✅ Found by Community</div>
+          <a class="popup-found-btn btn-view" href="${foundData.url}" target="_blank">View GitHub Report</a>
+        `;
+      } else {
+        const markUrl = generateFoundUrl(data);
+        actionBtn = `
+          <a class="popup-found-btn btn-mark" href="${markUrl}" target="_blank">Mark Found for Everyone</a>
+        `;
+      }
+
+      const popupHtml = `
+        <div style="color: #111; font-size: 12px; font-family: -apple-system, sans-serif; min-width: 150px;">
+          <strong style="color:${data.color === '#00FF00' ? '#008800' : data.color}; font-size:13px;">${data.label}</strong><br/>
+          <span>Coords: <b>(${data.x}, ${data.y})</b></span><br/>
+          ${actionBtn}
         </div>
-      `);
+      `;
+      marker.bindPopup(popupHtml);
+
+      if (hideFoundActive && isFound) {
+        marker.setOpacity(0);
+      } else {
+        marker.setOpacity(1);
+      }
+    }
+
+    function createPin(x, y, label, color) {
+      const key = `${x},${y}`;
+      const marker = L.marker([y, x]).addTo(map);
+
+      markerInstances.set(key, marker);
+      updateMarkerVisual(marker, key, { x, y, label, color });
       return marker;
     }
 
-    // 1. Fetch pre-existing strongholds from data.json
+    window.toggleHideFound = function() {
+      hideFoundActive = !hideFoundActive;
+      const btn = document.getElementById('toggle-found-btn');
+      btn.textContent = hideFoundActive ? "Show Found" : "Hide Found";
+      btn.style.borderColor = hideFoundActive ? "#58a6ff" : "#30363d";
+
+      markerInstances.forEach((marker, key) => {
+        if (globalFoundCoords.has(key)) {
+          marker.setOpacity(hideFoundActive ? 0 : 1);
+        }
+      });
+    };
+
+    async function loadFoundStatus() {
+      const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=supply-found&state=open&per_page=100`;
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) return;
+        const issues = await res.json();
+
+        issues.forEach(issue => {
+          const match = issue.body.match(/<!--DATA:({.*?})-->/);
+          if (match) {
+            try {
+              const data = JSON.parse(match[1]);
+              const key = `${data.x},${data.y}`;
+              globalFoundCoords.set(key, { url: issue.html_url });
+            } catch (e) {}
+          }
+        });
+      } catch (err) {
+        console.error("Could not fetch global found status:", err);
+      }
+    }
+
     async function loadStaticData() {
       try {
         const res = await fetch('data.json');
@@ -226,12 +331,15 @@
         if (data.strongholds) {
           data.strongholds.forEach(group => {
             group.coordinates.forEach(pt => {
-              registeredCoords.set(`${pt.x},${pt.y}`, {
+              const key = `${pt.x},${pt.y}`;
+              registeredCoords.set(key, {
+                x: pt.x,
+                y: pt.y,
                 label: group.label,
                 level: group.level,
                 color: group.color
               });
-              createPin(pt.x, pt.y, group.label, group.color, "Base Stronghold");
+              createPin(pt.x, pt.y, group.label, group.color);
             });
           });
         }
@@ -240,8 +348,7 @@
       }
     }
 
-    // 2. Fetch live community points from GitHub Issues
-    async function loadGitHubMarkers() {
+    async function loadCommunityMarkers() {
       const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=map-marker&state=open&per_page=100`;
       try {
         const res = await fetch(endpoint);
@@ -254,42 +361,63 @@
             try {
               const data = JSON.parse(match[1]);
               const key = `${data.x},${data.y}`;
-              registeredCoords.set(key, { label: data.type || issue.title, color: '#ffffff' });
-              createPin(data.x, data.y, data.type || issue.title, '#ffffff', `Submitted (<a href="${issue.html_url}" target="_blank">issue</a>)`);
-            } catch (e) {
-              console.warn("Skipping bad marker format:", issue.id);
-            }
+              registeredCoords.set(key, { x: data.x, y: data.y, label: data.type || issue.title, color: '#ffffff' });
+              createPin(data.x, data.y, data.type || issue.title, '#ffffff');
+            } catch (e) {}
           }
         });
-      } catch (err) {
-        console.error("Could not fetch user coordinates:", err);
-      }
+      } catch (err) {}
     }
 
-    Promise.all([loadStaticData(), loadGitHubMarkers()]);
+    async function init() {
+      await loadFoundStatus();
+      await loadStaticData();
+      await loadCommunityMarkers();
 
-    // 3. Search and Duplicate Handling
+      markerInstances.forEach((marker, key) => {
+        const data = registeredCoords.get(key);
+        if (data) updateMarkerVisual(marker, key, data);
+      });
+    }
+    init();
+
+    // --- Unified Search, Mark-Found & Add Logic ---
     function submitCoordinate() {
       const x = parseInt(document.getElementById('input-x').value, 10);
       const y = parseInt(document.getElementById('input-y').value, 10);
       const type = document.getElementById('input-type').value;
 
       if (isNaN(x) || isNaN(y)) {
-        showStatus("Please enter both X and Y coordinates.", true);
+        showStatus("Please enter both X and Y coordinates.", 'error');
         return;
       }
 
       const key = `${x},${y}`;
 
+      // CASE 1: Coordinate already exists on our map
       if (registeredCoords.has(key)) {
         const existing = registeredCoords.get(key);
-        showStatus(`Already found! "${existing.label}" exists at (${x}, ${y}).`, true);
-        map.flyTo([y, x], 1.6);
+        const marker = markerInstances.get(key);
+        map.flyTo([y, x], 2);
+
+        if (marker) marker.openPopup();
+
+        // 1A: Already claimed by someone
+        if (globalFoundCoords.has(key)) {
+          showStatus(`Already collected! "${existing.label}" at (${x}, ${y}) was already marked found.`, 'error');
+          return;
+        }
+
+        // 1B: Known supply, ready to be marked as found
+        showStatus(`Matched ${existing.label}! Redirecting to mark it found for everyone...`, 'success');
+        const markUrl = generateFoundUrl(existing);
+        window.open(markUrl, '_blank');
         return;
       }
 
+      // CASE 2: Brand new coordinate (add new spot)
       map.flyTo([y, x], 1.6);
-      showStatus(`New coordinate! Redirecting to save (${x}, ${y})...`, false);
+      showStatus(`New location! Redirecting to add (${x}, ${y}) to the map...`, 'info');
 
       const title = `${type} at (${x}, ${y})`;
       const rawData = JSON.stringify({ x, y, type });
