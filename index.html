@@ -3,56 +3,183 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Map Test</title>
+  <title>Supply Coordinate Tracker</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; }
-    body, html { margin: 0; padding: 0; height: 100%; background: #0f1115; font-family: sans-serif; color: #fff; }
-    #map { width: 100%; height: 100vh; background: #161b22; }
-    .hud {
-      position: absolute; top: 15px; left: 60px; z-index: 1000;
-      background: rgba(18, 21, 27, 0.9); padding: 10px 16px; border-radius: 6px;
-      border: 1px solid #30363d; font-size: 13px;
+    body, html { margin: 0; padding: 0; height: 100%; background: #0b0e14; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #e6edf3; overflow: hidden; }
+    
+    #map { width: 100%; height: 100vh; background: #07090e; }
+
+    /* Top Control HUD */
+    .top-panel {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.95);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
     }
-    .leaflet-popup-content-wrapper { background: #1c2128; color: #f0f6fc; border: 1px solid #30363d; }
-    .leaflet-popup-tip { background: #1c2128; }
-    .marker-form input, .marker-form select {
-      width: 100%; margin: 6px 0; padding: 6px; background: #0d1117;
-      border: 1px solid #30363d; color: #fff; border-radius: 4px;
+
+    .coord-field {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #090d13;
+      border: 1px solid #30363d;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
-    .submit-btn {
-      display: block; width: 100%; text-align: center; background: #238636;
-      color: #fff; padding: 7px; border-radius: 4px; text-decoration: none;
-      font-weight: bold; font-size: 13px; margin-top: 6px;
+    .coord-field span { font-weight: 700; color: #58a6ff; font-size: 12px; }
+    .coord-field input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      width: 55px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    select.type-select {
+      background: #090d13;
+      border: 1px solid #30363d;
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .btn-submit {
+      background: #238636;
+      border: 1px solid #2ea043;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-submit:hover { background: #2ea043; }
+
+    /* Alert / Warning Bar */
+    #status-msg {
+      position: absolute;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      display: none;
+    }
+    .msg-error { background: #cf222e; color: #fff; border: 1px solid #f85149; }
+    .msg-info { background: #1f6feb; color: #fff; }
+
+    /* Custom game marker styling */
+    .pin-label {
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid #58a6ff;
+      border-radius: 3px;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 4px;
+      text-align: center;
+      white-space: nowrap;
     }
   </style>
 </head>
 <body>
-  <div class="hud">📍 Click anywhere to place a test pin</div>
+
+  <div class="top-panel">
+    <div class="coord-field">
+      <span>X</span>
+      <input type="number" id="input-x" placeholder="0" min="0" max="1000" />
+    </div>
+    <div class="coord-field">
+      <span>Y</span>
+      <input type="number" id="input-y" placeholder="0" min="0" max="1000" />
+    </div>
+
+    <select id="input-type" class="type-select">
+      <option value="Lv.6 Supply">Lv.6 Supply</option>
+      <option value="Lv.5 Supply">Lv.5 Supply</option>
+      <option value="Lv.4 Supply">Lv.4 Supply</option>
+      <option value="Rare Chest">Rare Chest</option>
+    </select>
+
+    <button class="btn-submit" onclick="submitCoordinate()">Mark Coord</button>
+  </div>
+
+  <div id="status-msg"></div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // REPLACE THESE TWO WITH YOUR DETAILS:
+    // --- Repository Settings ---
     const REPO_OWNER = "iKnowMyABC";
     const REPO_NAME = "testing-stuff";
 
-    const MAP_WIDTH = 1000;
-    const MAP_HEIGHT = 1000;
+    // Standard game boundary coordinates (e.g. 1000 x 1000 grid)
+    const GRID_SIZE = 1000;
 
+    // Cache of all verified registered coordinates: "x,y" => issue metadata
+    const registeredCoords = new Map();
+
+    // Setup Leaflet Cartesian Plane
     const map = L.map('map', {
       crs: L.CRS.Simple,
       minZoom: -1,
-      maxZoom: 2
+      maxZoom: 3,
+      zoomSnap: 0.25,
+      zoomDelta: 0.5
     });
 
-    const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
-    
-    // Draw a simple test grid boundary
-    L.rectangle(bounds, { color: "#30363d", weight: 2, fillOpacity: 0.1 }).addTo(map);
+    const bounds = [[0, 0], [GRID_SIZE, GRID_SIZE]];
+    L.rectangle(bounds, { color: "#30363d", weight: 1.5, fillOpacity: 0.04 }).addTo(map);
     map.fitBounds(bounds);
 
-    // Fetch existing marker issues
+    function showStatus(text, isError = false) {
+      const box = document.getElementById('status-msg');
+      box.className = isError ? 'msg-error' : 'msg-info';
+      box.textContent = text;
+      box.style.display = 'block';
+      setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    // Render Pin
+    function placePin(x, y, label, url) {
+      const icon = L.divIcon({
+        className: 'pin-label',
+        html: `📍 ${label}`,
+        iconSize: [80, 20],
+        iconAnchor: [40, 10]
+      });
+
+      const marker = L.marker([y, x], { icon }).addTo(map);
+      marker.bindPopup(`
+        <div style="color: #111; font-size: 12px;">
+          <strong>${label}</strong><br/>
+          <span>Coordinates: (${x}, ${y})</span><br/>
+          ${url ? `<a href="${url}" target="_blank">View GitHub Entry</a>` : ''}
+        </div>
+      `);
+      return marker;
+    }
+
+    // Fetch live markers from repo issues
     async function loadMarkers() {
       const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=map-marker&state=open&per_page=100`;
       try {
@@ -63,54 +190,64 @@
         issues.forEach(issue => {
           const match = issue.body.match(/<!--DATA:({.*?})-->/);
           if (match) {
-            const data = JSON.parse(match[1]);
-            L.marker([data.y, data.x]).addTo(map)
-              .bindPopup(`<strong>${issue.title}</strong><br>Category: ${data.category}<br>Coords: (${data.x}, ${data.y})`);
+            try {
+              const data = JSON.parse(match[1]);
+              const key = `${data.x},${data.y}`;
+              
+              // Store in registered index to catch duplicates
+              registeredCoords.set(key, { ...data, title: issue.title, url: issue.html_url });
+              
+              placePin(data.x, data.y, data.type || issue.title, issue.html_url);
+            } catch (e) {
+              console.warn("Skipping bad marker format:", issue.id);
+            }
           }
         });
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error("Could not fetch coordinate list:", err);
       }
     }
     loadMarkers();
 
-    // Handle clicks
-    let popup = null;
-    map.on('click', (e) => {
-      const x = Math.round(e.latlng.lng);
-      const y = Math.round(e.latlng.lat);
-      if (x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) return;
+    // Coordinate submission and duplication verification
+    function submitCoordinate() {
+      const xInput = document.getElementById('input-x');
+      const yInput = document.getElementById('input-y');
+      const typeInput = document.getElementById('input-type');
 
-      popup = L.popup()
-        .setLatLng(e.latlng)
-        .setContent(`
-          <div class="marker-form">
-            <strong>Test Marker</strong>
-            <input type="text" id="m-name" placeholder="Name" />
-            <select id="m-cat">
-              <option value="Supplies">Supplies</option>
-              <option value="Base">Base</option>
-            </select>
-            <a href="#" id="m-link" class="submit-btn" target="_blank">Submit via GitHub</a>
-          </div>
-        `).openOn(map);
+      const x = parseInt(xInput.value, 10);
+      const y = parseInt(yInput.value, 10);
+      const type = typeInput.value;
 
-      setTimeout(() => {
-        const name = document.getElementById('m-name');
-        const cat = document.getElementById('m-cat');
-        const link = document.getElementById('m-link');
-        function sync() {
-          const title = name.value.trim() || `Point at (${x}, ${y})`;
-          const category = cat.value;
-          const rawData = JSON.stringify({ x, y, category });
-          const body = `Marker data:\n\n<!--DATA:${rawData}-->\n\nCoords: (${x}, ${y})`;
-          link.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=map-marker`;
-        }
-        name.addEventListener('input', sync);
-        cat.addEventListener('change', sync);
-        sync();
-      }, 50);
-    });
+      if (isNaN(x) || isNaN(y)) {
+        showStatus("Please enter both X and Y coordinates.", true);
+        return;
+      }
+
+      const key = `${x},${y}`;
+
+      // Duplicate Check
+      if (registeredCoords.has(key)) {
+        const existing = registeredCoords.get(key);
+        showStatus(`Already found! Marked as "${existing.type || existing.title}" at (${x}, ${y}).`, true);
+        map.flyTo([y, x], 1.5);
+        return;
+      }
+
+      // If coordinate is fresh, prepare GitHub submission link
+      const title = `${type} at (${x}, ${y})`;
+      const rawData = JSON.stringify({ x, y, type });
+      const body = `Coordinate Marker Submission\n\n<!--DATA:${rawData}-->\n\n- **X:** ${x}\n- **Y:** ${y}\n- **Type:** ${type}`;
+
+      const submitUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=map-marker`;
+
+      // Zoom immediately to position on map
+      map.flyTo([y, x], 1.5);
+
+      // Open tab for direct verification/creation
+      showStatus(`Coordinate open! Redirecting to confirm mark...`, false);
+      window.open(submitUrl, '_blank');
+    }
   </script>
 </body>
 </html>
