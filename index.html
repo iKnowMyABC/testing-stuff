@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Season 2 Tactical Map</title>
+  <title>Season 2 Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; }
@@ -15,17 +15,10 @@
       overflow: hidden;
     }
 
-    #map-container {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      background: radial-gradient(circle at 50% 50%, #151b23 0%, #090d12 100%);
-    }
-
     #map {
       width: 100%;
-      height: 100%;
-      background: transparent;
+      height: 100vh;
+      background: #090d12;
     }
 
     /* Top HUD / Coordinate Input */
@@ -35,7 +28,7 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      background: rgba(18, 22, 30, 0.95);
+      background: rgba(13, 17, 23, 0.95);
       border: 1px solid #30363d;
       border-radius: 6px;
       padding: 6px 14px;
@@ -50,7 +43,7 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      background: #0d1117;
+      background: #090d13;
       border: 1px solid #30363d;
       padding: 4px 8px;
       border-radius: 4px;
@@ -68,7 +61,7 @@
     }
 
     select.type-select {
-      background: #0d1117;
+      background: #090d13;
       border: 1px solid #30363d;
       color: #fff;
       padding: 6px 8px;
@@ -122,69 +115,58 @@
     .msg-error { background: #da3633; color: #fff; border: 1px solid #f85149; }
     .msg-info { background: #1f6feb; color: #fff; }
 
-    /* Glowing radar dot styling */
+    /* Crisp dot markers */
     .stronghold-pin {
       border-radius: 50%;
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
-      transition: transform 0.15s ease;
+      border: 1px solid #ffffff;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+      transition: transform 0.1s ease;
     }
     .stronghold-pin:hover {
       transform: scale(1.6);
       z-index: 9999 !important;
     }
 
-    /* Grid zone tags inside the map */
-    .sector-tag {
-      color: rgba(255, 255, 255, 0.15);
-      font-size: 24px;
-      font-weight: 800;
-      font-family: monospace;
-      text-align: center;
-      pointer-events: none;
-      user-select: none;
-    }
-    .axis-tick-label {
-      color: rgba(139, 148, 158, 0.6);
-      font-size: 9px;
+    /* Minimalist Axis Tick Labels */
+    .axis-label {
+      color: #8b949e;
+      font-size: 10px;
       font-family: monospace;
       font-weight: 600;
-      pointer-events: none;
       user-select: none;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <div id="map-container">
-    <div class="top-panel">
-      <div class="coord-field">
-        <span>X</span>
-        <input type="number" id="input-x" placeholder="0" min="0" max="1000" />
-      </div>
-      <div class="coord-field">
-        <span>Y</span>
-        <input type="number" id="input-y" placeholder="0" min="0" max="1000" />
-      </div>
-
-      <select id="input-type" class="type-select">
-        <option value="Level 1">Level 1</option>
-        <option value="Level 2">Level 2</option>
-        <option value="Level 3">Level 3</option>
-        <option value="Level 4">Level 4</option>
-        <option value="Level 5">Level 5</option>
-        <option value="Level 6">Level 6</option>
-        <option value="Level 7">Level 7</option>
-        <option value="Custom Spot">Custom Spot</option>
-      </select>
-
-      <button class="btn-submit" onclick="submitCoordinate()">Mark / Go</button>
+  <div class="top-panel">
+    <div class="coord-field">
+      <span>X</span>
+      <input type="number" id="input-x" placeholder="0" min="0" max="1000" />
+    </div>
+    <div class="coord-field">
+      <span>Y</span>
+      <input type="number" id="input-y" placeholder="0" min="0" max="1000" />
     </div>
 
-    <div class="hud-coords" id="hud-coords">X: 0 | Y: 0</div>
-    <div id="status-msg"></div>
-    <div id="map"></div>
+    <select id="input-type" class="type-select">
+      <option value="Level 1">Level 1</option>
+      <option value="Level 2">Level 2</option>
+      <option value="Level 3">Level 3</option>
+      <option value="Level 4">Level 4</option>
+      <option value="Level 5">Level 5</option>
+      <option value="Level 6">Level 6</option>
+      <option value="Level 7">Level 7</option>
+      <option value="Custom Spot">Custom Spot</option>
+    </select>
+
+    <button class="btn-submit" onclick="submitCoordinate()">Mark / Go</button>
   </div>
+
+  <div class="hud-coords" id="hud-coords">X: 0 | Y: 0</div>
+  <div id="status-msg"></div>
+  <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
@@ -194,12 +176,12 @@
 
     const registeredCoords = new Map();
 
-    // 1. Setup Cartesian coordinates with bottom-left (0,0) to top-right (1000, 1000)
+    // 1. Initialize map with Cartesian coordinates
     const map = L.map('map', {
       crs: L.CRS.Simple,
-      minZoom: -1.5,
+      minZoom: -2,
       maxZoom: 3,
-      zoomSnap: 0.2,
+      zoomSnap: 0.25,
       zoomDelta: 0.5,
       attributionControl: false
     });
@@ -207,93 +189,51 @@
     const bounds = [[0, 0], [MAP_LIMIT, MAP_LIMIT]];
     map.fitBounds(bounds);
 
-    // 2. Draw Game Sector Boundaries & Tactical Grid
-    function createTacticalGrid() {
-      const gridLayer = L.layerGroup().addTo(map);
+    // 2. Crisp Technical Grid Layer
+    function drawCleanGrid() {
+      const grid = L.layerGroup().addTo(map);
 
-      // (A) Minor cell grid (every 20 units)
-      for (let i = 0; i <= MAP_LIMIT; i += 20) {
+      // (A) Minor grid lines (every 25 units, faint)
+      for (let i = 0; i <= MAP_LIMIT; i += 25) {
         if (i % 100 === 0) continue;
-        // Verticals
-        L.polyline([[0, i], [MAP_LIMIT, i]], {
-          color: 'rgba(56, 139, 253, 0.05)',
-          weight: 1,
-          interactive: false
-        }).addTo(gridLayer);
-        // Horizontals
-        L.polyline([[i, 0], [i, MAP_LIMIT]], {
-          color: 'rgba(56, 139, 253, 0.05)',
-          weight: 1,
-          interactive: false
-        }).addTo(gridLayer);
+        L.polyline([[0, i], [MAP_LIMIT, i]], { color: '#161b22', weight: 0.75, interactive: false }).addTo(grid);
+        L.polyline([[i, 0], [i, MAP_LIMIT]], { color: '#161b22', weight: 0.75, interactive: false }).addTo(grid);
       }
 
-      // (B) Major zone grid (every 100 units)
+      // (B) Major grid lines (every 100 units, sharp)
       for (let i = 0; i <= MAP_LIMIT; i += 100) {
-        // Vertical lines
-        L.polyline([[0, i], [MAP_LIMIT, i]], {
-          color: 'rgba(56, 139, 253, 0.2)',
-          weight: 1.5,
-          interactive: false
-        }).addTo(gridLayer);
+        L.polyline([[0, i], [MAP_LIMIT, i]], { color: '#262c36', weight: 1.25, interactive: false }).addTo(grid);
+        L.polyline([[i, 0], [i, MAP_LIMIT]], { color: '#262c36', weight: 1.25, interactive: false }).addTo(grid);
 
-        // Horizontal lines
-        L.polyline([[i, 0], [i, MAP_LIMIT]], {
-          color: 'rgba(56, 139, 253, 0.2)',
-          weight: 1.5,
-          interactive: false
-        }).addTo(gridLayer);
-
-        // Axis numeric indicators (X axis along bottom)
-        L.marker([6, i], {
+        // Bottom Axis Labels (X)
+        L.marker([0, i], {
           icon: L.divIcon({
-            className: 'axis-tick-label',
+            className: 'axis-label',
             html: `${i}`,
-            iconSize: [30, 12],
-            iconAnchor: [15, 6]
+            iconSize: [30, 14],
+            iconAnchor: [15, 0]
           }),
           interactive: false
-        }).addTo(gridLayer);
+        }).addTo(grid);
 
-        // Axis numeric indicators (Y axis along left edge)
+        // Left Axis Labels (Y)
         if (i > 0) {
-          L.marker([i, 12], {
+          L.marker([i, 0], {
             icon: L.divIcon({
-              className: 'axis-tick-label',
+              className: 'axis-label',
               html: `${i}`,
-              iconSize: [30, 12],
-              iconAnchor: [15, 6]
+              iconSize: [30, 14],
+              iconAnchor: [34, 7]
             }),
             interactive: false
-          }).addTo(gridLayer);
+          }).addTo(grid);
         }
       }
 
-      // (C) Watermarked Sector Quadrant Labels (e.g. S1, S2, ...)
-      let sectorNum = 1;
-      for (let y = 850; y >= 50; y -= 200) {
-        for (let x = 100; x <= 900; x += 200) {
-          L.marker([y, x], {
-            icon: L.divIcon({
-              className: 'sector-tag',
-              html: `ZONE ${sectorNum++}`,
-              iconSize: [120, 30],
-              iconAnchor: [60, 15]
-            }),
-            interactive: false
-          }).addTo(gridLayer);
-        }
-      }
-
-      // Outer map border
-      L.rectangle(bounds, {
-        color: '#58a6ff',
-        weight: 2,
-        fillColor: '#0a0e14',
-        fillOpacity: 0.45
-      }).addTo(gridLayer);
+      // Border outline
+      L.rectangle(bounds, { color: '#388bfd', weight: 1.5, fill: false }).addTo(grid);
     }
-    createTacticalGrid();
+    drawCleanGrid();
 
     // 3. Live Cursor Coordinates
     map.on('mousemove', (e) => {
@@ -316,8 +256,8 @@
       const icon = L.divIcon({
         className: 'stronghold-pin',
         html: `<div style="width:100%;height:100%;background:${color};border-radius:50%;"></div>`,
-        iconSize: [11, 11],
-        iconAnchor: [5.5, 5.5]
+        iconSize: [9, 9],
+        iconAnchor: [4.5, 4.5]
       });
 
       const marker = L.marker([y, x], { icon }).addTo(map);
@@ -383,7 +323,7 @@
 
     Promise.all([loadStaticData(), loadGitHubMarkers()]);
 
-    // 6. Search & Duplicate Verification
+    // 6. Coordinate Submission & Duplicate Check
     function submitCoordinate() {
       const x = parseInt(document.getElementById('input-x').value, 10);
       const y = parseInt(document.getElementById('input-y').value, 10);
