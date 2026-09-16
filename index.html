@@ -122,7 +122,7 @@
     .msg-info { background: #1f6feb; color: #fff; }
     .msg-success { background: #238636; color: #fff; border: 1px solid #2ea043; }
 
-    /* Radar Pins */
+    /* Pins */
     .stronghold-pin {
       border-radius: 50%;
       border: 1.5px solid #ffffff;
@@ -141,8 +141,8 @@
       filter: grayscale(100%);
     }
 
-    /* Popup Action Button */
-    .popup-found-btn {
+    /* Popup Buttons */
+    .popup-btn {
       display: inline-block;
       width: 100%;
       margin-top: 8px;
@@ -151,12 +151,13 @@
       font-weight: 700;
       text-align: center;
       border-radius: 4px;
-      text-decoration: none;
+      border: none;
       cursor: pointer;
     }
     .btn-mark { background: #238636; color: #fff; }
     .btn-mark:hover { background: #2ea043; }
-    .btn-view { background: #30363d; color: #58a6ff; }
+    .btn-unmark { background: #30363d; color: #8b949e; }
+    .btn-unmark:hover { background: #21262d; color: #fff; }
   </style>
 </head>
 <body>
@@ -190,15 +191,21 @@
   <div id="status-msg"></div>
   <div id="map"></div>
 
+  <!-- Leaflet and Firebase Realtime Database -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const REPO_OWNER = "iKnowMyABC"; // <-- Your GitHub handle
-    const REPO_NAME = "testing-stuff";
-    const MAP_LIMIT = 1000;
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+  <script>
+    const FIREBASE_DB_URL = "https://season-2-supplies-default-rtdb.europe-west1.firebasedatabase.app/";
+
+    firebase.initializeApp({ databaseURL: FIREBASE_DB_URL });
+    const db = firebase.database();
+
+    const MAP_LIMIT = 1000;
     const registeredCoords = new Map();
-    const markerInstances = new Map(); 
-    const globalFoundCoords = new Map();
+    const markerInstances = new Map();
+    const globalFoundCoords = new Set();
     let hideFoundActive = false;
 
     const map = L.map('map', {
@@ -227,19 +234,26 @@
       box.className = type === 'error' ? 'msg-error' : (type === 'success' ? 'msg-success' : 'msg-info');
       box.textContent = text;
       box.style.display = 'block';
-      setTimeout(() => { box.style.display = 'none'; }, 4500);
+      setTimeout(() => { box.style.display = 'none'; }, 4000);
     }
 
-    function generateFoundUrl(data) {
-      const title = `[FOUND] ${data.label} at (${data.x}, ${data.y})`;
-      const rawData = JSON.stringify({ x: data.x, y: data.y, type: data.label });
-      const body = `Marking supply found for global server.\n\n<!--DATA:${rawData}-->\n\n- **X:** ${data.x}\n- **Y:** ${data.y}\n- **Supply:** ${data.label}`;
-      return `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=supply-found`;
-    }
+    window.toggleFoundFirebase = function(key) {
+      const isFound = globalFoundCoords.has(key);
+      const safeKey = key.replace(',', '_');
+
+      if (isFound) {
+        db.ref(`found_supplies/${safeKey}`).remove();
+        showStatus(`Unmarked (${key.replace('_', ',')})`, 'info');
+      } else {
+        db.ref(`found_supplies/${safeKey}`).set({
+          timestamp: Date.now()
+        });
+        showStatus(`Marked found for everyone!`, 'success');
+      }
+    };
 
     function updateMarkerVisual(marker, key, data) {
       const isFound = globalFoundCoords.has(key);
-      const foundData = globalFoundCoords.get(key);
 
       const icon = L.divIcon({
         className: `stronghold-pin ${isFound ? 'is-found' : ''}`,
@@ -249,24 +263,18 @@
       });
       marker.setIcon(icon);
 
-      let actionBtn = "";
-      if (isFound) {
-        actionBtn = `
-          <div style="margin-top:6px; color:#3fb950; font-weight:700;">✅ Found by Community</div>
-          <a class="popup-found-btn btn-view" href="${foundData.url}" target="_blank">View GitHub Report</a>
-        `;
-      } else {
-        const markUrl = generateFoundUrl(data);
-        actionBtn = `
-          <a class="popup-found-btn btn-mark" href="${markUrl}" target="_blank">Mark Found for Everyone</a>
-        `;
-      }
-
       const popupHtml = `
-        <div style="color: #111; font-size: 12px; font-family: -apple-system, sans-serif; min-width: 150px;">
+        <div style="color: #111; font-size: 12px; font-family: -apple-system, sans-serif; min-width: 140px;">
           <strong style="color:${data.color === '#00FF00' ? '#008800' : data.color}; font-size:13px;">${data.label}</strong><br/>
           <span>Coords: <b>(${data.x}, ${data.y})</b></span><br/>
-          ${actionBtn}
+          <small style="color:${isFound ? '#238636' : '#666'}; font-weight:700;">
+            ${isFound ? '✅ Found by Community' : '⭕ Unclaimed'}
+          </small>
+          <button 
+            class="popup-btn ${isFound ? 'btn-unmark' : 'btn-mark'}" 
+            onclick="toggleFoundFirebase('${key}')">
+            ${isFound ? 'Mark Unclaimed' : '✓ 1-Click Mark Found'}
+          </button>
         </div>
       `;
       marker.bindPopup(popupHtml);
@@ -300,26 +308,22 @@
       });
     };
 
-    async function loadFoundStatus() {
-      const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=supply-found&state=open&per_page=100`;
-      try {
-        const res = await fetch(endpoint);
-        if (!res.ok) return;
-        const issues = await res.json();
+    function listenToFoundSupplies() {
+      db.ref('found_supplies').on('value', (snapshot) => {
+        globalFoundCoords.clear();
+        const data = snapshot.val();
+        if (data) {
+          Object.keys(data).forEach(safeKey => {
+            const key = safeKey.replace('_', ',');
+            globalFoundCoords.add(key);
+          });
+        }
 
-        issues.forEach(issue => {
-          const match = issue.body.match(/<!--DATA:({.*?})-->/);
-          if (match) {
-            try {
-              const data = JSON.parse(match[1]);
-              const key = `${data.x},${data.y}`;
-              globalFoundCoords.set(key, { url: issue.html_url });
-            } catch (e) {}
-          }
+        markerInstances.forEach((marker, key) => {
+          const itemData = registeredCoords.get(key);
+          if (itemData) updateMarkerVisual(marker, key, itemData);
         });
-      } catch (err) {
-        console.error("Could not fetch global found status:", err);
-      }
+      });
     }
 
     async function loadStaticData() {
@@ -348,40 +352,24 @@
       }
     }
 
-    async function loadCommunityMarkers() {
-      const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=map-marker&state=open&per_page=100`;
-      try {
-        const res = await fetch(endpoint);
-        if (!res.ok) return;
-        const issues = await res.json();
-
-        issues.forEach(issue => {
-          const match = issue.body.match(/<!--DATA:({.*?})-->/);
-          if (match) {
-            try {
-              const data = JSON.parse(match[1]);
-              const key = `${data.x},${data.y}`;
-              registeredCoords.set(key, { x: data.x, y: data.y, label: data.type || issue.title, color: '#ffffff' });
-              createPin(data.x, data.y, data.type || issue.title, '#ffffff');
-            } catch (e) {}
-          }
-        });
-      } catch (err) {}
+    function listenToCustomPins() {
+      db.ref('custom_markers').on('child_added', (snapshot) => {
+        const pt = snapshot.val();
+        const key = `${pt.x},${pt.y}`;
+        if (!registeredCoords.has(key)) {
+          registeredCoords.set(key, { x: pt.x, y: pt.y, label: pt.type, color: '#ffffff' });
+          createPin(pt.x, pt.y, pt.type, '#ffffff');
+        }
+      });
     }
 
     async function init() {
-      await loadFoundStatus();
       await loadStaticData();
-      await loadCommunityMarkers();
-
-      markerInstances.forEach((marker, key) => {
-        const data = registeredCoords.get(key);
-        if (data) updateMarkerVisual(marker, key, data);
-      });
+      listenToCustomPins();
+      listenToFoundSupplies();
     }
     init();
 
-    // --- Unified Search, Mark-Found & Add Logic ---
     function submitCoordinate() {
       const x = parseInt(document.getElementById('input-x').value, 10);
       const y = parseInt(document.getElementById('input-y').value, 10);
@@ -394,37 +382,29 @@
 
       const key = `${x},${y}`;
 
-      // CASE 1: Coordinate already exists on our map
       if (registeredCoords.has(key)) {
-        const existing = registeredCoords.get(key);
         const marker = markerInstances.get(key);
         map.flyTo([y, x], 2);
-
         if (marker) marker.openPopup();
 
-        // 1A: Already claimed by someone
         if (globalFoundCoords.has(key)) {
-          showStatus(`Already collected! "${existing.label}" at (${x}, ${y}) was already marked found.`, 'error');
-          return;
+          showStatus(`Already collected at (${x}, ${y})!`, 'error');
+        } else {
+          toggleFoundFirebase(key);
         }
-
-        // 1B: Known supply, ready to be marked as found
-        showStatus(`Matched ${existing.label}! Redirecting to mark it found for everyone...`, 'success');
-        const markUrl = generateFoundUrl(existing);
-        window.open(markUrl, '_blank');
         return;
       }
 
-      // CASE 2: Brand new coordinate (add new spot)
+      const safeKey = `${x}_${y}`;
+      db.ref(`custom_markers/${safeKey}`).set({
+        x: x,
+        y: y,
+        type: type,
+        timestamp: Date.now()
+      });
+
       map.flyTo([y, x], 1.6);
-      showStatus(`New location! Redirecting to add (${x}, ${y}) to the map...`, 'info');
-
-      const title = `${type} at (${x}, ${y})`;
-      const rawData = JSON.stringify({ x, y, type });
-      const body = `Community Coordinate Submission\n\n<!--DATA:${rawData}-->\n\n- **X:** ${x}\n- **Y:** ${y}\n- **Type:** ${type}`;
-      const submitUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=map-marker`;
-
-      window.open(submitUrl, '_blank');
+      showStatus(`Saved new spot at (${x}, ${y})!`, 'success');
     }
   </script>
 </body>
