@@ -3,58 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Season 2 Map</title>
+  <title>Season 2 Tactical Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; }
-    body, html { margin: 0; padding: 0; height: 100%; background: #07090e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #e6edf3; overflow: hidden; }
-    #map { width: 100%; height: 100vh; background: #07090e; }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #0d1117;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      color: #c9d1d9;
+      overflow: hidden;
+    }
 
-    /* Top HUD controls */
+    #map-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 50%, #151b23 0%, #090d12 100%);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    /* Top HUD / Coordinate Input */
     .top-panel {
       position: absolute;
       top: 14px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      background: rgba(13, 17, 23, 0.95);
+      background: rgba(18, 22, 30, 0.95);
       border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 8px 14px;
+      border-radius: 6px;
+      padding: 6px 14px;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
     }
 
     .coord-field {
       display: flex;
       align-items: center;
-      gap: 5px;
-      background: #090d13;
+      gap: 4px;
+      background: #0d1117;
       border: 1px solid #30363d;
-      padding: 5px 8px;
+      padding: 4px 8px;
       border-radius: 4px;
     }
-    .coord-field span { font-weight: bold; color: #58a6ff; font-size: 13px; }
+    .coord-field span { font-weight: 700; color: #58a6ff; font-size: 11px; }
     .coord-field input {
       background: transparent;
       border: none;
       outline: none;
       color: #fff;
-      width: 50px;
+      width: 48px;
       font-weight: 600;
       font-size: 13px;
+      font-family: monospace;
     }
 
     select.type-select {
-      background: #090d13;
+      background: #0d1117;
       border: 1px solid #30363d;
       color: #fff;
-      padding: 6px 10px;
+      padding: 6px 8px;
       border-radius: 4px;
-      font-size: 13px;
+      font-size: 12px;
       outline: none;
     }
 
@@ -65,90 +84,225 @@
       padding: 6px 14px;
       border-radius: 4px;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
     }
     .btn-submit:hover { background: #2ea043; }
 
-    /* Flash notification banner */
+    /* Tactical HUD Overlay for live cursor coordinates */
+    .hud-coords {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.9);
+      border: 1px solid #30363d;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #8b949e;
+      pointer-events: none;
+    }
+    .hud-coords b { color: #58a6ff; }
+
+    /* Flash Status */
     #status-msg {
       position: absolute;
-      top: 68px;
+      top: 66px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      font-size: 13px;
-      padding: 7px 16px;
-      border-radius: 6px;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 4px;
       display: none;
-      font-weight: 500;
+      font-weight: 600;
     }
-    .msg-error { background: #b62324; color: #fff; border: 1px solid #ff7b72; }
+    .msg-error { background: #da3633; color: #fff; border: 1px solid #f85149; }
     .msg-info { background: #1f6feb; color: #fff; }
 
-    /* Custom node pin styling */
+    /* Glowing radar dot styling */
     .stronghold-pin {
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000;
-      font-size: 10px;
-      font-weight: 900;
-      border: 1.5px solid #fff;
-      box-shadow: 0 0 6px rgba(0,0,0,0.8);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+      transition: transform 0.15s ease;
+    }
+    .stronghold-pin:hover {
+      transform: scale(1.6);
+      z-index: 9999 !important;
+    }
+
+    /* Grid zone tags inside the map */
+    .sector-tag {
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 24px;
+      font-weight: 800;
+      font-family: monospace;
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
+    }
+    .axis-tick-label {
+      color: rgba(139, 148, 158, 0.6);
+      font-size: 9px;
+      font-family: monospace;
+      font-weight: 600;
+      pointer-events: none;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="top-panel">
-    <div class="coord-field">
-      <span>X</span>
-      <input type="number" id="input-x" placeholder="0" min="0" max="1000" />
-    </div>
-    <div class="coord-field">
-      <span>Y</span>
-      <input type="number" id="input-y" placeholder="0" min="0" max="1000" />
+  <div id="map-container">
+    <div class="top-panel">
+      <div class="coord-field">
+        <span>X</span>
+        <input type="number" id="input-x" placeholder="0" min="0" max="1000" />
+      </div>
+      <div class="coord-field">
+        <span>Y</span>
+        <input type="number" id="input-y" placeholder="0" min="0" max="1000" />
+      </div>
+
+      <select id="input-type" class="type-select">
+        <option value="Level 1">Level 1</option>
+        <option value="Level 2">Level 2</option>
+        <option value="Level 3">Level 3</option>
+        <option value="Level 4">Level 4</option>
+        <option value="Level 5">Level 5</option>
+        <option value="Level 6">Level 6</option>
+        <option value="Level 7">Level 7</option>
+        <option value="Custom Spot">Custom Spot</option>
+      </select>
+
+      <button class="btn-submit" onclick="submitCoordinate()">Mark / Go</button>
     </div>
 
-    <select id="input-type" class="type-select">
-      <option value="Level 1">Level 1</option>
-      <option value="Level 2">Level 2</option>
-      <option value="Level 3">Level 3</option>
-      <option value="Level 4">Level 4</option>
-      <option value="Level 5">Level 5</option>
-      <option value="Level 6">Level 6</option>
-      <option value="Level 7">Level 7</option>
-      <option value="Custom Spot">Custom Spot</option>
-    </select>
-
-    <button class="btn-submit" onclick="submitCoordinate()">Mark / Go</button>
+    <div class="hud-coords" id="hud-coords">X: 0 | Y: 0</div>
+    <div id="status-msg"></div>
+    <div id="map"></div>
   </div>
-
-  <div id="status-msg"></div>
-  <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const REPO_OWNER = "iKnowMyABC";
     const REPO_NAME = "testing-stuff";
-    const GRID_SIZE = 1000;
+    const MAP_LIMIT = 1000;
 
-    // Cache of all coordinates to prevent duplicates: "x,y" => details
     const registeredCoords = new Map();
 
+    // 1. Setup Cartesian coordinates with bottom-left (0,0) to top-right (1000, 1000)
     const map = L.map('map', {
       crs: L.CRS.Simple,
-      minZoom: -1,
+      minZoom: -1.5,
       maxZoom: 3,
-      zoomSnap: 0.25,
-      zoomDelta: 0.5
+      zoomSnap: 0.2,
+      zoomDelta: 0.5,
+      attributionControl: false
     });
 
-    const bounds = [[0, 0], [GRID_SIZE, GRID_SIZE]];
-    L.rectangle(bounds, { color: "#30363d", weight: 2, fillOpacity: 0.05 }).addTo(map);
+    const bounds = [[0, 0], [MAP_LIMIT, MAP_LIMIT]];
     map.fitBounds(bounds);
+
+    // 2. Draw Game Sector Boundaries & Tactical Grid
+    function createTacticalGrid() {
+      const gridLayer = L.layerGroup().addTo(map);
+
+      // (A) Minor cell grid (every 20 units)
+      for (let i = 0; i <= MAP_LIMIT; i += 20) {
+        if (i % 100 === 0) continue;
+        // Verticals
+        L.polyline([[0, i], [MAP_LIMIT, i]], {
+          color: 'rgba(56, 139, 253, 0.05)',
+          weight: 1,
+          interactive: false
+        }).addTo(gridLayer);
+        // Horizontals
+        L.polyline([[i, 0], [i, MAP_LIMIT]], {
+          color: 'rgba(56, 139, 253, 0.05)',
+          weight: 1,
+          interactive: false
+        }).addTo(gridLayer);
+      }
+
+      // (B) Major zone grid (every 100 units)
+      for (let i = 0; i <= MAP_LIMIT; i += 100) {
+        // Vertical lines
+        L.polyline([[0, i], [MAP_LIMIT, i]], {
+          color: 'rgba(56, 139, 253, 0.2)',
+          weight: 1.5,
+          interactive: false
+        }).addTo(gridLayer);
+
+        // Horizontal lines
+        L.polyline([[i, 0], [i, MAP_LIMIT]], {
+          color: 'rgba(56, 139, 253, 0.2)',
+          weight: 1.5,
+          interactive: false
+        }).addTo(gridLayer);
+
+        // Axis numeric indicators (X axis along bottom)
+        L.marker([6, i], {
+          icon: L.divIcon({
+            className: 'axis-tick-label',
+            html: `${i}`,
+            iconSize: [30, 12],
+            iconAnchor: [15, 6]
+          }),
+          interactive: false
+        }).addTo(gridLayer);
+
+        // Axis numeric indicators (Y axis along left edge)
+        if (i > 0) {
+          L.marker([i, 12], {
+            icon: L.divIcon({
+              className: 'axis-tick-label',
+              html: `${i}`,
+              iconSize: [30, 12],
+              iconAnchor: [15, 6]
+            }),
+            interactive: false
+          }).addTo(gridLayer);
+        }
+      }
+
+      // (C) Watermarked Sector Quadrant Labels (e.g. S1, S2, ...)
+      let sectorNum = 1;
+      for (let y = 850; y >= 50; y -= 200) {
+        for (let x = 100; x <= 900; x += 200) {
+          L.marker([y, x], {
+            icon: L.divIcon({
+              className: 'sector-tag',
+              html: `ZONE ${sectorNum++}`,
+              iconSize: [120, 30],
+              iconAnchor: [60, 15]
+            }),
+            interactive: false
+          }).addTo(gridLayer);
+        }
+      }
+
+      // Outer map border
+      L.rectangle(bounds, {
+        color: '#58a6ff',
+        weight: 2,
+        fillColor: '#0a0e14',
+        fillOpacity: 0.45
+      }).addTo(gridLayer);
+    }
+    createTacticalGrid();
+
+    // 3. Live Cursor Coordinates
+    map.on('mousemove', (e) => {
+      const x = Math.round(e.latlng.lng);
+      const y = Math.round(e.latlng.lat);
+      if (x >= 0 && x <= MAP_LIMIT && y >= 0 && y <= MAP_LIMIT) {
+        document.getElementById('hud-coords').innerHTML = `X: <b>${x}</b> | Y: <b>${y}</b>`;
+      }
+    });
 
     function showStatus(text, isError = false) {
       const box = document.getElementById('status-msg');
@@ -162,22 +316,22 @@
       const icon = L.divIcon({
         className: 'stronghold-pin',
         html: `<div style="width:100%;height:100%;background:${color};border-radius:50%;"></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6]
+        iconSize: [11, 11],
+        iconAnchor: [5.5, 5.5]
       });
 
       const marker = L.marker([y, x], { icon }).addTo(map);
       marker.bindPopup(`
-        <div style="color: #111; font-size: 13px;">
-          <strong style="color:${color === '#00FF00' ? '#008000' : color}; font-size:14px;">${label}</strong><br/>
-          <span>Coordinates: (${x}, ${y})</span>
+        <div style="color: #111; font-size: 12px; font-family: -apple-system, sans-serif;">
+          <strong style="color:${color === '#00FF00' ? '#008800' : color}; font-size:13px;">${label}</strong><br/>
+          <span>Coordinates: <b>(${x}, ${y})</b></span>
           ${subtitle ? `<br/><small style="color:#666;">${subtitle}</small>` : ''}
         </div>
       `);
       return marker;
     }
 
-    // 1. Load initial static coordinates from data.json
+    // 4. Load points from data.json
     async function loadStaticData() {
       try {
         const res = await fetch('data.json');
@@ -201,7 +355,7 @@
       }
     }
 
-    // 2. Load dynamic user-submitted markers from GitHub Issues
+    // 5. Load dynamic community points from issues
     async function loadGitHubMarkers() {
       const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=map-marker&state=open&per_page=100`;
       try {
@@ -216,7 +370,7 @@
               const data = JSON.parse(match[1]);
               const key = `${data.x},${data.y}`;
               registeredCoords.set(key, { label: data.type || issue.title, color: '#ffffff' });
-              createPin(data.x, data.y, data.type || issue.title, '#ffffff', `Submitted by user (<a href="${issue.html_url}" target="_blank">issue</a>)`);
+              createPin(data.x, data.y, data.type || issue.title, '#ffffff', `Submitted (<a href="${issue.html_url}" target="_blank">issue</a>)`);
             } catch (e) {
               console.warn("Skipping bad marker format:", issue.id);
             }
@@ -227,10 +381,9 @@
       }
     }
 
-    // Initialize both data feeds
     Promise.all([loadStaticData(), loadGitHubMarkers()]);
 
-    // 3. Duplicate check and submission
+    // 6. Search & Duplicate Verification
     function submitCoordinate() {
       const x = parseInt(document.getElementById('input-x').value, 10);
       const y = parseInt(document.getElementById('input-y').value, 10);
@@ -243,17 +396,15 @@
 
       const key = `${x},${y}`;
 
-      // Duplicate Check
       if (registeredCoords.has(key)) {
         const existing = registeredCoords.get(key);
         showStatus(`Already found! "${existing.label}" exists at (${x}, ${y}).`, true);
-        map.flyTo([y, x], 2);
+        map.flyTo([y, x], 1.6);
         return;
       }
 
-      // If coordinate is not found, jump there and propose adding via GitHub Issue
-      map.flyTo([y, x], 2);
-      showStatus(`New location! Redirecting to save (${x}, ${y})...`, false);
+      map.flyTo([y, x], 1.6);
+      showStatus(`New coordinate! Redirecting to save (${x}, ${y})...`, false);
 
       const title = `${type} at (${x}, ${y})`;
       const rawData = JSON.stringify({ x, y, type });
