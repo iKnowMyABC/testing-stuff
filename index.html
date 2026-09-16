@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Season 2 Map</title>
+  <title>Season 2 Tactical Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; }
     body, html {
       margin: 0; padding: 0; height: 100%;
-      background: #0d1117;
+      background: #090d12;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
       color: #c9d1d9;
       overflow: hidden;
@@ -82,7 +82,6 @@
     }
     .btn-submit:hover { background: #2ea043; }
 
-    /* Tactical HUD Overlay for live cursor coordinates */
     .hud-coords {
       position: absolute;
       bottom: 15px;
@@ -99,7 +98,6 @@
     }
     .hud-coords b { color: #58a6ff; }
 
-    /* Flash Status */
     #status-msg {
       position: absolute;
       top: 66px;
@@ -115,26 +113,16 @@
     .msg-error { background: #da3633; color: #fff; border: 1px solid #f85149; }
     .msg-info { background: #1f6feb; color: #fff; }
 
-    /* Crisp dot markers */
+    /* Radar dot markers */
     .stronghold-pin {
       border-radius: 50%;
-      border: 1px solid #ffffff;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.95);
       transition: transform 0.1s ease;
     }
     .stronghold-pin:hover {
       transform: scale(1.6);
       z-index: 9999 !important;
-    }
-
-    /* Minimalist Axis Tick Labels */
-    .axis-label {
-      color: #8b949e;
-      font-size: 10px;
-      font-family: monospace;
-      font-weight: 600;
-      user-select: none;
-      pointer-events: none;
     }
   </style>
 </head>
@@ -170,16 +158,16 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const REPO_OWNER = "iKnowMyABC";
+    // --- Repository Settings ---
+    const REPO_OWNER = "iKnowMyABC"; // <-- Put your GitHub username here
     const REPO_NAME = "testing-stuff";
     const MAP_LIMIT = 1000;
 
     const registeredCoords = new Map();
 
-    // 1. Initialize map with Cartesian coordinates
     const map = L.map('map', {
       crs: L.CRS.Simple,
-      minZoom: -2,
+      minZoom: -1.5,
       maxZoom: 3,
       zoomSnap: 0.25,
       zoomDelta: 0.5,
@@ -187,55 +175,12 @@
     });
 
     const bounds = [[0, 0], [MAP_LIMIT, MAP_LIMIT]];
+
+    // --- Load your uploaded PNG map ---
+    L.imageOverlay('season-2-grid.png', bounds).addTo(map);
     map.fitBounds(bounds);
 
-    // 2. Crisp Technical Grid Layer
-    function drawCleanGrid() {
-      const grid = L.layerGroup().addTo(map);
-
-      // (A) Minor grid lines (every 25 units, faint)
-      for (let i = 0; i <= MAP_LIMIT; i += 25) {
-        if (i % 100 === 0) continue;
-        L.polyline([[0, i], [MAP_LIMIT, i]], { color: '#161b22', weight: 0.75, interactive: false }).addTo(grid);
-        L.polyline([[i, 0], [i, MAP_LIMIT]], { color: '#161b22', weight: 0.75, interactive: false }).addTo(grid);
-      }
-
-      // (B) Major grid lines (every 100 units, sharp)
-      for (let i = 0; i <= MAP_LIMIT; i += 100) {
-        L.polyline([[0, i], [MAP_LIMIT, i]], { color: '#262c36', weight: 1.25, interactive: false }).addTo(grid);
-        L.polyline([[i, 0], [i, MAP_LIMIT]], { color: '#262c36', weight: 1.25, interactive: false }).addTo(grid);
-
-        // Bottom Axis Labels (X)
-        L.marker([0, i], {
-          icon: L.divIcon({
-            className: 'axis-label',
-            html: `${i}`,
-            iconSize: [30, 14],
-            iconAnchor: [15, 0]
-          }),
-          interactive: false
-        }).addTo(grid);
-
-        // Left Axis Labels (Y)
-        if (i > 0) {
-          L.marker([i, 0], {
-            icon: L.divIcon({
-              className: 'axis-label',
-              html: `${i}`,
-              iconSize: [30, 14],
-              iconAnchor: [34, 7]
-            }),
-            interactive: false
-          }).addTo(grid);
-        }
-      }
-
-      // Border outline
-      L.rectangle(bounds, { color: '#388bfd', weight: 1.5, fill: false }).addTo(grid);
-    }
-    drawCleanGrid();
-
-    // 3. Live Cursor Coordinates
+    // Live mouse position tracker
     map.on('mousemove', (e) => {
       const x = Math.round(e.latlng.lng);
       const y = Math.round(e.latlng.lat);
@@ -256,8 +201,8 @@
       const icon = L.divIcon({
         className: 'stronghold-pin',
         html: `<div style="width:100%;height:100%;background:${color};border-radius:50%;"></div>`,
-        iconSize: [9, 9],
-        iconAnchor: [4.5, 4.5]
+        iconSize: [11, 11],
+        iconAnchor: [5.5, 5.5]
       });
 
       const marker = L.marker([y, x], { icon }).addTo(map);
@@ -271,7 +216,7 @@
       return marker;
     }
 
-    // 4. Load points from data.json
+    // 1. Fetch pre-existing strongholds from data.json
     async function loadStaticData() {
       try {
         const res = await fetch('data.json');
@@ -295,7 +240,7 @@
       }
     }
 
-    // 5. Load dynamic community points from issues
+    // 2. Fetch live community points from GitHub Issues
     async function loadGitHubMarkers() {
       const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=map-marker&state=open&per_page=100`;
       try {
@@ -323,7 +268,7 @@
 
     Promise.all([loadStaticData(), loadGitHubMarkers()]);
 
-    // 6. Coordinate Submission & Duplicate Check
+    // 3. Search and Duplicate Handling
     function submitCoordinate() {
       const x = parseInt(document.getElementById('input-x').value, 10);
       const y = parseInt(document.getElementById('input-y').value, 10);
