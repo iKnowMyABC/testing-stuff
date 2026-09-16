@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Map Test</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body, html { margin: 0; padding: 0; height: 100%; background: #0f1115; font-family: sans-serif; color: #fff; }
+    #map { width: 100%; height: 100vh; background: #161b22; }
+    .hud {
+      position: absolute; top: 15px; left: 60px; z-index: 1000;
+      background: rgba(18, 21, 27, 0.9); padding: 10px 16px; border-radius: 6px;
+      border: 1px solid #30363d; font-size: 13px;
+    }
+    .leaflet-popup-content-wrapper { background: #1c2128; color: #f0f6fc; border: 1px solid #30363d; }
+    .leaflet-popup-tip { background: #1c2128; }
+    .marker-form input, .marker-form select {
+      width: 100%; margin: 6px 0; padding: 6px; background: #0d1117;
+      border: 1px solid #30363d; color: #fff; border-radius: 4px;
+    }
+    .submit-btn {
+      display: block; width: 100%; text-align: center; background: #238636;
+      color: #fff; padding: 7px; border-radius: 4px; text-decoration: none;
+      font-weight: bold; font-size: 13px; margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="hud">📍 Click anywhere to place a test pin</div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // REPLACE THESE TWO WITH YOUR DETAILS:
+    const REPO_OWNER = "YOUR_GITHUB_USERNAME";
+    const REPO_NAME = "map-test";
+
+    const MAP_WIDTH = 1000;
+    const MAP_HEIGHT = 1000;
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -1,
+      maxZoom: 2
+    });
+
+    const bounds = [[0, 0], [MAP_HEIGHT, MAP_WIDTH]];
+    
+    // Draw a simple test grid boundary
+    L.rectangle(bounds, { color: "#30363d", weight: 2, fillOpacity: 0.1 }).addTo(map);
+    map.fitBounds(bounds);
+
+    // Fetch existing marker issues
+    async function loadMarkers() {
+      const endpoint = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=map-marker&state=open&per_page=100`;
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) return;
+        const issues = await res.json();
+
+        issues.forEach(issue => {
+          const match = issue.body.match(/<!--DATA:({.*?})-->/);
+          if (match) {
+            const data = JSON.parse(match[1]);
+            L.marker([data.y, data.x]).addTo(map)
+              .bindPopup(`<strong>${issue.title}</strong><br>Category: ${data.category}<br>Coords: (${data.x}, ${data.y})`);
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    loadMarkers();
+
+    // Handle clicks
+    let popup = null;
+    map.on('click', (e) => {
+      const x = Math.round(e.latlng.lng);
+      const y = Math.round(e.latlng.lat);
+      if (x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) return;
+
+      popup = L.popup()
+        .setLatLng(e.latlng)
+        .setContent(`
+          <div class="marker-form">
+            <strong>Test Marker</strong>
+            <input type="text" id="m-name" placeholder="Name" />
+            <select id="m-cat">
+              <option value="Supplies">Supplies</option>
+              <option value="Base">Base</option>
+            </select>
+            <a href="#" id="m-link" class="submit-btn" target="_blank">Submit via GitHub</a>
+          </div>
+        `).openOn(map);
+
+      setTimeout(() => {
+        const name = document.getElementById('m-name');
+        const cat = document.getElementById('m-cat');
+        const link = document.getElementById('m-link');
+        function sync() {
+          const title = name.value.trim() || `Point at (${x}, ${y})`;
+          const category = cat.value;
+          const rawData = JSON.stringify({ x, y, category });
+          const body = `Marker data:\n\n<!--DATA:${rawData}-->\n\nCoords: (${x}, ${y})`;
+          link.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=map-marker`;
+        }
+        name.addEventListener('input', sync);
+        cat.addEventListener('change', sync);
+        sync();
+      }, 50);
+    });
+  </script>
+</body>
+</html>
