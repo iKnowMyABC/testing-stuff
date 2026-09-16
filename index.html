@@ -141,6 +141,11 @@
       filter: grayscale(100%);
     }
 
+    /* Reliable CSS Filter to Hide Found Pins */
+    #map.hide-found .stronghold-pin.is-found {
+      display: none !important;
+    }
+
     /* Popup Buttons */
     .popup-btn {
       display: inline-block;
@@ -278,12 +283,6 @@
         </div>
       `;
       marker.bindPopup(popupHtml);
-
-      if (hideFoundActive && isFound) {
-        marker.setOpacity(0);
-      } else {
-        marker.setOpacity(1);
-      }
     }
 
     function createPin(x, y, label, color) {
@@ -298,14 +297,17 @@
     window.toggleHideFound = function() {
       hideFoundActive = !hideFoundActive;
       const btn = document.getElementById('toggle-found-btn');
+      const mapElement = document.getElementById('map');
+
       btn.textContent = hideFoundActive ? "Show Found" : "Hide Found";
       btn.style.borderColor = hideFoundActive ? "#58a6ff" : "#30363d";
 
-      markerInstances.forEach((marker, key) => {
-        if (globalFoundCoords.has(key)) {
-          marker.setOpacity(hideFoundActive ? 0 : 1);
-        }
-      });
+      if (hideFoundActive) {
+        mapElement.classList.add('hide-found');
+        map.closePopup();
+      } else {
+        mapElement.classList.remove('hide-found');
+      }
     };
 
     function listenToFoundSupplies() {
