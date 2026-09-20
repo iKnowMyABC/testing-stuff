@@ -3,439 +3,362 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Iron Dreadnought — Alliance Heavy Rail</title>
+  <title>Alliance Train • The Frozen Dreadnought</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --rail-dark: #06090d;
-      --iron-hull: #0e141d;
-      --iron-plate: #151e2a;
-      --iron-rivet: #2c3c4f;
-      --iron-border: #354a63;
+      --bg-base: #070a0e;
+      --card-bg: rgba(12, 17, 23, 0.7);
+      --card-bg-subtle: rgba(17, 24, 34, 0.85);
+      --seat-bg: rgba(7, 10, 14, 0.6);
       
-      --furnace-amber: #ff9800;
-      --furnace-glow: rgba(255, 152, 0, 0.4);
+      --frost-border: rgba(120, 180, 232, 0.22);
+      --frost-bright: #78b4e8;
+      --frost-glow: rgba(120, 180, 232, 0.25);
+      --ice-white: #eaf5ff;
+      --steel-muted: #9ab0c2;
+      --steel-dim: #5a6e7f;
+
       --conductor-gold: #e2b04a;
-      
-      --vip-crimson: #d32f2f;
-      --vip-glow: rgba(211, 47, 47, 0.4);
-      
-      --frost-steam: #8ec5fc;
-      --frost-glow: rgba(142, 197, 252, 0.35);
-      --track-line: rgba(70, 95, 125, 0.4);
-      
-      --text-main: #d2e4f7;
-      --text-muted: #6f88a2;
+      --vip-crimson: #992d22;
+      --rollover-gold: #d18a45;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: radial-gradient(circle at 50% 20%, #101826 0%, var(--rail-dark) 85%);
-      color: var(--text-main);
-      font-family: 'Chakra Petch', sans-serif;
+      background: var(--bg-base);
+      color: var(--ice-white);
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       padding: 40px 16px 80px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background-image: radial-gradient(circle at 50% 10%, rgba(120, 180, 232, 0.08) 0%, transparent 70%);
     }
 
-    .train-chassis {
+    .train-container {
       width: 100%;
-      max-width: 1140px;
+      max-width: 1120px;
     }
 
-    /* HEADER: LOCOMOTIVE ENGINE HOOD */
-    .locomotive-header {
+    /* HEADER */
+    .train-header {
       text-align: center;
-      margin-bottom: 30px;
-      position: relative;
+      margin-bottom: 28px;
     }
 
-    .steam-pipes {
+    .train-header .sub-caption {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
-      letter-spacing: 5px;
-      color: var(--frost-steam);
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--frost-bright);
       text-transform: uppercase;
-      opacity: 0.8;
       margin-bottom: 6px;
     }
 
-    .locomotive-title {
+    .train-header h1 {
       font-family: 'Cinzel', serif;
-      font-size: 32px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: #ffffff;
-      text-shadow: 0 0 20px var(--frost-glow), 0 4px 10px rgba(0, 0, 0, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--ice-white);
+      text-shadow: 0 0 16px var(--frost-glow);
     }
 
-    .locomotive-title span.insignia {
-      color: var(--furnace-amber);
-      font-size: 24px;
+    /* METRIC HUD BAR */
+    .hud-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin-bottom: 30px;
     }
 
-    /* DASHBOARD GAUGES & STATUS */
-    .train-dashboard {
-      background: linear-gradient(180deg, #16202c 0%, #0d131b 100%);
-      border: 2px solid var(--iron-border);
-      border-radius: 6px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 25px rgba(0, 0, 0, 0.7);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 35px;
-      flex-wrap: wrap;
-      gap: 14px;
+    @media (max-width: 768px) {
+      .hud-bar { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .gauge-item {
+    .hud-item {
       display: flex;
       flex-direction: column;
       gap: 3px;
     }
 
-    .gauge-label {
-      font-size: 10px;
+    .hud-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
       letter-spacing: 1.5px;
-      color: var(--text-muted);
+      color: var(--steel-dim);
       text-transform: uppercase;
     }
 
-    .gauge-value {
+    .hud-val {
       font-family: 'Cinzel', serif;
-      font-size: 15px;
-      font-weight: 800;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ice-white);
+      letter-spacing: 1px;
     }
 
-    .pressure-light {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--furnace-amber);
-      box-shadow: 0 0 8px var(--furnace-glow);
-      display: inline-block;
-    }
-
-    /* THE ENGINE CABIN (CONDUCTOR + VIP) */
-    .cabin-assembly {
+    /* CABIN LEADERS: CONDUCTOR & VIP */
+    .engine-quarters {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 40px;
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
-    @media (max-width: 650px) {
-      .cabin-assembly { grid-template-columns: 1fr; }
+    @media (max-width: 600px) {
+      .engine-quarters { grid-template-columns: 1fr; }
     }
 
-    .pilot-module {
-      background: linear-gradient(135deg, #1a2533 0%, #0d131c 100%);
-      border: 2px solid;
-      border-radius: 8px;
-      padding: 18px 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .pilot-module.conductor-module {
-      border-color: var(--conductor-gold);
-      box-shadow: 0 0 20px rgba(226, 176, 74, 0.2);
-    }
-
-    .pilot-module.vip-module {
-      border-color: var(--vip-crimson);
-      box-shadow: 0 0 20px rgba(211, 47, 47, 0.2);
-    }
-
-    .rivet-corner {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #475d77;
-      border-radius: 50%;
-      box-shadow: inset 1px 1px 1px #000;
-    }
-    .rc-tl { top: 6px; left: 6px; }
-    .rc-tr { top: 6px; right: 6px; }
-    .rc-bl { bottom: 6px; left: 6px; }
-    .rc-br { bottom: 6px; right: 6px; }
-
-    .module-badge {
+    .cabin-pod {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 16px 20px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      font-size: 11px;
+      text-align: center;
+      position: relative;
+    }
+
+    .cabin-pod.conductor-pod {
+      border-color: rgba(226, 176, 74, 0.4);
+      box-shadow: 0 0 14px rgba(226, 176, 74, 0.12);
+    }
+
+    .cabin-pod.vip-pod {
+      border-color: rgba(153, 45, 34, 0.45);
+      box-shadow: 0 0 14px rgba(153, 45, 34, 0.12);
+    }
+
+    .pod-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
-    .conductor-module .module-badge { color: var(--conductor-gold); }
-    .vip-module .module-badge { color: var(--vip-crimson); }
+    .conductor-pod .pod-label { color: var(--conductor-gold); }
+    .vip-pod .pod-label { color: #e57373; }
 
-    .pilot-nameplate {
-      background: rgba(7, 10, 14, 0.7);
-      border: 1px solid var(--iron-rivet);
-      padding: 12px 14px;
-      border-radius: 4px;
-      text-align: center;
+    .pod-occupant {
       font-family: 'Cinzel', serif;
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      min-height: 52px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--ice-white);
+      min-height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
     }
 
-    .conductor-module .pilot-nameplate {
-      color: #fff2c8;
-      text-shadow: 0 0 10px rgba(226, 176, 74, 0.4);
-    }
-
-    .vip-module .pilot-nameplate {
-      color: #ffd8d8;
-      text-shadow: 0 0 10px rgba(211, 47, 47, 0.4);
-    }
-
-    /* THE RAIL TRACK & CARRIAGES */
-    .train-consist {
-      position: relative;
-      margin-bottom: 40px;
-    }
-
-    /* Dual Iron Rail beneath the cars */
-    .train-consist::after {
-      content: "";
-      position: absolute;
-      bottom: -15px;
-      left: 0;
-      right: 0;
-      height: 6px;
-      background: repeating-linear-gradient(90deg, #1c2633 0px, #1c2633 24px, #070a0e 24px, #070a0e 32px);
-      border-top: 2px solid var(--iron-border);
-      border-bottom: 2px solid #000;
-      z-index: 1;
-    }
-
-    .cars-flex {
+    /* CARRIAGES GRID */
+    .carriages-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
-      position: relative;
-      z-index: 2;
+      margin-bottom: 35px;
     }
 
-    @media (max-width: 900px) { .cars-flex { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 500px) { .cars-flex { grid-template-columns: 1fr; } }
+    @media (max-width: 880px) { .carriages-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .carriages-grid { grid-template-columns: 1fr; } }
 
-    .car-box {
-      background: linear-gradient(180deg, #131a24 0%, #090e14 100%);
-      border: 1px solid var(--iron-border);
-      border-radius: 6px;
-      padding: 14px 10px 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+    .carriage-module {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 14px 12px;
       display: flex;
       flex-direction: column;
     }
 
-    .car-chassis-top {
-      border-bottom: 2px solid var(--iron-rivet);
+    .carriage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(120, 180, 232, 0.12);
       padding-bottom: 8px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      margin-bottom: 10px;
     }
 
-    .car-serial {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-    }
-
-    .car-name {
+    .carriage-header .num {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
-      font-weight: 800;
+      font-size: 9px;
       letter-spacing: 1px;
-      color: var(--frost-steam);
+      color: var(--frost-bright);
+      font-weight: 700;
     }
 
-    .berth-list {
+    .carriage-header .name {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--steel-muted);
+      text-transform: uppercase;
+    }
+
+    .seat-rows {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 6px;
     }
 
-    .berth-slot {
-      background: rgba(14, 20, 29, 0.95);
-      border-left: 3px solid #2a3d52;
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.6);
-      border-radius: 2px;
-      padding: 7px 10px;
+    .seat-box {
+      background: var(--seat-bg);
+      border: 1px solid rgba(120, 180, 232, 0.1);
+      border-radius: 3px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 34px;
-      transition: border-color 0.25s ease;
-    }
-
-    .berth-slot.locked-in {
-      border-left-color: var(--frost-steam);
-      background: linear-gradient(90deg, rgba(142, 197, 252, 0.08) 0%, rgba(14, 20, 29, 0.95) 100%);
-    }
-
-    .berth-slot.rollover-slot {
-      border-left-color: var(--furnace-amber);
-      background: linear-gradient(90deg, rgba(255, 152, 0, 0.12) 0%, rgba(14, 20, 29, 0.95) 100%);
-    }
-
-    .slot-id {
-      font-size: 10px;
-      color: var(--text-muted);
-      font-weight: 700;
-      width: 16px;
-    }
-
-    .slot-passenger {
+      min-height: 32px;
       font-size: 12px;
-      font-weight: 600;
-      color: #9cb5cf;
+      transition: all 0.2s ease;
+    }
+
+    .seat-box .left-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .seat-box .seat-index {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      color: var(--steel-dim);
+      width: 14px;
+    }
+
+    .seat-box .passenger-name {
+      color: var(--steel-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      flex-grow: 1;
-      padding-left: 6px;
+      font-size: 12px;
     }
 
-    .berth-slot.locked-in .slot-passenger {
-      color: #ffffff;
+    .seat-box.boarded {
+      background: rgba(120, 180, 232, 0.08);
+      border-color: rgba(120, 180, 232, 0.35);
     }
 
-    .metal-tag {
-      font-size: 8px;
+    .seat-box.boarded .passenger-name {
+      color: var(--ice-white);
+    }
+
+    .seat-box.guaranteed-rollover {
+      border-color: rgba(209, 138, 69, 0.5);
+      background: rgba(209, 138, 69, 0.08);
+    }
+
+    .rollover-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 7px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      padding: 1px 5px;
+      color: var(--rollover-gold);
+      border: 1px solid rgba(209, 138, 69, 0.4);
+      padding: 1px 4px;
       border-radius: 2px;
       text-transform: uppercase;
-      background: #20170a;
-      border: 1px solid var(--furnace-amber);
-      color: var(--furnace-amber);
     }
 
-    /* LEVER CONTROLS */
-    .controls-deck {
+    /* DRAW CONTROLS */
+    .action-panel {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 20px;
-      margin: 45px 0 35px;
+      gap: 16px;
+      margin-bottom: 40px;
       flex-wrap: wrap;
     }
 
-    .steam-lever-btn {
-      background: linear-gradient(180deg, #2b3b4f 0%, #151e29 100%);
-      border: 2px solid var(--frost-steam);
-      border-radius: 4px;
-      color: #ffffff;
+    .btn-action-draw {
+      background: linear-gradient(180deg, rgba(120, 180, 232, 0.15) 0%, rgba(12, 17, 23, 0.8) 100%);
+      border: 1px solid var(--frost-bright);
+      color: var(--ice-white);
       font-family: 'Cinzel', serif;
-      font-size: 14px;
-      font-weight: 900;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 2px;
-      padding: 14px 34px;
+      padding: 12px 28px;
       cursor: pointer;
-      box-shadow: 0 0 16px var(--frost-glow), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      box-shadow: 0 0 14px var(--frost-glow);
       transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 12px;
     }
 
-    .steam-lever-btn:hover:not(:disabled) {
-      background: linear-gradient(180deg, #374b64 0%, #1c2837 100%);
+    .btn-action-draw:hover:not(:disabled) {
+      background: rgba(120, 180, 232, 0.25);
       border-color: #ffffff;
       transform: translateY(-2px);
-      box-shadow: 0 0 24px var(--frost-glow);
+      box-shadow: 0 0 20px var(--frost-glow);
     }
 
-    .steam-lever-btn:disabled {
+    .btn-action-draw:disabled {
       opacity: 0.4;
       cursor: not-allowed;
       box-shadow: none;
     }
 
-    .e-brake-btn {
+    .btn-reset-cycle {
       background: transparent;
-      border: 1px solid #662222;
+      border: 1px solid rgba(153, 45, 34, 0.4);
       color: #b05e5e;
-      font-size: 11px;
-      letter-spacing: 1px;
-      padding: 14px 20px;
-      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      padding: 12px 18px;
       cursor: pointer;
-      font-family: 'Chakra Petch', sans-serif;
-      font-weight: 700;
+      border-radius: 3px;
       transition: all 0.2s ease;
     }
 
-    .e-brake-btn:hover {
-      background: #331111;
-      border-color: #ff4444;
-      color: #ff8888;
+    .btn-reset-cycle:hover {
+      border-color: var(--vip-crimson);
+      color: #ff9d94;
+      background: rgba(153, 45, 34, 0.1);
     }
 
-    /* LOWER PANELS (QUEUE & HISTORY) */
-    .lower-panels {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+    /* INFORMATIVE SECTIONS (QUEUE & LOGS) */
+    .deck-section {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
     }
 
-    .panel-block {
-      background: var(--iron-hull);
-      border: 1px solid var(--iron-border);
-      border-radius: 6px;
-      padding: 20px;
-    }
-
-    .panel-headline {
+    .deck-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--frost-bright);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: var(--frost-steam);
-      margin-bottom: 14px;
-      border-bottom: 1px solid var(--iron-rivet);
+      border-bottom: 1px solid rgba(120, 180, 232, 0.1);
       padding-bottom: 8px;
     }
 
-    .roster-queue {
+    .queue-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 6px;
@@ -444,491 +367,457 @@
       padding-right: 6px;
     }
 
-    .queue-plate {
-      background: #090d13;
-      border: 1px solid rgba(70, 95, 125, 0.25);
+    .queue-tag {
+      background: var(--seat-bg);
+      border: 1px solid rgba(120, 180, 232, 0.1);
+      border-radius: 2px;
       padding: 5px 8px;
       font-size: 11px;
-      color: var(--text-muted);
-      border-radius: 2px;
+      color: var(--steel-muted);
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-align: center;
     }
 
-    /* HISTORICAL MANIFESTS */
-    .manifest-feed {
+    /* HISTORY LIST */
+    .history-feed {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       max-height: 380px;
       overflow-y: auto;
       padding-right: 6px;
     }
 
-    .manifest-entry {
-      background: #080c11;
-      border: 1px solid var(--iron-rivet);
-      border-left: 3px solid var(--frost-steam);
-      border-radius: 4px;
-      padding: 12px 16px;
+    .history-entry {
+      background: var(--seat-bg);
+      border: 1px solid rgba(120, 180, 232, 0.12);
+      border-radius: 3px;
+      padding: 10px 14px;
     }
 
-    .manifest-entry.rollover-entry {
-      border-left-color: var(--furnace-amber);
+    .history-entry.rollover-entry {
+      border-left: 3px solid var(--rollover-gold);
     }
 
-    .manifest-header {
+    .entry-top {
       display: flex;
       justify-content: space-between;
+      font-family: 'Cinzel', serif;
       font-size: 11px;
       font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 8px;
+      color: var(--ice-white);
+      margin-bottom: 6px;
     }
 
-    .manifest-officers {
+    .entry-leads {
       display: flex;
-      gap: 20px;
-      font-size: 12px;
+      gap: 16px;
+      font-size: 11px;
+      font-family: 'Cinzel', serif;
       margin-bottom: 8px;
     }
 
-    .officer-cond { color: var(--conductor-gold); }
-    .officer-vip { color: var(--vip-crimson); }
+    .lead-cond { color: var(--conductor-gold); }
+    .lead-vip { color: #e57373; }
 
-    .manifest-passengers {
+    .entry-names {
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
     }
 
-    .passenger-token {
-      background: #121a24;
-      border: 1px solid #1f2d3d;
+    .passenger-pill {
+      background: rgba(12, 17, 23, 0.8);
+      border: 1px solid rgba(120, 180, 232, 0.1);
       font-size: 10px;
-      color: var(--text-muted);
+      color: var(--steel-muted);
       padding: 2px 6px;
       border-radius: 2px;
     }
 
-    .passenger-token.rollover {
-      border-color: var(--furnace-amber);
-      color: #ffd285;
+    .passenger-pill.is-rollover {
+      border-color: rgba(209, 138, 69, 0.4);
+      color: var(--rollover-gold);
     }
 
-    .pneumatic-flicker {
-      animation: pneumaticFlash 0.12s infinite alternate;
+    .slot-flicker {
+      animation: slotFlash 0.12s infinite alternate;
     }
 
-    @keyframes pneumaticFlash {
-      0% { opacity: 0.3; color: var(--frost-steam); }
-      100% { opacity: 1; color: #ffffff; }
+    @keyframes slotFlash {
+      from { color: var(--steel-dim); }
+      to { color: var(--ice-white); }
     }
   </style>
 </head>
 <body>
 
-  <div class="train-chassis">
+  <div class="train-container">
 
-    <!-- ENGINE HOOD HEADER -->
-    <div class="locomotive-header">
-      <div class="steam-pipes">Class VII Heavy Armored Transport</div>
-      <div class="locomotive-title">
-        <span class="insignia">ᛟ</span>
-        <span>THE IRON DREADNOUGHT</span>
-        <span class="insignia">ᛟ</span>
+    <!-- HEADER -->
+    <div class="train-header">
+      <div class="sub-caption">Alliance Boarding Engine</div>
+      <h1>ᛟ THE FROZEN DREADNOUGHT ᛟ</h1>
+    </div>
+
+    <!-- METRIC HUD BAR -->
+    <div class="hud-bar">
+      <div class="hud-item">
+        <span class="hud-label">Current Cycle</span>
+        <span class="hud-val" id="hud-cycle">CYCLE 1 • DAY 1/4</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Waiting In Pool</span>
+        <span class="hud-val" id="hud-pool" style="color: var(--frost-bright);">100 / 100</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Cycle Boarded</span>
+        <span class="hud-val" id="hud-boarded">0 / 100</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Departure Capacity</span>
+        <span class="hud-val">30 SEATS</span>
       </div>
     </div>
 
-    <!-- GAUGES & STATUS -->
-    <div class="train-dashboard">
-      <div class="gauge-item">
-        <span class="gauge-label">BOILER STATUS</span>
-        <span class="gauge-value"><span class="pressure-light"></span> LIVE STEAM</span>
+    <!-- ENGINE CABIN: CONDUCTOR + VIP -->
+    <div class="engine-quarters">
+      <div class="cabin-pod conductor-pod">
+        <div class="pod-label">ᛟ Train Conductor ᛟ</div>
+        <div class="pod-occupant" id="slot-conductor">--- STANDBY ---</div>
       </div>
-      <div class="gauge-item">
-        <span class="gauge-label">CYCLE ROTATION</span>
-        <span class="gauge-value" id="disp-cycle" style="color: var(--furnace-amber);">CYCLE 1 • STAGE 1/4</span>
-      </div>
-      <div class="gauge-item">
-        <span class="gauge-label">AWAITING BOARDING</span>
-        <span class="gauge-value" id="disp-pool" style="color: var(--frost-steam);">100 PASSENGERS</span>
-      </div>
-      <div class="gauge-item">
-        <span class="gauge-label">CYCLE DISPATCHED</span>
-        <span class="gauge-value" id="disp-boarded">0 / 100</span>
+      <div class="cabin-pod vip-pod">
+        <div class="pod-label">★ VIP Guest ★</div>
+        <div class="pod-occupant" id="slot-vip">--- STANDBY ---</div>
       </div>
     </div>
 
-    <!-- CABIN ASSEMBLY (CONDUCTOR & VIP) -->
-    <div class="cabin-assembly">
-      
-      <!-- CONDUCTOR -->
-      <div class="pilot-module conductor-module">
-        <div class="rivet-corner rc-tl"></div><div class="rivet-corner rc-tr"></div>
-        <div class="rivet-corner rc-bl"></div><div class="rivet-corner rc-br"></div>
-        <div class="module-badge">
-          <span>⚙</span> ENGINE COMMAND • CONDUCTOR
+    <!-- CARRIAGES (4 COLUMNS) -->
+    <div class="carriages-grid">
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR I</span>
+          <span class="name">Vanguard</span>
         </div>
-        <div class="pilot-nameplate" id="seat-conductor">--- DISENGAGED ---</div>
+        <div class="seat-rows" id="car-1-seats"></div>
       </div>
 
-      <!-- VIP -->
-      <div class="pilot-module vip-module">
-        <div class="rivet-corner rc-tl"></div><div class="rivet-corner rc-tr"></div>
-        <div class="rivet-corner rc-bl"></div><div class="rivet-corner rc-br"></div>
-        <div class="module-badge">
-          <span>★</span> HIGH COMMENDATION • VIP BERTH
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR II</span>
+          <span class="name">Glacial Iron</span>
         </div>
-        <div class="pilot-nameplate" id="seat-vip">--- DISENGAGED ---</div>
+        <div class="seat-rows" id="car-2-seats"></div>
       </div>
 
-    </div>
-
-    <!-- THE CARRIAGES -->
-    <div class="train-consist">
-      <div class="cars-flex">
-        
-        <!-- CAR 1 -->
-        <div class="car-box">
-          <div class="car-chassis-top">
-            <span class="car-serial">CAR-01</span>
-            <span class="car-name">VANGUARD</span>
-          </div>
-          <div class="berth-list" id="car-1-berths"></div>
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR III</span>
+          <span class="name">Shieldwall</span>
         </div>
+        <div class="seat-rows" id="car-3-seats"></div>
+      </div>
 
-        <!-- CAR 2 -->
-        <div class="car-box">
-          <div class="car-chassis-top">
-            <span class="car-serial">CAR-02</span>
-            <span class="car-name">GLACIAL IRON</span>
-          </div>
-          <div class="berth-list" id="car-2-berths"></div>
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR IV</span>
+          <span class="name">Outrider</span>
         </div>
-
-        <!-- CAR 3 -->
-        <div class="car-box">
-          <div class="car-chassis-top">
-            <span class="car-serial">CAR-03</span>
-            <span class="car-name">SHIELDWALL</span>
-          </div>
-          <div class="berth-list" id="car-3-berths"></div>
-        </div>
-
-        <!-- CAR 4 -->
-        <div class="car-box">
-          <div class="car-chassis-top">
-            <span class="car-serial">CAR-04</span>
-            <span class="car-name">OUTRIDER</span>
-          </div>
-          <div class="berth-list" id="car-4-berths"></div>
-        </div>
-
+        <div class="seat-rows" id="car-4-seats"></div>
       </div>
     </div>
 
-    <!-- LEVER CONTROLS -->
-    <div class="controls-deck">
-      <button class="steam-lever-btn" id="btn-fire-train" onclick="initiateBoardingSequence()">
-        <span>PULL STEAM LEVER</span> • 30-SEAT DEPARTURE
+    <!-- ACTION CONTROLS -->
+    <div class="action-panel">
+      <button class="btn-action-draw" id="btn-draw" onclick="executeDrawSequence()">
+        ᛟ INITIATE TRAIN DRAW (30 SEATS) ᛟ
       </button>
-      <button class="e-brake-btn" onclick="executeEmergencyReset()">EMERGENCY OVERHAUL (RESET)</button>
+      <button class="btn-reset-cycle" onclick="resetCycle()">RESET ROTATION</button>
     </div>
 
-    <!-- LOWER INFORMATION PANELS -->
-    <div class="lower-panels">
-      
-      <!-- WAITING POOL -->
-      <div class="panel-block">
-        <div class="panel-headline">
-          <span>PRIORITY BOARDING MANIFEST</span>
-          <span id="queue-tally" style="font-size: 11px; color: var(--text-muted);">100 ELIGIBLE</span>
-        </div>
-        <div class="roster-queue" id="waiting-manifest-display"></div>
+    <!-- WAITING QUEUE -->
+    <div class="deck-section">
+      <div class="deck-title">
+        <span>WAITING POOL FOR NEXT DRAW</span>
+        <span id="queue-counter" style="font-size: 10px; color: var(--steel-dim);">100 ELIGIBLE</span>
       </div>
+      <div class="queue-grid" id="pool-names-display"></div>
+    </div>
 
-      <!-- DISPATCH LOGS -->
-      <div class="panel-block">
-        <div class="panel-headline">
-          <span>DISPATCH TELEGRAPH LOGS</span>
-          <span id="log-tally" style="font-size: 11px; color: var(--text-muted);">0 DEPARTURES LOGGED</span>
-        </div>
-        <div class="manifest-feed" id="dispatch-feed-display"></div>
+    <!-- DEPARTURE LOGS -->
+    <div class="deck-section">
+      <div class="deck-title">
+        <span>ᛟ HISTORICAL DEPARTURE LOGS</span>
+        <span id="log-counter" style="font-size: 10px; color: var(--steel-dim);">0 DRAWS LOGGED</span>
       </div>
-
+      <div class="history-feed" id="history-feed-display"></div>
     </div>
 
   </div>
 
   <script>
-    // 100 MEMBER ALLIANCE POOL
+    // 100 MEMBER ROSTER SEED
     const ROSTER_SEED = [
       "MOUSE [R5]",
       "WARLORD_THOR", "RECRUITER_FREYA", "MUSE_LOKI", "BUTLER_TYR",
       "BROTHERGRIMM"
     ];
     for (let i = 7; i <= 100; i++) {
-      ROSTER_SEED.push(`SOLDIER_${String(i).padStart(3, '0')}`);
+      ROSTER_SEED.push(`MEMBER_${String(i).padStart(3, '0')}`);
     }
 
-    let engineData = {
+    let siteTrainState = {
       cycle: 1,
-      stage: 1,
-      waitingPool: [...ROSTER_SEED],
-      dispatchedThisCycle: [],
-      activeTrain: null,
-      manifestLogs: []
+      day: 1,
+      pool: [...ROSTER_SEED],
+      boardedThisCycle: [],
+      currentTrain: null,
+      history: []
     };
 
-    function loadEngineData() {
-      const data = localStorage.getItem("dreadnought_engine_v3");
-      if (data) engineData = JSON.parse(data);
+    function loadState() {
+      const saved = localStorage.getItem("grimm_mainsite_train_v1");
+      if (saved) siteTrainState = JSON.parse(saved);
     }
 
-    function saveEngineData() {
-      localStorage.setItem("dreadnought_engine_v3", JSON.stringify(engineData));
+    function saveState() {
+      localStorage.setItem("grimm_mainsite_train_v1", JSON.stringify(siteTrainState));
     }
 
-    function buildEmptyBerths() {
+    function buildEmptySlots() {
       for (let c = 1; c <= 4; c++) {
-        const berthCol = document.getElementById(`car-${c}-berths`);
-        berthCol.innerHTML = "";
-        for (let b = 1; b <= 7; b++) {
-          const slot = document.createElement("div");
-          slot.className = "berth-slot";
-          slot.id = `berth-c${c}-b${b}`;
-          slot.innerHTML = `
-            <span class="slot-id">0${b}</span>
-            <span class="slot-passenger">--- EMPTY ---</span>
+        const carList = document.getElementById(`car-${c}-seats`);
+        carList.innerHTML = "";
+        for (let s = 1; s <= 7; s++) {
+          const seat = document.createElement("div");
+          seat.className = "seat-box";
+          seat.id = `seat-c${c}-s${s}`;
+          seat.innerHTML = `
+            <div class="left-info">
+              <span class="seat-index">${s}</span>
+              <span class="passenger-name">---</span>
+            </div>
           `;
-          berthCol.appendChild(slot);
+          carList.appendChild(seat);
         }
       }
     }
 
-    function refreshGaugesAndLists() {
-      document.getElementById("disp-cycle").innerText = `CYCLE ${engineData.cycle} • STAGE ${engineData.stage}/4`;
-      document.getElementById("disp-pool").innerText = `${engineData.waitingPool.length} PASSENGERS`;
-      document.getElementById("disp-boarded").innerText = `${engineData.dispatchedThisCycle.length} / 100`;
-      document.getElementById("queue-tally").innerText = `${engineData.waitingPool.length} ELIGIBLE`;
+    function updateInterface() {
+      document.getElementById("hud-cycle").innerText = `CYCLE ${siteTrainState.cycle} • DAY ${siteTrainState.day}/4`;
+      document.getElementById("hud-pool").innerText = `${siteTrainState.pool.length} / 100`;
+      document.getElementById("hud-boarded").innerText = `${siteTrainState.boardedThisCycle.length} / 100`;
+      document.getElementById("queue-counter").innerText = `${siteTrainState.pool.length} ELIGIBLE`;
 
-      // Render Waiting Manifest
-      const queueBox = document.getElementById("waiting-manifest-display");
+      // Render Queue
+      const queueBox = document.getElementById("pool-names-display");
       queueBox.innerHTML = "";
-      engineData.waitingPool.forEach(soldier => {
-        const plate = document.createElement("div");
-        plate.className = "queue-plate";
-        plate.innerText = soldier;
-        queueBox.appendChild(plate);
+      siteTrainState.pool.forEach(name => {
+        const tag = document.createElement("div");
+        tag.className = "queue-tag";
+        tag.innerText = name;
+        queueBox.appendChild(tag);
       });
 
-      // Restore Active Train if saved
-      if (engineData.activeTrain) {
-        document.getElementById("seat-conductor").innerText = engineData.activeTrain.conductor;
-        document.getElementById("seat-vip").innerText = engineData.activeTrain.vip;
+      // Restore active train
+      if (siteTrainState.currentTrain) {
+        document.getElementById("slot-conductor").innerText = siteTrainState.currentTrain.conductor;
+        document.getElementById("slot-vip").innerText = siteTrainState.currentTrain.vip;
 
-        let passCounter = 0;
+        let passIndex = 0;
         for (let c = 1; c <= 4; c++) {
-          for (let b = 1; b <= 7; b++) {
-            const slot = document.getElementById(`berth-c${c}-b${b}`);
-            const p = engineData.activeTrain.passengers[passCounter++];
+          for (let s = 1; s <= 7; s++) {
+            const slot = document.getElementById(`seat-c${c}-s${s}`);
+            const p = siteTrainState.currentTrain.passengers[passIndex++];
             if (slot && p) {
-              slot.className = "berth-slot locked-in" + (p.rollover ? " rollover-slot" : "");
-              slot.querySelector(".slot-passenger").innerText = p.name;
-              
-              const existingTag = slot.querySelector(".metal-tag");
-              if (existingTag) existingTag.remove();
-              if (p.rollover) {
-                const tag = document.createElement("span");
-                tag.className = "metal-tag";
-                tag.innerText = "ROLLOVER";
-                slot.appendChild(tag);
+              slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
+              slot.querySelector(".passenger-name").innerText = p.name;
+
+              const oldTag = slot.querySelector(".rollover-tag");
+              if (oldTag) oldTag.remove();
+
+              if (p.isRollover) {
+                const rTag = document.createElement("span");
+                rTag.className = "rollover-tag";
+                rTag.innerText = "ROLLOVER";
+                slot.appendChild(rTag);
               }
             }
           }
         }
       }
 
-      renderManifestLogs();
+      renderLogs();
     }
 
-    function renderManifestLogs() {
-      const feed = document.getElementById("dispatch-feed-display");
-      const tally = document.getElementById("log-tally");
+    function renderLogs() {
+      const feed = document.getElementById("history-feed-display");
+      const count = document.getElementById("log-counter");
       feed.innerHTML = "";
 
-      if (!engineData.manifestLogs || engineData.manifestLogs.length === 0) {
-        feed.innerHTML = `<div style="text-align: center; font-size: 11px; color: var(--text-muted); padding: 16px;">NO DISPATCH HISTORY IN STEAM TELEGRAPH</div>`;
-        tally.innerText = `0 DEPARTURES LOGGED`;
+      if (!siteTrainState.history || siteTrainState.history.length === 0) {
+        feed.innerHTML = `<div style="text-align:center; font-size:11px; color:var(--steel-dim); padding:16px;">NO DEPARTURES RECORDED YET.</div>`;
+        count.innerText = `0 DRAWS LOGGED`;
         return;
       }
 
-      tally.innerText = `${engineData.manifestLogs.length} DEPARTURES LOGGED`;
+      count.innerText = `${siteTrainState.history.length} DRAWS LOGGED`;
 
-      engineData.manifestLogs.forEach(entry => {
-        const row = document.createElement("div");
-        row.className = "manifest-entry" + (entry.isRollover ? " rollover-entry" : "");
-        
-        const tags = entry.passengers.map(p => 
-          `<span class="passenger-token ${p.rollover ? 'rollover' : ''}">${p.name}${p.rollover ? ' ★' : ''}</span>`
+      siteTrainState.history.forEach(entry => {
+        const item = document.createElement("div");
+        item.className = "history-entry" + (entry.rollover ? " rollover-entry" : "");
+
+        const pills = entry.passengers.map(p => 
+          `<span class="passenger-pill ${p.isRollover ? 'is-rollover' : ''}">${p.name}${p.isRollover ? ' ★' : ''}</span>`
         ).join("");
 
-        row.innerHTML = `
-          <div class="manifest-header">
-            <span>DISPATCH CYCLE ${entry.cycle} • STAGE ${entry.stage} ${entry.isRollover ? '<strong style="color: var(--furnace-amber);">[OVERHAUL RESET]</strong>' : ''}</span>
-            <span style="color: var(--text-muted);">${entry.time}</span>
+        item.innerHTML = `
+          <div class="entry-top">
+            <span>CYCLE ${entry.cycle} • DAY ${entry.day} ${entry.rollover ? '<strong style="color: var(--rollover-gold);">(ROLLOVER RESET)</strong>' : ''}</span>
+            <span style="color: var(--steel-dim); font-size: 10px;">${entry.time}</span>
           </div>
-          <div class="manifest-officers">
-            <span class="officer-cond">CONDUCTOR: <strong>${entry.conductor}</strong></span>
-            <span class="officer-vip">VIP: <strong>${entry.vip}</strong></span>
+          <div class="entry-leads">
+            <span class="lead-cond">CONDUCTOR: <strong>${entry.conductor}</strong></span>
+            <span class="lead-vip">VIP: <strong>${entry.vip}</strong></span>
           </div>
-          <div class="manifest-passengers">${tags}</div>
+          <div class="entry-names">${pills}</div>
         `;
-        feed.appendChild(row);
+        feed.appendChild(item);
       });
     }
 
-    // DRAW LOGIC (THE 100-MEMBER NO-REPLACEMENT CYCLE)
-    function initiateBoardingSequence() {
-      const lever = document.getElementById("btn-fire-train");
-      lever.disabled = true;
+    // DRAW ENGINE
+    function executeDrawSequence() {
+      const btn = document.getElementById("btn-draw");
+      btn.disabled = true;
 
       const shuffle = arr => arr.sort(() => Math.random() - 0.5);
-      engineData.waitingPool = shuffle(engineData.waitingPool);
+      siteTrainState.pool = shuffle(siteTrainState.pool);
 
-      let currentManifest = [];
-      let isRollover = false;
-      const currentCycle = engineData.cycle;
-      const currentStage = engineData.stage;
+      let drawnToday = [];
+      let rolloverHappened = false;
+      const curCycle = siteTrainState.cycle;
+      const curDay = siteTrainState.day;
 
-      if (engineData.waitingPool.length >= 30) {
-        // Standard Stage (1, 2, or 3)
-        const chosen = engineData.waitingPool.splice(0, 30);
-        currentManifest = chosen.map(name => ({ name, rollover: false }));
-        engineData.dispatchedThisCycle.push(...chosen);
-        engineData.stage++;
+      if (siteTrainState.pool.length >= 30) {
+        // Standard Day (1, 2, or 3)
+        const chosen = siteTrainState.pool.splice(0, 30);
+        drawnToday = chosen.map(name => ({ name, isRollover: false }));
+        siteTrainState.boardedThisCycle.push(...chosen);
+        siteTrainState.day++;
       } else {
-        // Stage 4: Take guaranteed remaining (10) + fresh fill (20)
-        isRollover = true;
-        const carryoverGuaranteed = [...engineData.waitingPool];
-        currentManifest = carryoverGuaranteed.map(name => ({ name, rollover: true }));
+        // Day 4 Rollover: Guaranteed seats + pool refill
+        rolloverHappened = true;
+        const guaranteed = [...siteTrainState.pool];
+        drawnToday = guaranteed.map(name => ({ name, isRollover: true }));
 
-        // Refill pool
         const freshRoster = shuffle([...ROSTER_SEED]);
-        engineData.waitingPool = freshRoster.filter(name => !carryoverGuaranteed.includes(name));
+        siteTrainState.pool = freshRoster.filter(name => !guaranteed.includes(name));
 
-        const deficit = 30 - carryoverGuaranteed.length;
-        const freshPull = engineData.waitingPool.splice(0, deficit);
-        currentManifest.push(...freshPull.map(name => ({ name, rollover: false })));
+        const needed = 30 - guaranteed.length;
+        const freshPull = siteTrainState.pool.splice(0, needed);
+        drawnToday.push(...freshPull.map(name => ({ name, isRollover: false })));
 
-        // Advance Cycle
-        engineData.dispatchedThisCycle = [...freshPull];
-        engineData.cycle++;
-        engineData.stage = 2; // Next run is Stage 2 of new cycle
+        siteTrainState.boardedThisCycle = [...freshPull];
+        siteTrainState.cycle++;
+        siteTrainState.day = 2;
       }
 
-      const conductor = currentManifest[0].name;
-      const vip = currentManifest[1].name;
-      const passengers = currentManifest.slice(2, 30);
+      const conductor = drawnToday[0].name;
+      const vip = drawnToday[1].name;
+      const passengers = drawnToday.slice(2, 30);
 
-      engineData.activeTrain = { conductor, vip, passengers, isRollover };
+      siteTrainState.currentTrain = { conductor, vip, passengers, rolloverHappened };
 
-      // Record in telegraph logs
-      const d = new Date();
-      engineData.manifestLogs.unshift({
-        cycle: currentCycle,
-        stage: currentStage,
-        time: d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      const now = new Date();
+      siteTrainState.history.unshift({
+        cycle: curCycle,
+        day: curDay,
+        time: now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         conductor,
         vip,
         passengers,
-        isRollover
+        rollover: rolloverHappened
       });
-      saveEngineData();
+      saveState();
 
-      // EXECUTE MECHANICAL ANIMATION
-      animateMechanicalLock(conductor, vip, passengers, () => {
-        lever.disabled = false;
-        refreshGaugesAndLists();
+      runAnimation(conductor, vip, passengers, () => {
+        btn.disabled = false;
+        updateInterface();
       });
     }
 
-    function animateMechanicalLock(conductor, vip, passengers, done) {
-      document.getElementById("seat-conductor").innerText = "PRESSURIZING...";
-      document.getElementById("seat-vip").innerText = "PRESSURIZING...";
+    function runAnimation(conductor, vip, passengers, callback) {
+      document.getElementById("slot-conductor").innerText = "ROLLING...";
+      document.getElementById("slot-vip").innerText = "ROLLING...";
 
       for (let c = 1; c <= 4; c++) {
-        for (let b = 1; b <= 7; b++) {
-          const slot = document.getElementById(`berth-c${c}-b${b}`);
-          slot.className = "berth-slot";
-          const tag = slot.querySelector(".metal-tag");
+        for (let s = 1; s <= 7; s++) {
+          const slot = document.getElementById(`seat-c${c}-s${s}`);
+          slot.className = "seat-box";
+          const tag = slot.querySelector(".rollover-tag");
           if (tag) tag.remove();
-          const pLabel = slot.querySelector(".slot-passenger");
-          pLabel.innerText = "CHASSIS ENGAGING...";
-          pLabel.classList.add("pneumatic-flicker");
+          const pName = slot.querySelector(".passenger-name");
+          pName.innerText = "ROLLING...";
+          pName.classList.add("slot-flicker");
         }
       }
 
-      // Lock Conductor
       setTimeout(() => {
-        document.getElementById("seat-conductor").innerText = conductor;
+        document.getElementById("slot-conductor").innerText = conductor;
       }, 600);
 
-      // Lock VIP
       setTimeout(() => {
-        document.getElementById("seat-vip").innerText = vip;
+        document.getElementById("slot-vip").innerText = vip;
       }, 1000);
 
-      // Cascading Berth Lock
       passengers.forEach((p, idx) => {
         const cIdx = Math.floor(idx / 7) + 1;
-        const bIdx = (idx % 7) + 1;
+        const sIdx = (idx % 7) + 1;
         setTimeout(() => {
-          const slot = document.getElementById(`berth-c${cIdx}-b${bIdx}`);
-          const pLabel = slot.querySelector(".slot-passenger");
-          pLabel.classList.remove("pneumatic-flicker");
-          pLabel.innerText = p.name;
-          slot.className = "berth-slot locked-in" + (p.rollover ? " rollover-slot" : "");
+          const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
+          const pName = slot.querySelector(".passenger-name");
+          pName.classList.remove("slot-flicker");
+          pName.innerText = p.name;
+          slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
 
-          if (p.rollover) {
+          if (p.isRollover) {
             const tag = document.createElement("span");
-            tag.className = "metal-tag";
+            tag.className = "rollover-tag";
             tag.innerText = "ROLLOVER";
             slot.appendChild(tag);
           }
 
           if (idx === passengers.length - 1) {
-            setTimeout(done, 300);
+            setTimeout(callback, 300);
           }
-        }, 1200 + (idx * 55));
+        }, 1100 + (idx * 50));
       });
     }
 
-    function executeEmergencyReset() {
-      if (!confirm("ENGAGE EMERGENCY OVERHAUL?\nThis resets rotation to Cycle 1, Stage 1 and clears all dispatch logs.")) return;
-      localStorage.removeItem("dreadnought_engine_v3");
-      engineData = {
+    function resetCycle() {
+      if (!confirm("Reset the entire train cycle back to Cycle 1, Day 1 and clear history?")) return;
+      localStorage.removeItem("grimm_mainsite_train_v1");
+      siteTrainState = {
         cycle: 1,
-        stage: 1,
-        waitingPool: [...ROSTER_SEED],
-        dispatchedThisCycle: [],
-        activeTrain: null,
-        manifestLogs: []
+        day: 1,
+        pool: [...ROSTER_SEED],
+        boardedThisCycle: [],
+        currentTrain: null,
+        history: []
       };
-      saveEngineData();
-      buildEmptyBerths();
-      document.getElementById("seat-conductor").innerText = "--- DISENGAGED ---";
-      document.getElementById("seat-vip").innerText = "--- DISENGAGED ---";
-      refreshGaugesAndLists();
+      saveState();
+      buildEmptySlots();
+      document.getElementById("slot-conductor").innerText = "--- STANDBY ---";
+      document.getElementById("slot-vip").innerText = "--- STANDBY ---";
+      updateInterface();
     }
 
-    // INITIALIZE
-    loadEngineData();
-    buildEmptyBerths();
-    refreshGaugesAndLists();
+    loadState();
+    buildEmptySlots();
+    updateInterface();
   </script>
 </body>
 </html>
