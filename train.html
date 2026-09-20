@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alliance Train • The Frozen Dreadnought</title>
+  <title>Alliance Train • The Golden Juggernaut</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -22,11 +22,16 @@
       --steel-muted: #9ab0c2;
       --steel-dim: #5a6e7f;
 
-      --conductor-gold: #e2b04a;
-      --conductor-glow: rgba(226, 176, 74, 0.2);
-      --vip-crimson: #992d22;
-      --vip-light: #ff7675;
-      --vip-glow: rgba(153, 45, 34, 0.25);
+      /* Roles Colors: Conductor (Crimson) & VIP (Golden Ticket) */
+      --conductor-crimson: #c0392b;
+      --conductor-crimson-bright: #e74c3c;
+      --conductor-glow: rgba(231, 76, 60, 0.3);
+
+      --vip-gold: #f39c12;
+      --vip-gold-light: #f1c40f;
+      --vip-ticket-bg: linear-gradient(135deg, rgba(243, 156, 18, 0.15) 0%, rgba(12, 17, 23, 0.9) 100%);
+      --vip-glow: rgba(241, 196, 15, 0.35);
+
       --rollover-gold: #d18a45;
       --success-green: #2ecc71;
     }
@@ -58,7 +63,7 @@
 
     .train-header .sub-caption {
       font-family: 'Cinzel', serif;
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 3px;
       color: var(--frost-bright);
       text-transform: uppercase;
@@ -118,12 +123,13 @@
       background: rgba(209, 138, 69, 0.12);
       border: 1px solid var(--rollover-gold);
       border-radius: 4px;
-      padding: 10px 16px;
+      padding: 12px 18px;
       margin-bottom: 20px;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       font-size: 12px;
+      box-shadow: 0 0 16px rgba(209, 138, 69, 0.25);
     }
 
     .staging-banner.active {
@@ -134,6 +140,29 @@
       color: #ffd4a8;
       font-family: 'Cinzel', serif;
       letter-spacing: 1px;
+    }
+
+    .btn-confirm-depart {
+      background: linear-gradient(180deg, rgba(46, 204, 113, 0.3) 0%, rgba(12, 17, 23, 0.9) 100%);
+      border: 1px solid var(--success-green);
+      color: #bbf7d0;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 9px 20px;
+      cursor: pointer;
+      border-radius: 3px;
+      box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-confirm-depart:hover {
+      background: rgba(46, 204, 113, 0.45);
+      box-shadow: 0 0 22px rgba(46, 204, 113, 0.5);
+      color: #ffffff;
+      transform: translateY(-1px);
     }
 
     .swap-mode-indicator {
@@ -210,8 +239,6 @@
     }
 
     .cabin-pod {
-      background: var(--card-bg);
-      border: 1px solid var(--frost-border);
       border-radius: 4px;
       padding: 16px 20px 24px;
       display: flex;
@@ -227,14 +254,18 @@
       box-shadow: 0 0 18px rgba(255, 212, 168, 0.4) !important;
     }
 
+    /* Conductor Pod (Command Crimson) */
     .cabin-pod.conductor-pod {
-      border-color: rgba(226, 176, 74, 0.4);
-      box-shadow: 0 0 14px var(--conductor-glow);
+      background: rgba(18, 11, 13, 0.85);
+      border: 1px solid var(--conductor-crimson);
+      box-shadow: 0 0 16px var(--conductor-glow);
     }
 
+    /* VIP Pod (Golden Ticket Theme) */
     .cabin-pod.vip-pod {
-      border-color: rgba(153, 45, 34, 0.45);
-      box-shadow: 0 0 14px var(--vip-glow);
+      background: var(--vip-ticket-bg);
+      border: 1px solid var(--vip-gold);
+      box-shadow: 0 0 18px var(--vip-glow);
     }
 
     .pod-header-row {
@@ -253,8 +284,11 @@
       text-transform: uppercase;
     }
 
-    .conductor-pod .pod-label { color: var(--conductor-gold); }
-    .vip-pod .pod-label { color: var(--vip-light); }
+    .conductor-pod .pod-label { color: var(--conductor-crimson-bright); }
+    .vip-pod .pod-label { 
+      color: var(--vip-gold-light); 
+      text-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+    }
 
     .pod-btn-trigger {
       background: rgba(7, 10, 14, 0.85);
@@ -328,18 +362,17 @@
 
     .carriage-header .num {
       font-family: 'Cinzel', serif;
-      font-size: 9px;
-      letter-spacing: 1px;
-      color: var(--frost-bright);
-      font-weight: 700;
-    }
-
-    .carriage-header .name {
-      font-family: 'Cinzel', serif;
       font-size: 10px;
       letter-spacing: 1.5px;
-      color: var(--steel-muted);
-      text-transform: uppercase;
+      color: var(--frost-bright);
+      font-weight: 800;
+    }
+
+    .carriage-header .seats-count {
+      font-size: 9px;
+      color: var(--steel-dim);
+      letter-spacing: 1px;
+      font-family: 'Cinzel', serif;
     }
 
     .seat-rows {
@@ -430,7 +463,7 @@
       color: var(--steel-muted);
       font-family: 'Inter', sans-serif;
       font-size: 9px;
-      font-weight: 500;
+      font-weight: 600;
       padding: 2px 5px;
       border-radius: 2px;
       cursor: pointer;
@@ -451,7 +484,7 @@
       gap: 6px;
     }
 
-    /* ACTION CONTROLS */
+    /* ACTION PANEL */
     .action-panel {
       display: flex;
       justify-content: center;
@@ -489,33 +522,6 @@
       box-shadow: none;
     }
 
-    .btn-confirm-depart {
-      display: none;
-      background: linear-gradient(180deg, rgba(46, 204, 113, 0.25) 0%, rgba(12, 17, 23, 0.9) 100%);
-      border: 1px solid var(--success-green);
-      color: #bbf7d0;
-      font-family: 'Cinzel', serif;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      padding: 12px 28px;
-      cursor: pointer;
-      border-radius: 3px;
-      box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .btn-confirm-depart:hover {
-      background: rgba(46, 204, 113, 0.4);
-      box-shadow: 0 0 22px rgba(46, 204, 113, 0.5);
-      color: #ffffff;
-      transform: translateY(-2px);
-    }
-
-    .btn-confirm-depart.active {
-      display: inline-block;
-    }
-
     .btn-reset-cycle {
       background: transparent;
       border: 1px solid rgba(153, 45, 34, 0.4);
@@ -530,7 +536,7 @@
     }
 
     .btn-reset-cycle:hover {
-      border-color: var(--vip-crimson);
+      border-color: #c0392b;
       color: #ff9d94;
       background: rgba(153, 45, 34, 0.1);
     }
@@ -631,7 +637,7 @@
 
     .btn-delete-log:hover {
       background: rgba(153, 45, 34, 0.25);
-      border-color: var(--vip-crimson);
+      border-color: #c0392b;
       color: #ff9d94;
     }
 
@@ -643,8 +649,8 @@
       margin-bottom: 8px;
     }
 
-    .lead-cond { color: var(--conductor-gold); }
-    .lead-vip { color: var(--vip-light); }
+    .lead-cond { color: var(--conductor-crimson-bright); }
+    .lead-vip { color: var(--vip-gold-light); }
 
     .entry-names {
       display: flex;
@@ -675,7 +681,7 @@
       to { color: var(--ice-white); }
     }
 
-    /* MODAL ARCHITECTURE */
+    /* MODALS */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -804,8 +810,8 @@
 
     <!-- HEADER -->
     <div class="train-header">
-      <div class="sub-caption">Alliance Boarding Engine</div>
-      <h1>ᛟ THE FROZEN DREADNOUGHT ᛟ</h1>
+      <div class="sub-caption">Alliance Train</div>
+      <h1>ᛟ THE GOLDEN JUGGERNAUT ᛟ</h1>
     </div>
 
     <!-- METRIC HUD BAR -->
@@ -828,19 +834,19 @@
       </div>
     </div>
 
-    <!-- STAGING BANNER -->
+    <!-- STAGING BANNER (ONLY CONFIRMATION BUTTON) -->
     <div class="staging-banner" id="staging-banner">
       <div class="staging-text">
         ᛟ <strong>BOARDING IN PROGRESS:</strong> Adjust berths or substitute no-shows. Click <strong>CONFIRM DEPARTURE</strong> when ready to commit to history.
       </div>
-      <button class="btn-confirm-depart active" onclick="confirmTrainDeparture()">
+      <button class="btn-confirm-depart" onclick="confirmTrainDeparture()">
         ᛟ CONFIRM DEPARTURE ᛟ
       </button>
     </div>
 
     <!-- SEAT SWAP PROMPT -->
     <div class="swap-mode-indicator" id="swap-mode-indicator">
-      Select the target seat you want to swap <strong><span id="source-swap-name" style="color: #ffd4a8;">---</span></strong> with:
+      Select target seat to move <strong><span id="source-swap-name" style="color: #ffd4a8;">---</span></strong> with:
       <button onclick="cancelSeatToSeatSwap()" style="margin-left: 10px; background: transparent; border: 1px solid var(--frost-bright); color: var(--ice-white); padding: 2px 8px; border-radius: 2px; cursor: pointer;">Cancel</button>
     </div>
 
@@ -856,10 +862,10 @@
       </div>
     </div>
 
-    <!-- ENGINE CABIN: CONDUCTOR + VIP -->
+    <!-- ENGINE CABIN: CONDUCTOR + VIP SEAT -->
     <div class="engine-quarters">
       
-      <!-- CONDUCTOR POD -->
+      <!-- CONDUCTOR POD (RED/CRIMSON) -->
       <div class="cabin-pod conductor-pod" id="pod-conductor">
         <div class="pod-header-row">
           <div class="pod-label">ᛟ Train Conductor ᛟ</div>
@@ -871,10 +877,10 @@
         <div class="pod-actions-row" id="conductor-actions"></div>
       </div>
 
-      <!-- VIP POD -->
+      <!-- VIP SEAT POD (GOLDEN VIP TICKET) -->
       <div class="cabin-pod vip-pod" id="pod-vip">
         <div class="pod-header-row">
-          <div class="pod-label">★ VIP Guest ★</div>
+          <div class="pod-label">★ VIP Seat ★</div>
           <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('vip')">
             <span id="label-vip-mode">[ AUTO-DRAW ]</span> &#9662;
           </button>
@@ -889,32 +895,32 @@
     <div class="carriages-grid">
       <div class="carriage-module">
         <div class="carriage-header">
-          <span class="num">CAR I</span>
-          <span class="name">Vanguard</span>
+          <span class="num">CARRIAGE I</span>
+          <span class="seats-count">7 SEATS</span>
         </div>
         <div class="seat-rows" id="car-1-seats"></div>
       </div>
 
       <div class="carriage-module">
         <div class="carriage-header">
-          <span class="num">CAR II</span>
-          <span class="name">Glacial Iron</span>
+          <span class="num">CARRIAGE II</span>
+          <span class="seats-count">7 SEATS</span>
         </div>
         <div class="seat-rows" id="car-2-seats"></div>
       </div>
 
       <div class="carriage-module">
         <div class="carriage-header">
-          <span class="num">CAR III</span>
-          <span class="name">Shieldwall</span>
+          <span class="num">CARRIAGE III</span>
+          <span class="seats-count">7 SEATS</span>
         </div>
         <div class="seat-rows" id="car-3-seats"></div>
       </div>
 
       <div class="carriage-module">
         <div class="carriage-header">
-          <span class="num">CAR IV</span>
-          <span class="name">Outrider</span>
+          <span class="num">CARRIAGE IV</span>
+          <span class="seats-count">7 SEATS</span>
         </div>
         <div class="seat-rows" id="car-4-seats"></div>
       </div>
@@ -924,9 +930,6 @@
     <div class="action-panel">
       <button class="btn-action-draw" id="btn-draw" onclick="executeDrawSequence()">
         ᛟ INITIATE FULL AUTO DRAW (30 SEATS) ᛟ
-      </button>
-      <button class="btn-confirm-depart" id="btn-confirm-depart" onclick="confirmTrainDeparture()">
-        ᛟ CONFIRM DEPARTURE & RECORD TO HISTORY ᛟ
       </button>
       <button class="btn-reset-cycle" onclick="resetCycle()">RESET ROTATION</button>
     </div>
@@ -965,18 +968,18 @@
     </div>
   </div>
 
-  <!-- SEAT SUBSTITUTE MODAL -->
+  <!-- SEAT SUBSTITUTE MODAL (POOL SWAP) -->
   <div id="sub-picker-modal" class="modal-backdrop" onclick="closeSubModalOnBackdrop(event)">
     <div class="picker-box">
       <div class="picker-header">
-        <h3 id="sub-modal-title">STANDBY REPLACEMENT FROM POOL</h3>
+        <h3 id="sub-modal-title">SWAP NO-SHOW WITH POOL</h3>
         <button class="picker-close" onclick="closeSubModal()">&times;</button>
       </div>
       <div style="padding: 8px 16px 0; font-size: 11px; color: var(--steel-muted);">
-        No-Show: <strong id="sub-target-name" style="color: var(--rollover-gold);">---</strong> (will return to waiting pool)
+        Replacing: <strong id="sub-target-name" style="color: var(--rollover-gold);">---</strong> (will return to waiting pool)
       </div>
       <div class="picker-search-bar">
-        <input type="text" id="sub-search-input" class="picker-input" placeholder="Search standby in pool..." oninput="filterSubList()" />
+        <input type="text" id="sub-search-input" class="picker-input" placeholder="Search replacement in pool..." oninput="filterSubList()" />
       </div>
       <div class="picker-list" id="sub-items-container"></div>
     </div>
@@ -1012,12 +1015,12 @@
     let carriageSwapSource = null;
 
     function loadState() {
-      const saved = localStorage.getItem("grimm_mainsite_train_v6");
+      const saved = localStorage.getItem("grimm_golden_juggernaut_v1");
       if (saved) siteTrainState = JSON.parse(saved);
     }
 
     function saveState() {
-      localStorage.setItem("grimm_mainsite_train_v6", JSON.stringify(siteTrainState));
+      localStorage.setItem("grimm_golden_juggernaut_v1", JSON.stringify(siteTrainState));
     }
 
     function setDrawMode(mode) {
@@ -1061,7 +1064,7 @@
     function openPicker(role) {
       if (currentOperationMode !== "MANUAL") return;
       activePickerTarget = role;
-      const title = role === 'conductor' ? 'ᛟ ASSIGN CONDUCTOR' : '★ ASSIGN VIP GUEST';
+      const title = role === 'conductor' ? 'ᛟ ASSIGN CONDUCTOR' : '★ ASSIGN VIP SEAT';
       document.getElementById("picker-title").innerText = title;
       
       const searchInput = document.getElementById("picker-search-input");
@@ -1140,7 +1143,7 @@
       closePicker();
     }
 
-    /* STANDBY SUBSTITUTION */
+    /* 1. SWAP: NO-SHOW WITH POOL (UP/DOWN ARROWS ⇅) */
     function openSeatSubstitute(type, index = null) {
       if (!siteTrainState.currentTrain) return;
 
@@ -1157,7 +1160,7 @@
       swapTargetSeat = { type, index, currentName };
 
       document.getElementById("sub-target-name").innerText = currentName;
-      document.getElementById("sub-modal-title").innerText = `SUBSTITUTE ${type.toUpperCase()}`;
+      document.getElementById("sub-modal-title").innerText = `SWAP ${type.toUpperCase()} WITH POOL`;
       
       const searchInput = document.getElementById("sub-search-input");
       searchInput.value = "";
@@ -1188,14 +1191,14 @@
       const candidates = siteTrainState.pool.filter(name => name.toLowerCase().includes(query));
 
       if (candidates.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:var(--steel-dim); font-size:11px; padding:16px;">No eligible standbys in pool matching "${query}"</div>`;
+        container.innerHTML = `<div style="text-align:center; color:var(--steel-dim); font-size:11px; padding:16px;">No eligible replacements in pool matching "${query}"</div>`;
         return;
       }
 
       candidates.forEach(name => {
         const item = document.createElement("div");
         item.className = "picker-item";
-        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--frost-bright);">Board Train &rarr;</span>`;
+        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--frost-bright);">Take Seat &rarr;</span>`;
         item.onclick = () => executeSeatSwapWithPool(name);
         container.appendChild(item);
       });
@@ -1229,7 +1232,7 @@
       closeSubModal();
     }
 
-    /* SEAT-TO-SEAT SWAPPING */
+    /* 2. MOVE: SEAT-TO-SEAT POSITION CHANGE (SIDE-BY-SIDE ARROWS ⇄) */
     function startSeatToSeatSwap(type, index = null) {
       let memberName = "";
       if (type === 'conductor') memberName = siteTrainState.currentTrain.conductor;
@@ -1284,6 +1287,7 @@
         srcRollover = siteTrainState.currentTrain.passengers[src.index].isRollover;
       }
 
+      // Assign target to source slot
       if (src.type === 'conductor') {
         siteTrainState.currentTrain.conductor = targetName;
         siteTrainState.currentTrain.condIsRollover = targetRollover;
@@ -1295,6 +1299,7 @@
         siteTrainState.currentTrain.passengers[src.index].isRollover = targetRollover;
       }
 
+      // Assign source to target slot
       if (targetType === 'conductor') {
         siteTrainState.currentTrain.conductor = srcName;
         siteTrainState.currentTrain.condIsRollover = srcRollover;
@@ -1331,7 +1336,7 @@
       document.querySelectorAll(".swap-target-active").forEach(el => el.classList.remove("swap-target-active"));
     }
 
-    /* CONFIRMATION WORKFLOW */
+    /* CONFIRMATION WORKFLOW: COMMIT STAGED TRAIN TO HISTORY */
     function confirmTrainDeparture() {
       if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) {
         alert("No active train staging to confirm.");
@@ -1484,15 +1489,19 @@
       document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
       document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
 
-      runAnimation(finalConductor, condRollover, finalVIP, vipRollover, passengers, () => {
+      // Execute Smooth Staggered Boarding Animation
+      runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
         btn.disabled = false;
         updateInterface();
       });
     }
 
     function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
-      document.getElementById("slot-conductor").innerText = "LOCKING...";
-      document.getElementById("slot-vip").innerText = "LOCKING...";
+      // Clear current visual slots and start flicker
+      document.getElementById("slot-conductor").innerText = "ROLLING...";
+      document.getElementById("slot-vip").innerText = "ROLLING...";
+      document.getElementById("conductor-actions").innerHTML = "";
+      document.getElementById("vip-actions").innerHTML = "";
 
       for (let c = 1; c <= 4; c++) {
         for (let s = 1; s <= 7; s++) {
@@ -1501,20 +1510,27 @@
           slot.innerHTML = `
             <div class="left-info">
               <span class="seat-index">${s}</span>
-              <span class="passenger-name slot-flicker">ROLLING...</span>
+              <span class="passenger-name slot-flicker">BOARDING...</span>
             </div>
           `;
         }
       }
 
+      // Lock Conductor
       setTimeout(() => {
-        document.getElementById("slot-conductor").innerHTML = `${conductor} ${condRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-      }, 500);
+        document.getElementById("slot-conductor").innerHTML = `
+          ${conductor} ${condRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+        `;
+      }, 450);
 
+      // Lock VIP
       setTimeout(() => {
-        document.getElementById("slot-vip").innerHTML = `${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-      }, 900);
+        document.getElementById("slot-vip").innerHTML = `
+          ${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+        `;
+      }, 800);
 
+      // Stagger through 28 passengers
       passengers.forEach((p, idx) => {
         const cIdx = Math.floor(idx / 7) + 1;
         const sIdx = (idx % 7) + 1;
@@ -1522,16 +1538,21 @@
           const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
           slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
           slot.innerHTML = `
-            <div class="left-info">
+            <div class="left-info" onclick="startSeatToSeatSwap('passenger', ${idx})" style="cursor: pointer;">
               <span class="seat-index">${sIdx}</span>
               <span class="passenger-name">${p.name}</span>
+            </div>
+            <div class="seat-actions">
+              ${p.isRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+              <button type="button" class="btn-seat-action" title="Swap with pool" onclick="openSeatSubstitute('passenger', ${idx})">⇅ Swap</button>
+              <button type="button" class="btn-seat-action" title="Move seat position" onclick="startSeatToSeatSwap('passenger', ${idx})">⇄ Move</button>
             </div>
           `;
 
           if (idx === passengers.length - 1) {
-            setTimeout(callback, 300);
+            setTimeout(callback, 250);
           }
-        }, 1000 + (idx * 40));
+        }, 900 + (idx * 35));
       });
     }
 
@@ -1562,22 +1583,21 @@
       document.getElementById("hud-boarded").innerText = `${siteTrainState.boardedThisCycle.length} / 100`;
       document.getElementById("queue-counter").innerText = `${siteTrainState.pool.length} ELIGIBLE`;
 
+      // Status indicator
       const hudStatus = document.getElementById("hud-status");
       const stagingBanner = document.getElementById("staging-banner");
-      const confirmBtn = document.getElementById("btn-confirm-depart");
 
       if (isStaged) {
         hudStatus.innerText = "BOARDING / STAGING";
         hudStatus.style.color = "var(--rollover-gold)";
         stagingBanner.classList.add("active");
-        confirmBtn.classList.add("active");
       } else {
         hudStatus.innerText = siteTrainState.currentTrain ? "DEPARTED" : "STANDBY";
         hudStatus.style.color = siteTrainState.currentTrain ? "var(--success-green)" : "var(--steel-muted)";
         stagingBanner.classList.remove("active");
-        confirmBtn.classList.remove("active");
       }
 
+      // Render Queue
       const queueBox = document.getElementById("pool-names-display");
       queueBox.innerHTML = "";
       siteTrainState.pool.forEach(name => {
@@ -1587,6 +1607,7 @@
         queueBox.appendChild(tag);
       });
 
+      // Render Staged / Active Train
       if (siteTrainState.currentTrain) {
         const t = siteTrainState.currentTrain;
         document.getElementById("slot-conductor").innerHTML = `
@@ -1595,8 +1616,8 @@
         `;
 
         document.getElementById("conductor-actions").innerHTML = `
-          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇄ Standby</button>
-          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('conductor')">⇅ Move</button>
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇅ Swap</button>
+          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('conductor')">⇄ Move</button>
         `;
 
         document.getElementById("slot-vip").innerHTML = `
@@ -1605,8 +1626,8 @@
         `;
 
         document.getElementById("vip-actions").innerHTML = `
-          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇄ Standby</button>
-          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('vip')">⇅ Move</button>
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇅ Swap</button>
+          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('vip')">⇄ Move</button>
         `;
 
         let passIndex = 0;
@@ -1618,14 +1639,14 @@
             if (slot && p) {
               slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
               slot.innerHTML = `
-                <div class="left-info" onclick="startSeatToSeatSwap('passenger', ${pIdx})" style="cursor: pointer;" title="Click to swap seat with selected member">
+                <div class="left-info" onclick="startSeatToSeatSwap('passenger', ${pIdx})" style="cursor: pointer;" title="Click to swap seat position">
                   <span class="seat-index">${s}</span>
                   <span class="passenger-name">${p.name}</span>
                 </div>
                 <div class="seat-actions">
                   ${p.isRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
-                  <button type="button" class="btn-seat-action" title="Replace no-show from pool" onclick="openSeatSubstitute('passenger', ${pIdx})">⇄ Standby</button>
-                  <button type="button" class="btn-seat-action" title="Move member to another carriage seat" onclick="startSeatToSeatSwap('passenger', ${pIdx})">⇅ Move</button>
+                  <button type="button" class="btn-seat-action" title="Swap with pool" onclick="openSeatSubstitute('passenger', ${pIdx})">⇅ Swap</button>
+                  <button type="button" class="btn-seat-action" title="Move seat position" onclick="startSeatToSeatSwap('passenger', ${pIdx})">⇄ Move</button>
                 </div>
               `;
             }
