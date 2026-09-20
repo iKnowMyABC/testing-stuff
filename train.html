@@ -508,65 +508,72 @@
       }
     }
 
-    // CORE DRAW LOGIC: 30 SEATS (WITH DAY 4 ROLLOVER / REFILL)
+        // CORE DRAW LOGIC: 30 SEATS (TRANSPARENT ROLLOVER)
     function executeTrainDraw() {
       const drawBtn = document.getElementById("btn-draw-train");
       drawBtn.disabled = true;
 
-      // 1. Determine the 30 drawn members based on the pool
-      let drawnToday = [];
-      let rolloverNotice = false;
-
-      // Shuffle helper
       const shuffle = arr => arr.sort(() => Math.random() - 0.5);
       trainState.pool = shuffle(trainState.pool);
 
+      let drawnToday = [];
+      let guaranteedCount = 0;
+      let freshPullCount = 0;
+      let rolloverHappened = false;
+
       if (trainState.pool.length >= 30) {
-        // Standard draw (Day 1, Day 2, Day 3)
+        // Standard Day (1, 2, or 3)
         drawnToday = trainState.pool.splice(0, 30);
-      } else {
-        // Day 4 scenario: take remaining (e.g. 10), then reset pool and take the rest (20)
-        rolloverNotice = true;
-        const remaining = [...trainState.pool];
-        drawnToday = [...remaining];
-
-        // REFILL POOL WITH ALL 100 MEMBERS
-        trainState.pool = shuffle([...INITIAL_100_MEMBERS]);
-        
-        // Exclude the ones who just got their guaranteed carryover seats
-        trainState.pool = trainState.pool.filter(name => !remaining.includes(name));
-
-        // Take remaining slots to reach 30
-        const needed = 30 - remaining.length;
-        const additional = trainState.pool.splice(0, needed);
-        drawnToday = drawnToday.concat(additional);
-
-        // Reset boarded tracking for new cycle
-        trainState.boardedHistory = [];
-        trainState.day = 1;
-      }
-
-      trainState.boardedHistory.push(...drawnToday);
-      if (!rolloverNotice) {
+        trainState.boardedHistory.push(...drawnToday);
         trainState.day++;
+      } else {
+        // Rollover Day (The final 10 members + 20 from fresh pool)
+        rolloverHappened = true;
+        guaranteedCount = trainState.pool.length; // Exactly 10
+        const guaranteedMembers = [...trainState.pool];
+
+        // 1. Give all remaining members guaranteed seats
+        drawnToday = [...guaranteedMembers];
+
+        // 2. Refill the pool with everyone from the alliance roster
+        const freshRoster = shuffle([...INITIAL_100_MEMBERS]);
+
+        // 3. Exclude the 10 who are already on today's train
+        trainState.pool = freshRoster.filter(name => !guaranteedMembers.includes(name));
+
+        // 4. Pull the remaining 20 seats from the fresh pool
+        freshPullCount = 30 - guaranteedCount; // Exactly 20
+        const additionalDraw = trainState.pool.splice(0, freshPullCount);
+        drawnToday = drawnToday.concat(additionalDraw);
+
+        // 5. Start new cycle tracking
+        trainState.boardedHistory = [...additionalDraw];
+        trainState.day = 2; // Tomorrow will be Day 2 of the new cycle
       }
 
       const conductor = drawnToday[0];
       const vip = drawnToday[1];
-      const passengers = drawnToday.slice(2, 30); // 28 members
+      const passengers = drawnToday.slice(2, 30);
 
-      trainState.lastTrain = { conductor, vip, passengers };
+      trainState.lastTrain = { 
+        conductor, 
+        vip, 
+        passengers,
+        guaranteedCount,
+        rolloverHappened 
+      };
       saveState();
 
-      // RUN ANIMATION SEQUENCE
+      // RUN ANIMATION
       runDrawAnimation(conductor, vip, passengers, () => {
         drawBtn.disabled = false;
         updateUI();
-        if (rolloverNotice) {
-          alert("ᛟ CYCLE COMPLETE! All 100 members have boarded at least once. The pool has reset for the next cycle!");
+        if (rolloverHappened) {
+          alert(`ᛟ CYCLE ROTATION COMPLETE! ᛟ\n\n• ${guaranteedCount} carryover members received guaranteed seats.\n• ${freshPullCount} members were drawn from the fresh pool to fill the train.\n• ${trainState.pool.length} members remain in the pool for tomorrow.`);
         }
       });
     }
+
 
     // STAGGERED SLOT REEL ANIMATION
     function runDrawAnimation(conductor, vip, passengers, onComplete) {
