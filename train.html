@@ -802,6 +802,28 @@
       background: rgba(209, 138, 69, 0.15);
       color: #ffd4a8;
     }
+
+    .btn-reroll-staging {
+      background: rgba(120, 180, 232, 0.15);
+      border: 1px solid var(--frost-bright);
+      color: var(--ice-white);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 16px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-reroll-staging:hover {
+      background: rgba(120, 180, 232, 0.3);
+      box-shadow: 0 0 12px var(--frost-glow);
+      transform: translateY(-1px);
+    }
+    
   </style>
 </head>
 <body>
@@ -834,14 +856,19 @@
       </div>
     </div>
 
-    <!-- STAGING BANNER (ONLY CONFIRMATION BUTTON) -->
+    <!-- STAGING BANNER (WITH BOTH CONFIRM & REROLL) -->
     <div class="staging-banner" id="staging-banner">
       <div class="staging-text">
         ᛟ <strong>BOARDING IN PROGRESS:</strong> Adjust berths or substitute no-shows. Click <strong>CONFIRM DEPARTURE</strong> when ready to commit to history.
       </div>
-      <button class="btn-confirm-depart" onclick="confirmTrainDeparture()">
-        ᛟ CONFIRM DEPARTURE ᛟ
-      </button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn-reroll-staging" onclick="rerollStagingTrain()">
+          🎲 REROLL STAGING
+        </button>
+        <button class="btn-confirm-depart" onclick="confirmTrainDeparture()">
+          ᛟ CONFIRM DEPARTURE ᛟ
+        </button>
+      </div>
     </div>
 
     <!-- SEAT SWAP PROMPT -->
@@ -1378,15 +1405,50 @@
       alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nTrain manifest is permanently recorded in official Departure Logs.");
     }
 
-    /* CORE DRAW SEQUENCE */
-    function executeDrawSequence() {
-      if (siteTrainState.currentTrain && siteTrainState.currentTrain.isStaged) {
-        if (!confirm("A train is already boarding! Discard current staging train and roll a new one?")) {
-          return;
+    // Helper to refund unconfirmed staged members back to the pool
+    function refundStagedTrain() {
+      if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) return;
+
+      const t = siteTrainState.currentTrain;
+      const stagedMembers = [
+        t.conductor,
+        t.vip,
+        ...t.passengers.map(p => p.name)
+      ];
+
+      // 1. Refund all staged members back into pool (avoiding duplicates)
+      stagedMembers.forEach(name => {
+        if (!siteTrainState.pool.includes(name)) {
+          siteTrainState.pool.push(name);
         }
+      });
+
+      // 2. Remove them from boardedThisCycle tracking
+      siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(
+        name => !stagedMembers.includes(name)
+      );
+
+      // 3. Clear current train
+      siteTrainState.currentTrain = null;
+    }
+
+    // One-click reroll button handler
+    function rerollStagingTrain() {
+      if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) return;
+      refundStagedTrain();
+      saveState();
+      executeDrawSequence();
+    }
+
+    /* CORE DRAW SEQUENCE (WITH AUTOMATIC STAGED REFUND) */
+    function executeDrawSequence() {
+      const btn = document.getElementById("btn-draw");
+
+      // If a train is already in staging, quietly refund those 30 members back to pool first
+      if (siteTrainState.currentTrain && siteTrainState.currentTrain.isStaged) {
+        refundStagedTrain();
       }
 
-      const btn = document.getElementById("btn-draw");
       btn.disabled = true;
 
       const manualCond = (currentOperationMode === "MANUAL") ? selectedConductor : null;
@@ -1489,7 +1551,6 @@
       document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
       document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
 
-      // Execute Smooth Staggered Boarding Animation
       runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
         btn.disabled = false;
         updateInterface();
