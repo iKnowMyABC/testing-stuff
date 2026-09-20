@@ -28,6 +28,7 @@
       --vip-light: #ff7675;
       --vip-glow: rgba(153, 45, 34, 0.25);
       --rollover-gold: #d18a45;
+      --success-green: #2ecc71;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,7 +47,7 @@
 
     .train-container {
       width: 100%;
-      max-width: 1140px;
+      max-width: 1160px;
     }
 
     /* HEADER */
@@ -82,7 +83,7 @@
       border: 1px solid var(--frost-border);
       border-radius: 4px;
       padding: 14px 18px;
-      margin-bottom: 26px;
+      margin-bottom: 24px;
     }
 
     @media (max-width: 768px) {
@@ -111,7 +112,47 @@
       letter-spacing: 1px;
     }
 
-    /* MODE TOGGLE SWITCH */
+    /* BOARDING STATUS BANNER */
+    .staging-banner {
+      display: none;
+      background: rgba(209, 138, 69, 0.12);
+      border: 1px solid var(--rollover-gold);
+      border-radius: 4px;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .staging-banner.active {
+      display: flex;
+    }
+
+    .staging-text {
+      color: #ffd4a8;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    .swap-mode-indicator {
+      display: none;
+      background: rgba(120, 180, 232, 0.15);
+      border: 1px dashed var(--frost-bright);
+      color: var(--ice-white);
+      padding: 8px 14px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .swap-mode-indicator.active {
+      display: block;
+    }
+
+    /* MODE TOGGLE */
     .mode-switch-container {
       display: flex;
       justify-content: center;
@@ -156,7 +197,7 @@
       box-shadow: 0 0 12px var(--frost-glow);
     }
 
-    /* ENGINE QUARTERS: CONDUCTOR & VIP */
+    /* ENGINE QUARTERS */
     .engine-quarters {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -172,12 +213,18 @@
       background: var(--card-bg);
       border: 1px solid var(--frost-border);
       border-radius: 4px;
-      padding: 16px 20px;
+      padding: 16px 20px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
       position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .cabin-pod.swap-target-active {
+      border-color: #ffd4a8 !important;
+      box-shadow: 0 0 18px rgba(255, 212, 168, 0.4) !important;
     }
 
     .cabin-pod.conductor-pod {
@@ -247,9 +294,10 @@
       align-items: center;
       justify-content: center;
       margin-top: 4px;
+      width: 100%;
     }
 
-    /* CARRIAGES (4 COLUMNS) */
+    /* CARRIAGES */
     .carriages-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -257,8 +305,8 @@
       margin-bottom: 35px;
     }
 
-    @media (max-width: 880px) { .carriages-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 480px) { .carriages-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 940px) { .carriages-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .carriages-grid { grid-template-columns: 1fr; } }
 
     .carriage-module {
       background: var(--card-bg);
@@ -304,20 +352,27 @@
       background: var(--seat-bg);
       border: 1px solid rgba(120, 180, 232, 0.1);
       border-radius: 3px;
-      padding: 6px 10px;
+      padding: 6px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 32px;
+      min-height: 34px;
       font-size: 12px;
       transition: all 0.2s ease;
+    }
+
+    .seat-box.swap-target-active {
+      border-color: #ffd4a8 !important;
+      background: rgba(209, 138, 69, 0.2) !important;
+      box-shadow: 0 0 10px rgba(255, 212, 168, 0.3);
     }
 
     .seat-box .left-info {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       overflow: hidden;
+      flex: 1;
     }
 
     .seat-box .seat-index {
@@ -332,7 +387,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .seat-box.boarded {
@@ -359,9 +414,44 @@
       padding: 1px 4px;
       border-radius: 2px;
       text-transform: uppercase;
+      margin-right: 2px;
     }
 
-    /* ACTION CONTROLS */
+    /* BUTTONS ON SEATS */
+    .seat-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-seat-action {
+      background: rgba(120, 180, 232, 0.08);
+      border: 1px solid rgba(120, 180, 232, 0.2);
+      color: var(--steel-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      padding: 2px 5px;
+      border-radius: 2px;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.15s ease;
+    }
+
+    .btn-seat-action:hover {
+      background: rgba(120, 180, 232, 0.25);
+      border-color: var(--frost-bright);
+      color: var(--ice-white);
+    }
+
+    .pod-actions-row {
+      position: absolute;
+      bottom: 8px;
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ACTION PANEL */
     .action-panel {
       display: flex;
       justify-content: center;
@@ -399,6 +489,33 @@
       box-shadow: none;
     }
 
+    .btn-confirm-depart {
+      display: none;
+      background: linear-gradient(180deg, rgba(46, 204, 113, 0.25) 0%, rgba(12, 17, 23, 0.9) 100%);
+      border: 1px solid var(--success-green);
+      color: #bbf7d0;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 12px 28px;
+      cursor: pointer;
+      border-radius: 3px;
+      box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-confirm-depart:hover {
+      background: rgba(46, 204, 113, 0.4);
+      box-shadow: 0 0 22px rgba(46, 204, 113, 0.5);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .btn-confirm-depart.active {
+      display: inline-block;
+    }
+
     .btn-reset-cycle {
       background: transparent;
       border: 1px solid rgba(153, 45, 34, 0.4);
@@ -418,7 +535,7 @@
       background: rgba(153, 45, 34, 0.1);
     }
 
-    /* INFORMATIVE SECTIONS (QUEUE & LOGS) */
+    /* DECK SECTIONS */
     .deck-section {
       background: var(--card-bg);
       border: 1px solid var(--frost-border);
@@ -463,7 +580,6 @@
       text-overflow: ellipsis;
     }
 
-    /* HISTORY LIST */
     .history-feed {
       display: flex;
       flex-direction: column;
@@ -559,7 +675,7 @@
       to { color: var(--ice-white); }
     }
 
-    /* SEARCHABLE PICKER MODAL */
+    /* MODALS */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -707,9 +823,25 @@
         <span class="hud-val" id="hud-boarded">0 / 100</span>
       </div>
       <div class="hud-item">
-        <span class="hud-label">Total Boarding Slots</span>
-        <span class="hud-val">30 SEATS</span>
+        <span class="hud-label">Boarding Status</span>
+        <span class="hud-val" id="hud-status" style="color: var(--steel-muted);">STANDBY</span>
       </div>
+    </div>
+
+    <!-- STAGING BANNER (ACTIVE WHEN DRAWN BUT NOT CONFIRMED) -->
+    <div class="staging-banner" id="staging-banner">
+      <div class="staging-text">
+        ᛟ <strong>BOARDING IN PROGRESS:</strong> Adjust seats or replace no-shows. Click <strong>CONFIRM DEPARTURE</strong> when ready to commit to history.
+      </div>
+      <button class="btn-confirm-depart active" onclick="confirmTrainDeparture()">
+        ᛟ CONFIRM DEPARTURE ᛟ
+      </button>
+    </div>
+
+    <!-- SWAP SEATS MODE PROMPT -->
+    <div class="swap-mode-indicator" id="swap-mode-indicator">
+      Select the target seat you want to swap <strong><span id="source-swap-name" style="color: #ffd4a8;">---</span></strong> with:
+      <button onclick="cancelSeatToSeatSwap()" style="margin-left: 10px; background: transparent; border: 1px solid var(--frost-bright); color: var(--ice-white); padding: 2px 8px; border-radius: 2px; cursor: pointer;">Cancel</button>
     </div>
 
     <!-- MODE TOGGLE SWITCH -->
@@ -728,7 +860,7 @@
     <div class="engine-quarters">
       
       <!-- CONDUCTOR POD -->
-      <div class="cabin-pod conductor-pod">
+      <div class="cabin-pod conductor-pod" id="pod-conductor">
         <div class="pod-header-row">
           <div class="pod-label">ᛟ Train Conductor ᛟ</div>
           <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('conductor')">
@@ -736,10 +868,11 @@
           </button>
         </div>
         <div class="pod-occupant" id="slot-conductor">--- STANDBY ---</div>
+        <div class="pod-actions-row" id="conductor-actions"></div>
       </div>
 
       <!-- VIP POD -->
-      <div class="cabin-pod vip-pod">
+      <div class="cabin-pod vip-pod" id="pod-vip">
         <div class="pod-header-row">
           <div class="pod-label">★ VIP Guest ★</div>
           <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('vip')">
@@ -747,6 +880,7 @@
           </button>
         </div>
         <div class="pod-occupant" id="slot-vip">--- STANDBY ---</div>
+        <div class="pod-actions-row" id="vip-actions"></div>
       </div>
 
     </div>
@@ -791,6 +925,9 @@
       <button class="btn-action-draw" id="btn-draw" onclick="executeDrawSequence()">
         ᛟ INITIATE FULL AUTO DRAW (30 SEATS) ᛟ
       </button>
+      <button class="btn-confirm-depart" id="btn-confirm-depart" onclick="confirmTrainDeparture()">
+        ᛟ CONFIRM DEPARTURE & RECORD TO HISTORY ᛟ
+      </button>
       <button class="btn-reset-cycle" onclick="resetCycle()">RESET ROTATION</button>
     </div>
 
@@ -806,7 +943,7 @@
     <!-- DEPARTURE LOGS -->
     <div class="deck-section">
       <div class="deck-title">
-        <span>ᛟ HISTORICAL DEPARTURE LOGS</span>
+        <span>ᛟ OFFICIAL DEPARTURE LOGS (CONFIRMED)</span>
         <span id="log-counter" style="font-size: 10px; color: var(--steel-dim);">0 DRAWS LOGGED</span>
       </div>
       <div class="history-feed" id="history-feed-display"></div>
@@ -814,7 +951,7 @@
 
   </div>
 
-  <!-- SEARCHABLE PICKER MODAL -->
+  <!-- SEARCHABLE PICKER MODAL (PRE-DRAW) -->
   <div id="member-picker-modal" class="modal-backdrop" onclick="closePickerOnBackdrop(event)">
     <div class="picker-box">
       <div class="picker-header">
@@ -828,11 +965,26 @@
     </div>
   </div>
 
+  <!-- SEAT SUBSTITUTE MODAL (FOR STANDBY REPLACEMENTS) -->
+  <div id="sub-picker-modal" class="modal-backdrop" onclick="closeSubModalOnBackdrop(event)">
+    <div class="picker-box">
+      <div class="picker-header">
+        <h3 id="sub-modal-title">STANDBY REPLACEMENT FROM POOL</h3>
+        <button class="picker-close" onclick="closeSubModal()">&times;</button>
+      </div>
+      <div style="padding: 8px 16px 0; font-size: 11px; color: var(--steel-muted);">
+        No-Show: <strong id="sub-target-name" style="color: var(--rollover-gold);">---</strong> (will return to waiting pool)
+      </div>
+      <div class="picker-search-bar">
+        <input type="text" id="sub-search-input" class="picker-input" placeholder="Search standby in pool..." oninput="filterSubList()" />
+      </div>
+      <div class="picker-list" id="sub-items-container"></div>
+    </div>
+  </div>
+
   <script>
-    // Set your admin pin for deleting individual test logs
     const ADMIN_DELETE_PIN = "1234";
 
-    // 100 MEMBER ROSTER SEED
     const ROSTER_SEED = [
       "MOUSE [R5]",
       "WARLORD_THOR", "RECRUITER_FREYA", "MUSE_LOKI", "BUTLER_TYR",
@@ -851,22 +1003,23 @@
       history: []
     };
 
-    // MODE & SELECTION STATE
-    let currentOperationMode = "AUTO"; // "AUTO" or "MANUAL"
-    let activePickerTarget = null;     // 'conductor' or 'vip'
-    let selectedConductor = null;      // null = Auto
-    let selectedVIP = null;            // null = Auto
+    let currentOperationMode = "AUTO"; 
+    let activePickerTarget = null;     
+    let selectedConductor = null;      
+    let selectedVIP = null;            
+
+    let swapTargetSeat = null; 
+    let carriageSwapSource = null; // for seat-to-seat movement
 
     function loadState() {
-      const saved = localStorage.getItem("grimm_mainsite_train_v4");
+      const saved = localStorage.getItem("grimm_mainsite_train_v6");
       if (saved) siteTrainState = JSON.parse(saved);
     }
 
     function saveState() {
-      localStorage.setItem("grimm_mainsite_train_v4", JSON.stringify(siteTrainState));
+      localStorage.setItem("grimm_mainsite_train_v6", JSON.stringify(siteTrainState));
     }
 
-    // DRAW MODE TOGGLING
     function setDrawMode(mode) {
       currentOperationMode = mode;
       
@@ -904,7 +1057,7 @@
       }
     }
 
-    // SEARCHABLE PICKER MODAL
+    /* PRE-DRAW PICKER */
     function openPicker(role) {
       if (currentOperationMode !== "MANUAL") return;
       activePickerTarget = role;
@@ -937,14 +1090,12 @@
       const list = document.getElementById("picker-items-container");
       list.innerHTML = "";
 
-      // Option 1: Auto Roll
       const autoBtn = document.createElement("div");
       autoBtn.className = "picker-item auto-option";
       autoBtn.innerHTML = `<span>[ AUTO-DRAW (RNG) ]</span> <span>🎲</span>`;
       autoBtn.onclick = () => selectMember(null);
       list.appendChild(autoBtn);
 
-      // Matches
       const matches = ROSTER_SEED.filter(name => name.toLowerCase().includes(query));
 
       if (matches.length === 0) {
@@ -989,7 +1140,419 @@
       closePicker();
     }
 
-    // BUILD INITIAL SEAT SLOTS IN DOM
+    /* 1. STANDBY SUBSTITUTION (SWAP NO-SHOW WITH WAITING POOL) */
+    function openSeatSubstitute(type, index = null) {
+      if (!siteTrainState.currentTrain) return;
+
+      if (siteTrainState.pool.length === 0) {
+        alert("The waiting pool is currently empty. No standbys available!");
+        return;
+      }
+
+      let currentName = "";
+      if (type === 'conductor') currentName = siteTrainState.currentTrain.conductor;
+      else if (type === 'vip') currentName = siteTrainState.currentTrain.vip;
+      else currentName = siteTrainState.currentTrain.passengers[index].name;
+
+      swapTargetSeat = { type, index, currentName };
+
+      document.getElementById("sub-target-name").innerText = currentName;
+      document.getElementById("sub-modal-title").innerText = `SUBSTITUTE ${type.toUpperCase()}`;
+      
+      const searchInput = document.getElementById("sub-search-input");
+      searchInput.value = "";
+
+      document.getElementById("sub-picker-modal").classList.add("active");
+      renderSubOptions("");
+      setTimeout(() => searchInput.focus(), 50);
+    }
+
+    function closeSubModal() {
+      document.getElementById("sub-picker-modal").classList.remove("active");
+      swapTargetSeat = null;
+    }
+
+    function closeSubModalOnBackdrop(e) {
+      if (e.target.id === "sub-picker-modal") closeSubModal();
+    }
+
+    function filterSubList() {
+      const q = document.getElementById("sub-search-input").value.trim().toLowerCase();
+      renderSubOptions(q);
+    }
+
+    function renderSubOptions(query) {
+      const container = document.getElementById("sub-items-container");
+      container.innerHTML = "";
+
+      const candidates = siteTrainState.pool.filter(name => name.toLowerCase().includes(query));
+
+      if (candidates.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--steel-dim); font-size:11px; padding:16px;">No eligible standbys in pool matching "${query}"</div>`;
+        return;
+      }
+
+      candidates.forEach(name => {
+        const item = document.createElement("div");
+        item.className = "picker-item";
+        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--frost-bright);">Board Train &rarr;</span>`;
+        item.onclick = () => executeSeatSwapWithPool(name);
+        container.appendChild(item);
+      });
+    }
+
+    function executeSeatSwapWithPool(replacementName) {
+      if (!swapTargetSeat) return;
+      const noShowName = swapTargetSeat.currentName;
+
+      // 1. Remove replacement from pool
+      siteTrainState.pool = siteTrainState.pool.filter(name => name !== replacementName);
+
+      // 2. Return no-show to pool
+      if (!siteTrainState.pool.includes(noShowName)) {
+        siteTrainState.pool.push(noShowName);
+      }
+
+      // 3. Update boarded history tracker
+      siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(name => name !== noShowName);
+      if (!siteTrainState.boardedThisCycle.includes(replacementName)) {
+        siteTrainState.boardedThisCycle.push(replacementName);
+      }
+
+      // 4. Update current staging train
+      if (swapTargetSeat.type === 'conductor') {
+        siteTrainState.currentTrain.conductor = replacementName;
+      } else if (swapTargetSeat.type === 'vip') {
+        siteTrainState.currentTrain.vip = replacementName;
+      } else {
+        siteTrainState.currentTrain.passengers[swapTargetSeat.index].name = replacementName;
+      }
+
+      saveState();
+      updateInterface();
+      closeSubModal();
+    }
+
+    /* 2. SEAT-TO-SEAT SWAPPING (MOVE BETWEEN CARRIAGES / CABIN) */
+    function startSeatToSeatSwap(type, index = null) {
+      let memberName = "";
+      if (type === 'conductor') memberName = siteTrainState.currentTrain.conductor;
+      else if (type === 'vip') memberName = siteTrainState.currentTrain.vip;
+      else memberName = siteTrainState.currentTrain.passengers[index].name;
+
+      if (!carriageSwapSource) {
+        // Step 1: Select first member
+        carriageSwapSource = { type, index, memberName };
+        document.getElementById("source-swap-name").innerText = memberName;
+        document.getElementById("swap-mode-indicator").classList.add("active");
+        highlightSwapTargets();
+      } else {
+        // Step 2: Swap with target
+        executeSeatToSeatSwap(type, index);
+      }
+    }
+
+    function cancelSeatToSeatSwap() {
+      carriageSwapSource = null;
+      document.getElementById("swap-mode-indicator").classList.remove("active");
+      clearSwapHighlights();
+    }
+
+    function executeSeatToSeatSwap(targetType, targetIndex) {
+      const src = carriageSwapSource;
+      if (!src) return;
+
+      if (src.type === targetType && src.index === targetIndex) {
+        cancelSeatToSeatSwap();
+        return;
+      }
+
+      // Get target details
+      let targetName = "";
+      let targetRollover = false;
+      if (targetType === 'conductor') {
+        targetName = siteTrainState.currentTrain.conductor;
+        targetRollover = siteTrainState.currentTrain.condIsRollover;
+      } else if (targetType === 'vip') {
+        targetName = siteTrainState.currentTrain.vip;
+        targetRollover = siteTrainState.currentTrain.vipIsRollover;
+      } else {
+        targetName = siteTrainState.currentTrain.passengers[targetIndex].name;
+        targetRollover = siteTrainState.currentTrain.passengers[targetIndex].isRollover;
+      }
+
+      // Get source details
+      let srcName = src.memberName;
+      let srcRollover = false;
+      if (src.type === 'conductor') {
+        srcRollover = siteTrainState.currentTrain.condIsRollover;
+      } else if (src.type === 'vip') {
+        srcRollover = siteTrainState.currentTrain.vipIsRollover;
+      } else {
+        srcRollover = siteTrainState.currentTrain.passengers[src.index].isRollover;
+      }
+
+      // Place target into source slot
+      if (src.type === 'conductor') {
+        siteTrainState.currentTrain.conductor = targetName;
+        siteTrainState.currentTrain.condIsRollover = targetRollover;
+      } else if (src.type === 'vip') {
+        siteTrainState.currentTrain.vip = targetName;
+        siteTrainState.currentTrain.vipIsRollover = targetRollover;
+      } else {
+        siteTrainState.currentTrain.passengers[src.index].name = targetName;
+        siteTrainState.currentTrain.passengers[src.index].isRollover = targetRollover;
+      }
+
+      // Place source into target slot
+      if (targetType === 'conductor') {
+        siteTrainState.currentTrain.conductor = srcName;
+        siteTrainState.currentTrain.condIsRollover = srcRollover;
+      } else if (targetType === 'vip') {
+        siteTrainState.currentTrain.vip = srcName;
+        siteTrainState.currentTrain.vipIsRollover = srcRollover;
+      } else {
+        siteTrainState.currentTrain.passengers[targetIndex].name = srcName;
+        siteTrainState.currentTrain.passengers[targetIndex].isRollover = srcRollover;
+      }
+
+      cancelSeatToSeatSwap();
+      saveState();
+      updateInterface();
+    }
+
+    function highlightSwapTargets() {
+      clearSwapHighlights();
+      if (!carriageSwapSource) return;
+
+      if (carriageSwapSource.type === 'conductor') {
+        document.getElementById("pod-conductor").classList.add("swap-target-active");
+      } else if (carriageSwapSource.type === 'vip') {
+        document.getElementById("pod-vip").classList.add("swap-target-active");
+      } else {
+        const cIdx = Math.floor(carriageSwapSource.index / 7) + 1;
+        const sIdx = (carriageSwapSource.index % 7) + 1;
+        const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
+        if (slot) slot.classList.add("swap-target-active");
+      }
+    }
+
+    function clearSwapHighlights() {
+      document.querySelectorAll(".swap-target-active").forEach(el => el.classList.remove("swap-target-active"));
+    }
+
+    /* CONFIRMATION WORKFLOW: COMMIT STAGED TRAIN TO HISTORY */
+    function confirmTrainDeparture() {
+      if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) {
+        alert("No active train staging to confirm.");
+        return;
+      }
+
+      const train = siteTrainState.currentTrain;
+      const now = new Date();
+      const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Build official permanent departure log
+      const logEntry = {
+        cycle: train.stagingCycle,
+        day: train.stagingDay,
+        time: timeStr,
+        conductor: train.conductor,
+        condIsRollover: train.condIsRollover,
+        vip: train.vip,
+        vipIsRollover: train.vipIsRollover,
+        manualConductor: train.manualConductor,
+        manualVIP: train.manualVIP,
+        passengers: JSON.parse(JSON.stringify(train.passengers)),
+        rollover: train.rolloverHappened
+      };
+
+      // Add to beginning of history
+      siteTrainState.history.unshift(logEntry);
+
+      // Finalize train state
+      train.isStaged = false;
+      train.confirmedTime = timeStr;
+
+      // Advance day/cycle officially
+      if (train.rolloverHappened) {
+        siteTrainState.cycle++;
+        siteTrainState.day = 2;
+      } else {
+        siteTrainState.day++;
+      }
+
+      saveState();
+      updateInterface();
+      alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nTrain manifest is permanently recorded in official Departure Logs.");
+    }
+
+    /* CORE DRAW SEQUENCE (STAGING MODE) */
+    function executeDrawSequence() {
+      if (siteTrainState.currentTrain && siteTrainState.currentTrain.isStaged) {
+        if (!confirm("A train is already boarding! Discard current staging train and roll a new one?")) {
+          return;
+        }
+      }
+
+      const btn = document.getElementById("btn-draw");
+      btn.disabled = true;
+
+      const manualCond = (currentOperationMode === "MANUAL") ? selectedConductor : null;
+      const manualVip = (currentOperationMode === "MANUAL") ? selectedVIP : null;
+
+      const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+      siteTrainState.pool = shuffle(siteTrainState.pool);
+
+      let finalConductor = manualCond;
+      let finalVIP = manualVip;
+      let condIsRollover = false;
+      let vipIsRollover = false;
+
+      let rolloverHappened = false;
+      const currentStagingCycle = siteTrainState.cycle;
+      const currentStagingDay = siteTrainState.day;
+
+      let rngNeeded = 28;
+      if (!finalConductor) rngNeeded++;
+      if (!finalVIP) rngNeeded++;
+
+      let eligibleCarryover = [...siteTrainState.pool];
+
+      if (finalConductor && eligibleCarryover.includes(finalConductor)) {
+        condIsRollover = true;
+        eligibleCarryover = eligibleCarryover.filter(name => name !== finalConductor);
+      }
+      if (finalVIP && eligibleCarryover.includes(finalVIP)) {
+        vipIsRollover = true;
+        eligibleCarryover = eligibleCarryover.filter(name => name !== finalVIP);
+      }
+
+      let drawnMembers = [];
+
+      if (eligibleCarryover.length >= rngNeeded) {
+        // Standard Day
+        siteTrainState.pool = eligibleCarryover;
+        const pulled = siteTrainState.pool.splice(0, rngNeeded);
+        drawnMembers = pulled.map(name => ({ name, isRollover: false }));
+
+        siteTrainState.boardedThisCycle.push(...pulled);
+        if (finalConductor && !siteTrainState.boardedThisCycle.includes(finalConductor)) {
+          siteTrainState.boardedThisCycle.push(finalConductor);
+        }
+        if (finalVIP && !siteTrainState.boardedThisCycle.includes(finalVIP)) {
+          siteTrainState.boardedThisCycle.push(finalVIP);
+        }
+      } else {
+        // Rollover Day
+        rolloverHappened = true;
+        const carryoverGuaranteed = [...eligibleCarryover];
+        drawnMembers = carryoverGuaranteed.map(name => ({ name, isRollover: true }));
+
+        const freshRoster = shuffle([...ROSTER_SEED]);
+        const seatedToday = [
+          ...carryoverGuaranteed,
+          ...(finalConductor ? [finalConductor] : []),
+          ...(finalVIP ? [finalVIP] : [])
+        ];
+        siteTrainState.pool = freshRoster.filter(name => !seatedToday.includes(name));
+
+        const deficit = rngNeeded - carryoverGuaranteed.length;
+        const freshPicks = siteTrainState.pool.splice(0, deficit);
+        drawnMembers.push(...freshPicks.map(name => ({ name, isRollover: false })));
+
+        siteTrainState.boardedThisCycle = [...freshPicks];
+        if (finalConductor) siteTrainState.boardedThisCycle.push(finalConductor);
+        if (finalVIP) siteTrainState.boardedThisCycle.push(finalVIP);
+      }
+
+      if (!finalConductor) {
+        const condObj = drawnMembers.shift();
+        finalConductor = condObj.name;
+        condIsRollover = condObj.isRollover;
+      }
+      if (!finalVIP) {
+        const vipObj = drawnMembers.shift();
+        finalVIP = vipObj.name;
+        vipIsRollover = vipObj.isRollover;
+      }
+
+      const passengers = drawnMembers;
+
+      // Create Staged Train (isStaged: true -> NOT in history yet)
+      siteTrainState.currentTrain = {
+        isStaged: true,
+        stagingCycle: currentStagingCycle,
+        stagingDay: currentStagingDay,
+        conductor: finalConductor,
+        condIsRollover,
+        vip: finalVIP,
+        vipIsRollover,
+        passengers,
+        manualConductor: !!manualCond,
+        manualVIP: !!manualVip,
+        rolloverHappened
+      };
+
+      saveState();
+
+      // Reset manual select
+      selectedConductor = null;
+      selectedVIP = null;
+      document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
+      document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
+
+      runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
+        btn.disabled = false;
+        updateInterface();
+      });
+    }
+
+    function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
+      document.getElementById("slot-conductor").innerText = "LOCKING...";
+      document.getElementById("slot-vip").innerText = "LOCKING...";
+
+      for (let c = 1; c <= 4; c++) {
+        for (let s = 1; s <= 7; s++) {
+          const slot = document.getElementById(`seat-c${c}-s${s}`);
+          slot.className = "seat-box";
+          slot.innerHTML = `
+            <div class="left-info">
+              <span class="seat-index">${s}</span>
+              <span class="passenger-name slot-flicker">ROLLING...</span>
+            </div>
+          `;
+        }
+      }
+
+      setTimeout(() => {
+        document.getElementById("slot-conductor").innerHTML = `${conductor} ${condRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
+      }, 500);
+
+      setTimeout(() => {
+        document.getElementById("slot-vip").innerHTML = `${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
+      }, 900);
+
+      passengers.forEach((p, idx) => {
+        const cIdx = Math.floor(idx / 7) + 1;
+        const sIdx = (idx % 7) + 1;
+        setTimeout(() => {
+          const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
+          slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
+          slot.innerHTML = `
+            <div class="left-info">
+              <span class="seat-index">${sIdx}</span>
+              <span class="passenger-name">${p.name}</span>
+            </div>
+          `;
+
+          if (idx === passengers.length - 1) {
+            setTimeout(callback, 300);
+          }
+        }, 1000 + (idx * 40));
+      });
+    }
+
     function buildEmptySlots() {
       for (let c = 1; c <= 4; c++) {
         const carList = document.getElementById(`car-${c}-seats`);
@@ -1009,12 +1572,30 @@
       }
     }
 
-    // REFRESH FULL UI
     function updateInterface() {
+      const isStaged = siteTrainState.currentTrain && siteTrainState.currentTrain.isStaged;
+
       document.getElementById("hud-cycle").innerText = `CYCLE ${siteTrainState.cycle} • DAY ${siteTrainState.day}/4`;
       document.getElementById("hud-pool").innerText = `${siteTrainState.pool.length} / 100`;
       document.getElementById("hud-boarded").innerText = `${siteTrainState.boardedThisCycle.length} / 100`;
       document.getElementById("queue-counter").innerText = `${siteTrainState.pool.length} ELIGIBLE`;
+
+      // Status indicator
+      const hudStatus = document.getElementById("hud-status");
+      const stagingBanner = document.getElementById("staging-banner");
+      const confirmBtn = document.getElementById("btn-confirm-depart");
+
+      if (isStaged) {
+        hudStatus.innerText = "BOARDING / STAGING";
+        hudStatus.style.color = "var(--rollover-gold)";
+        stagingBanner.classList.add("active");
+        confirmBtn.classList.add("active");
+      } else {
+        hudStatus.innerText = siteTrainState.currentTrain ? "DEPARTED" : "STANDBY";
+        hudStatus.style.color = siteTrainState.currentTrain ? "var(--success-green)" : "var(--steel-muted)";
+        stagingBanner.classList.remove("active");
+        confirmBtn.classList.remove("active");
+      }
 
       // Render Queue
       const queueBox = document.getElementById("pool-names-display");
@@ -1026,29 +1607,48 @@
         queueBox.appendChild(tag);
       });
 
-      // Restore active train if exists
+      // Render Active/Staged Train
       if (siteTrainState.currentTrain) {
-        document.getElementById("slot-conductor").innerHTML = `${siteTrainState.currentTrain.conductor} ${siteTrainState.currentTrain.condIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-        document.getElementById("slot-vip").innerHTML = `${siteTrainState.currentTrain.vip} ${siteTrainState.currentTrain.vipIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
+        const t = siteTrainState.currentTrain;
+        document.getElementById("slot-conductor").innerHTML = `
+          ${t.conductor} 
+          ${t.condIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+        `;
+
+        document.getElementById("conductor-actions").innerHTML = `
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇄ Standby</button>
+          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('conductor')">⇅ Move</button>
+        `;
+
+        document.getElementById("slot-vip").innerHTML = `
+          ${t.vip} 
+          ${t.vipIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+        `;
+
+        document.getElementById("vip-actions").innerHTML = `
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇄ Standby</button>
+          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('vip')">⇅ Move</button>
+        `;
 
         let passIndex = 0;
         for (let c = 1; c <= 4; c++) {
           for (let s = 1; s <= 7; s++) {
             const slot = document.getElementById(`seat-c${c}-s${s}`);
-            const p = siteTrainState.currentTrain.passengers[passIndex++];
+            const pIdx = passIndex++;
+            const p = t.passengers[pIdx];
             if (slot && p) {
               slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
-              slot.querySelector(".passenger-name").innerText = p.name;
-
-              const oldTag = slot.querySelector(".rollover-tag");
-              if (oldTag) oldTag.remove();
-
-              if (p.isRollover) {
-                const rTag = document.createElement("span");
-                rTag.className = "rollover-tag";
-                rTag.innerText = "ROLLOVER";
-                slot.appendChild(rTag);
-              }
+              slot.innerHTML = `
+                <div class="left-info" onclick="startSeatToSeatSwap('passenger', ${pIdx})" style="cursor: pointer;" title="Click to swap seat with selected member">
+                  <span class="seat-index">${s}</span>
+                  <span class="passenger-name">${p.name}</span>
+                </div>
+                <div class="seat-actions">
+                  ${p.isRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+                  <button type="button" class="btn-seat-action" title="Replace no-show from pool" onclick="openSeatSubstitute('passenger', ${pIdx})">⇄ Standby</button>
+                  <button type="button" class="btn-seat-action" title="Move member to another carriage seat" onclick="startSeatToSeatSwap('passenger', ${pIdx})">⇅ Move</button>
+                </div>
+              `;
             }
           }
         }
@@ -1063,7 +1663,7 @@
       feed.innerHTML = "";
 
       if (!siteTrainState.history || siteTrainState.history.length === 0) {
-        feed.innerHTML = `<div style="text-align:center; font-size:11px; color:var(--steel-dim); padding:16px;">NO DEPARTURES RECORDED YET.</div>`;
+        feed.innerHTML = `<div style="text-align:center; font-size:11px; color:var(--steel-dim); padding:16px;">NO OFFICIAL DEPARTURES RECORDED YET.</div>`;
         count.innerText = `0 DRAWS LOGGED`;
         return;
       }
@@ -1096,9 +1696,8 @@
       });
     }
 
-    // PIN PROTECTED LOG ENTRY DELETION
     function deleteHistoryEntry(index) {
-      const pin = prompt("Enter Admin PIN to delete this departure log:");
+      const pin = prompt("Enter Admin PIN to delete this departure log and refund members to the pool:");
       if (pin === null) return;
 
       if (pin.trim() !== ADMIN_DELETE_PIN) {
@@ -1107,217 +1706,69 @@
       }
 
       const target = siteTrainState.history[index];
-      if (confirm(`Confirm deletion of entry: Cycle ${target.cycle} - Day ${target.day} (${target.time})?`)) {
-        siteTrainState.history.splice(index, 1);
-        saveState();
-        renderLogs();
-      }
-    }
+      const isLatest = (index === 0);
 
-    // CORE DRAW ENGINE (WITH NO-REPLACEMENT CYCLE & ROLLOVER)
-    function executeDrawSequence() {
-      const btn = document.getElementById("btn-draw");
-      btn.disabled = true;
+      const confirmMsg = `Confirm deletion of Cycle ${target.cycle} - Day ${target.day} (${target.time})?\n\nThis will refund all 30 members back into the waiting pool and rewind cycle progress.`;
+      if (!confirm(confirmMsg)) return;
 
-      const manualCond = (currentOperationMode === "MANUAL") ? selectedConductor : null;
-      const manualVip = (currentOperationMode === "MANUAL") ? selectedVIP : null;
+      const refundedMembers = [
+        target.conductor,
+        target.vip,
+        ...target.passengers.map(p => p.name)
+      ];
 
-      const shuffle = arr => arr.sort(() => Math.random() - 0.5);
-      siteTrainState.pool = shuffle(siteTrainState.pool);
-
-      let finalConductor = manualCond;
-      let finalVIP = manualVip;
-      let condIsRollover = false;
-      let vipIsRollover = false;
-
-      let rolloverHappened = false;
-      const curCycle = siteTrainState.cycle;
-      const curDay = siteTrainState.day;
-
-      // 1. Calculate how many random slots are needed
-      let rngNeeded = 28;
-      if (!finalConductor) rngNeeded++;
-      if (!finalVIP) rngNeeded++;
-
-      // 2. Identify if manual picks originated from remaining carryover pool
-      let eligibleCarryover = [...siteTrainState.pool];
-
-      if (finalConductor && eligibleCarryover.includes(finalConductor)) {
-        condIsRollover = true;
-        eligibleCarryover = eligibleCarryover.filter(name => name !== finalConductor);
-      }
-      if (finalVIP && eligibleCarryover.includes(finalVIP)) {
-        vipIsRollover = true;
-        eligibleCarryover = eligibleCarryover.filter(name => name !== finalVIP);
-      }
-
-      let drawnMembers = [];
-
-      // 3. Determine if rollover is triggered
-      if (eligibleCarryover.length >= rngNeeded) {
-        // Standard Day
-        siteTrainState.pool = eligibleCarryover;
-        const pulled = siteTrainState.pool.splice(0, rngNeeded);
-        drawnMembers = pulled.map(name => ({ name, isRollover: false }));
-
-        siteTrainState.boardedThisCycle.push(...pulled);
-        if (finalConductor && !siteTrainState.boardedThisCycle.includes(finalConductor)) {
-          siteTrainState.boardedThisCycle.push(finalConductor);
+      refundedMembers.forEach(name => {
+        if (!siteTrainState.pool.includes(name)) {
+          siteTrainState.pool.push(name);
         }
-        if (finalVIP && !siteTrainState.boardedThisCycle.includes(finalVIP)) {
-          siteTrainState.boardedThisCycle.push(finalVIP);
-        }
-        siteTrainState.day++;
+      });
+
+      siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(
+        name => !refundedMembers.includes(name)
+      );
+
+      if (target.rollover) {
+        if (siteTrainState.cycle > 1) siteTrainState.cycle--;
+        siteTrainState.day = 4;
       } else {
-        // Rollover Day
-        rolloverHappened = true;
-        const carryoverGuaranteed = [...eligibleCarryover];
-        drawnMembers = carryoverGuaranteed.map(name => ({ name, isRollover: true }));
-
-        const freshRoster = shuffle([...ROSTER_SEED]);
-
-        const seatedToday = [
-          ...carryoverGuaranteed,
-          ...(finalConductor ? [finalConductor] : []),
-          ...(finalVIP ? [finalVIP] : [])
-        ];
-        siteTrainState.pool = freshRoster.filter(name => !seatedToday.includes(name));
-
-        const deficit = rngNeeded - carryoverGuaranteed.length;
-        const freshPicks = siteTrainState.pool.splice(0, deficit);
-        drawnMembers.push(...freshPicks.map(name => ({ name, isRollover: false })));
-
-        siteTrainState.boardedThisCycle = [...freshPicks];
-        if (finalConductor) siteTrainState.boardedThisCycle.push(finalConductor);
-        if (finalVIP) siteTrainState.boardedThisCycle.push(finalVIP);
-
-        siteTrainState.cycle++;
-        siteTrainState.day = 2;
+        if (siteTrainState.day > 1) siteTrainState.day--;
       }
 
-      // 4. Fill Auto slots if any
-      if (!finalConductor) {
-        const condObj = drawnMembers.shift();
-        finalConductor = condObj.name;
-        condIsRollover = condObj.isRollover;
+      siteTrainState.history.splice(index, 1);
+
+      if (isLatest) {
+        siteTrainState.currentTrain = null;
+        buildEmptySlots();
+        document.getElementById("slot-conductor").innerText = "--- STANDBY ---";
+        document.getElementById("slot-vip").innerText = "--- STANDBY ---";
+        document.getElementById("conductor-actions").innerHTML = "";
+        document.getElementById("vip-actions").innerHTML = "";
       }
-      if (!finalVIP) {
-        const vipObj = drawnMembers.shift();
-        finalVIP = vipObj.name;
-        vipIsRollover = vipObj.isRollover;
-      }
 
-      // Remaining 28 go to Carriages
-      const passengers = drawnMembers;
-
-      // 5. Save state
-      siteTrainState.currentTrain = {
-        conductor: finalConductor,
-        condIsRollover,
-        vip: finalVIP,
-        vipIsRollover,
-        passengers,
-        manualConductor: !!manualCond,
-        manualVIP: !!manualVip,
-        rolloverHappened
-      };
-
-      const now = new Date();
-      siteTrainState.history.unshift({
-        cycle: curCycle,
-        day: curDay,
-        time: now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        conductor: finalConductor,
-        condIsRollover,
-        vip: finalVIP,
-        vipIsRollover,
-        manualConductor: !!manualCond,
-        manualVIP: !!manualVip,
-        passengers,
-        rollover: rolloverHappened
-      });
       saveState();
-
-      // Reset picker selection state for next run
-      selectedConductor = null;
-      selectedVIP = null;
-      document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
-      document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
-
-      // 6. Trigger Animation
-      runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
-        btn.disabled = false;
-        updateInterface();
-      });
+      updateInterface();
+      alert("Departure removed! All 30 members have been refunded to the waiting pool.");
     }
 
-    function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
-      document.getElementById("slot-conductor").innerText = "LOCKING...";
-      document.getElementById("slot-vip").innerText = "LOCKING...";
-
-      for (let c = 1; c <= 4; c++) {
-        for (let s = 1; s <= 7; s++) {
-          const slot = document.getElementById(`seat-c${c}-s${s}`);
-          slot.className = "seat-box";
-          const tag = slot.querySelector(".rollover-tag");
-          if (tag) tag.remove();
-          const pName = slot.querySelector(".passenger-name");
-          pName.innerText = "ROLLING...";
-          pName.classList.add("slot-flicker");
-        }
-      }
-
-      setTimeout(() => {
-        document.getElementById("slot-conductor").innerHTML = `${conductor} ${condRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-      }, 500);
-
-      setTimeout(() => {
-        document.getElementById("slot-vip").innerHTML = `${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-      }, 900);
-
-      passengers.forEach((p, idx) => {
-        const cIdx = Math.floor(idx / 7) + 1;
-        const sIdx = (idx % 7) + 1;
-        setTimeout(() => {
-          const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
-          const pName = slot.querySelector(".passenger-name");
-          pName.classList.remove("slot-flicker");
-          pName.innerText = p.name;
-          slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
-
-          if (p.isRollover) {
-            const tag = document.createElement("span");
-            tag.className = "rollover-tag";
-            tag.innerText = "ROLLOVER";
-            slot.appendChild(tag);
-          }
-
-          if (idx === passengers.length - 1) {
-            setTimeout(callback, 300);
-          }
-        }, 1000 + (idx * 45));
-      });
-    }
-
-    // SAFE RESET: Resets rotation and pool, keeps all history logs intact
     function resetCycle() {
-      if (!confirm("Reset the current train cycle back to Day 1? (Departure history logs will be KEPT).")) return;
+      if (!confirm("Reset current cycle back to Day 1? (Confirmed history logs will be KEPT).")) return;
       siteTrainState.cycle = 1;
       siteTrainState.day = 1;
       siteTrainState.pool = [...ROSTER_SEED];
       siteTrainState.boardedThisCycle = [];
       siteTrainState.currentTrain = null;
-      // siteTrainState.history is preserved
 
       saveState();
       buildEmptySlots();
       document.getElementById("slot-conductor").innerText = "--- STANDBY ---";
       document.getElementById("slot-vip").innerText = "--- STANDBY ---";
+      document.getElementById("conductor-actions").innerHTML = "";
+      document.getElementById("vip-actions").innerHTML = "";
       setDrawMode("AUTO");
       updateInterface();
     }
 
-    // INITIAL LOAD
+    // INITIALIZATION
     loadState();
     buildEmptySlots();
     setDrawMode("AUTO");
