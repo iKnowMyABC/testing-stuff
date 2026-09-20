@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Station Platform • Pixi.js Gold Express</title>
+  <title>Alliance Train • The Frozen Dreadnought</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  
-  <!-- Pixi.js v7 CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --bg-dark: #070a0e;
-      --panel-bg: rgba(12, 17, 23, 0.88);
+      --bg-base: #070a0e;
+      --card-bg: rgba(12, 17, 23, 0.7);
+      --card-bg-subtle: rgba(17, 24, 34, 0.85);
+      --seat-bg: rgba(7, 10, 14, 0.6);
+      
       --frost-border: rgba(120, 180, 232, 0.22);
       --frost-bright: #78b4e8;
       --frost-glow: rgba(120, 180, 232, 0.25);
@@ -22,27 +22,23 @@
       --steel-muted: #9ab0c2;
       --steel-dim: #5a6e7f;
 
-      --gold-primary: #f39c12;
-      --gold-light: #f1c40f;
-      --gold-dark: #b7791f;
-
-      --card-bg-orange: rgba(22, 16, 10, 0.95);
-      --card-border-gold: #e67e22;
-
-      --conductor-gold: #ffd700;
-      --vip-crimson: #e74c3c;
-      --rollover-tag-bg: #d35400;
+      --conductor-gold: #e2b04a;
+      --conductor-glow: rgba(226, 176, 74, 0.2);
+      --vip-crimson: #992d22;
+      --vip-light: #ff7675;
+      --vip-glow: rgba(153, 45, 34, 0.25);
+      --rollover-gold: #d18a45;
       --success-green: #2ecc71;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg-dark);
+      background: var(--bg-base);
       color: var(--ice-white);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      padding: 24px 14px 90px;
+      padding: 40px 16px 90px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -51,58 +47,78 @@
 
     .train-container {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1160px;
     }
 
     /* HEADER */
-    .station-header {
+    .train-header {
       text-align: center;
-      margin-bottom: 18px;
+      margin-bottom: 24px;
     }
 
-    .station-header .sub-cap {
+    .train-header .sub-caption {
       font-family: 'Cinzel', serif;
       font-size: 10px;
       letter-spacing: 3px;
-      color: var(--gold-light);
+      color: var(--frost-bright);
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
-    .station-header h1 {
+    .train-header h1 {
       font-family: 'Cinzel', serif;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 800;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       color: var(--ice-white);
       text-shadow: 0 0 16px var(--frost-glow);
     }
 
-    /* HUD METRIC BAR */
+    /* METRIC HUD BAR */
     .hud-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      background: var(--panel-bg);
+      background: var(--card-bg);
       border: 1px solid var(--frost-border);
-      border-radius: 6px;
-      padding: 12px 18px;
-      margin-bottom: 20px;
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
     }
 
-    @media (max-width: 768px) { .hud-bar { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+      .hud-bar { grid-template-columns: repeat(2, 1fr); }
+    }
 
-    .hud-item { display: flex; flex-direction: column; gap: 2px; }
-    .hud-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; color: var(--steel-dim); text-transform: uppercase; }
-    .hud-val { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--ice-white); }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
 
-    /* STAGING / CONFIRM BANNER */
+    .hud-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: var(--steel-dim);
+      text-transform: uppercase;
+    }
+
+    .hud-val {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ice-white);
+      letter-spacing: 1px;
+    }
+
+    /* BOARDING STATUS BANNER */
     .staging-banner {
       display: none;
-      background: rgba(230, 126, 34, 0.15);
-      border: 1px solid var(--gold-primary);
-      border-radius: 6px;
-      padding: 12px 18px;
+      background: rgba(209, 138, 69, 0.12);
+      border: 1px solid var(--rollover-gold);
+      border-radius: 4px;
+      padding: 10px 16px;
       margin-bottom: 20px;
       align-items: center;
       justify-content: space-between;
@@ -110,10 +126,33 @@
       font-size: 12px;
     }
 
-    .staging-banner.active { display: flex; }
-    .staging-text { color: #fdebd0; font-family: 'Cinzel', serif; letter-spacing: 0.5px; }
+    .staging-banner.active {
+      display: flex;
+    }
 
-    /* MODE TOGGLE */
+    .staging-text {
+      color: #ffd4a8;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    .swap-mode-indicator {
+      display: none;
+      background: rgba(120, 180, 232, 0.15);
+      border: 1px dashed var(--frost-bright);
+      color: var(--ice-white);
+      padding: 8px 14px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .swap-mode-indicator.active {
+      display: block;
+    }
+
+    /* MODE TOGGLE SWITCH */
     .mode-switch-container {
       display: flex;
       justify-content: center;
@@ -146,6 +185,11 @@
       transition: all 0.2s ease;
     }
 
+    .mode-btn:hover:not(.active) {
+      color: var(--ice-white);
+      background: rgba(120, 180, 232, 0.08);
+    }
+
     .mode-btn.active {
       background: rgba(120, 180, 232, 0.18);
       border-color: var(--frost-bright);
@@ -153,184 +197,177 @@
       box-shadow: 0 0 12px var(--frost-glow);
     }
 
-    /* =========================================================
-       PIXI.JS STAGE & MANIFEST SPLIT
-    ========================================================= */
-    .viewport-grid {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 20px;
-      background: linear-gradient(90deg, #10151d 0%, #090c10 100%);
-      border: 1px solid var(--frost-border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
-    }
-
-    @media (max-width: 980px) { .viewport-grid { grid-template-columns: 1fr; } }
-
-    /* Canvas Container */
-    .pixi-stage-wrapper {
-      position: relative;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid rgba(120, 180, 232, 0.3);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
-      background: #c5d3df; /* Snow terrain base */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 640px;
-    }
-
-    #pixi-canvas-mount {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* RIGHT MANIFEST CARDS */
-    .manifest-panel-deck {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      justify-content: center;
-    }
-
-    .officers-cockpit-card {
-      background: rgba(18, 24, 34, 0.9);
-      border: 1px solid var(--gold-primary);
-      border-radius: 6px;
-      padding: 12px 16px;
+    /* ENGINE QUARTERS */
+    .engine-quarters {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      gap: 16px;
+      margin-bottom: 30px;
     }
 
-    .officer-pod {
+    @media (max-width: 650px) {
+      .engine-quarters { grid-template-columns: 1fr; }
+    }
+
+    .cabin-pod {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 16px 20px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-    }
-
-    .officer-pod .title-row {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-    }
-
-    .officer-pod.conductor .title-row { color: var(--conductor-gold); }
-    .officer-pod.vip .title-row { color: var(--vip-crimson); }
-
-    .officer-name-val {
-      font-family: 'Cinzel', serif;
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
-      min-height: 24px;
-      display: flex;
-      align-items: center;
-    }
-
-    .pod-picker-btn {
-      background: rgba(7, 10, 14, 0.85);
-      border: 1px solid var(--frost-border);
-      color: var(--ice-white);
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-
-    .pod-picker-btn.disabled-mode {
-      opacity: 0.35;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    /* CARRIAGE CARDS */
-    .cargo-card-pod {
-      background: var(--card-bg-orange);
-      border: 2px solid var(--card-border-gold);
-      border-radius: 8px;
-      padding: 10px 14px;
       position: relative;
       transition: all 0.2s ease;
     }
 
-    .cargo-card-pod.focused-car {
-      border-color: var(--gold-light);
-      box-shadow: 0 0 16px rgba(241, 196, 15, 0.45);
+    .cabin-pod.swap-target-active {
+      border-color: #ffd4a8 !important;
+      box-shadow: 0 0 18px rgba(255, 212, 168, 0.4) !important;
     }
 
-    .cargo-card-header {
+    .cabin-pod.conductor-pod {
+      border-color: rgba(226, 176, 74, 0.4);
+      box-shadow: 0 0 14px var(--conductor-glow);
+    }
+
+    .cabin-pod.vip-pod {
+      border-color: rgba(153, 45, 34, 0.45);
+      box-shadow: 0 0 14px var(--vip-glow);
+    }
+
+    .pod-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(230, 126, 34, 0.3);
-      padding-bottom: 5px;
-      margin-bottom: 8px;
+      width: 100%;
+      margin-bottom: 10px;
     }
 
-    .cargo-card-header .car-title {
+    .pod-label {
       font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .conductor-pod .pod-label { color: var(--conductor-gold); }
+    .vip-pod .pod-label { color: var(--vip-light); }
+
+    .pod-btn-trigger {
+      background: rgba(7, 10, 14, 0.85);
+      border: 1px solid var(--frost-border);
+      color: var(--ice-white);
+      font-family: 'Inter', sans-serif;
       font-size: 11px;
-      font-weight: 800;
-      color: var(--gold-light);
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
+      transition: all 0.2s ease;
     }
 
-    .cargo-card-header .car-count { font-size: 10px; font-weight: 700; color: var(--steel-muted); }
+    .pod-btn-trigger:hover {
+      border-color: var(--frost-bright);
+      background: rgba(120, 180, 232, 0.15);
+    }
 
-    .members-seat-grid {
+    .pod-btn-trigger.disabled-mode {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(120, 180, 232, 0.1);
+      pointer-events: none;
+    }
+
+    .pod-occupant {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--ice-white);
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+      width: 100%;
+    }
+
+    /* CARRIAGES (4 COLUMNS) */
+    .carriages-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 35px;
+    }
+
+    @media (max-width: 940px) { .carriages-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .carriages-grid { grid-template-columns: 1fr; } }
+
+    .carriage-module {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .carriage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(120, 180, 232, 0.12);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .carriage-header .num {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: var(--frost-bright);
+      font-weight: 700;
+    }
+
+    .carriage-header .name {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--steel-muted);
+      text-transform: uppercase;
+    }
+
+    .seat-rows {
+      display: flex;
+      flex-direction: column;
       gap: 6px;
     }
 
-    .members-seat-grid.row-2 {
-      grid-template-columns: repeat(3, 1fr);
-      margin-top: 6px;
-    }
-
-    @media (max-width: 1080px) {
-      .members-seat-grid { grid-template-columns: repeat(2, 1fr); }
-      .members-seat-grid.row-2 { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    .member-cargo-cell {
-      background: rgba(14, 20, 28, 0.9);
-      border: 1px solid rgba(230, 126, 34, 0.25);
-      border-radius: 4px;
-      padding: 5px 7px;
+    .seat-box {
+      background: var(--seat-bg);
+      border: 1px solid rgba(120, 180, 232, 0.1);
+      border-radius: 3px;
+      padding: 6px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 32px;
-      font-size: 11px;
+      min-height: 34px;
+      font-size: 12px;
+      transition: all 0.2s ease;
     }
 
-    .member-cargo-cell.boarded {
-      background: rgba(22, 32, 46, 0.95);
-      border-color: rgba(243, 156, 18, 0.45);
+    .seat-box.swap-target-active {
+      border-color: #ffd4a8 !important;
+      background: rgba(209, 138, 69, 0.2) !important;
+      box-shadow: 0 0 10px rgba(255, 212, 168, 0.3);
     }
 
-    .member-cargo-cell.guaranteed-rollover {
-      border-color: var(--gold-light);
-      background: rgba(230, 126, 34, 0.22);
-    }
-
-    .cell-left {
+    .seat-box .left-info {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -338,50 +375,83 @@
       flex: 1;
     }
 
-    .cell-index {
+    .seat-box .seat-index {
       font-family: 'Cinzel', serif;
       font-size: 9px;
-      font-weight: 800;
-      color: var(--gold-light);
-      width: 12px;
+      color: var(--steel-dim);
+      width: 14px;
     }
 
-    .cell-name {
+    .seat-box .passenger-name {
       color: var(--steel-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-size: 11px;
     }
 
-    .member-cargo-cell.boarded .cell-name { color: #ffffff; font-weight: 600; }
+    .seat-box.boarded {
+      background: rgba(120, 180, 232, 0.08);
+      border-color: rgba(120, 180, 232, 0.35);
+    }
+
+    .seat-box.boarded .passenger-name {
+      color: var(--ice-white);
+    }
+
+    .seat-box.guaranteed-rollover {
+      border-color: rgba(209, 138, 69, 0.5);
+      background: rgba(209, 138, 69, 0.08);
+    }
 
     .rollover-tag {
       font-family: 'Cinzel', serif;
       font-size: 7px;
-      font-weight: 800;
-      color: #ffffff;
-      background: var(--rollover-tag-bg);
-      border: 1px solid var(--gold-primary);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--rollover-gold);
+      border: 1px solid rgba(209, 138, 69, 0.4);
       padding: 1px 4px;
       border-radius: 2px;
       text-transform: uppercase;
       margin-right: 2px;
     }
 
-    .btn-seat-action {
-      background: rgba(243, 156, 18, 0.12);
-      border: 1px solid rgba(243, 156, 18, 0.3);
-      color: var(--gold-light);
-      font-size: 9px;
-      font-weight: 600;
-      padding: 2px 4px;
-      border-radius: 2px;
-      cursor: pointer;
+    /* BUTTONS ON SEATS */
+    .seat-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .btn-seat-action:hover { background: rgba(243, 156, 18, 0.4); color: #fff; }
+    .btn-seat-action {
+      background: rgba(120, 180, 232, 0.08);
+      border: 1px solid rgba(120, 180, 232, 0.2);
+      color: var(--steel-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      padding: 2px 5px;
+      border-radius: 2px;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.15s ease;
+    }
 
-    /* ACTION PANEL */
+    .btn-seat-action:hover {
+      background: rgba(120, 180, 232, 0.25);
+      border-color: var(--frost-bright);
+      color: var(--ice-white);
+    }
+
+    .pod-actions-row {
+      position: absolute;
+      bottom: 8px;
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ACTION CONTROLS */
     .action-panel {
       display: flex;
       justify-content: center;
@@ -392,28 +462,32 @@
     }
 
     .btn-action-draw {
-      background: linear-gradient(180deg, #f39c12 0%, #b7791f 100%);
-      border: 2px solid #fbe285;
-      color: #1a0f00;
+      background: linear-gradient(180deg, rgba(120, 180, 232, 0.15) 0%, rgba(12, 17, 23, 0.8) 100%);
+      border: 1px solid var(--frost-bright);
+      color: var(--ice-white);
       font-family: 'Cinzel', serif;
-      font-size: 13px;
-      font-weight: 900;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 2px;
-      padding: 14px 34px;
+      padding: 12px 28px;
       cursor: pointer;
-      border-radius: 4px;
-      box-shadow: 0 0 18px rgba(243, 156, 18, 0.4);
+      border-radius: 3px;
+      box-shadow: 0 0 14px var(--frost-glow);
       transition: all 0.2s ease;
     }
 
     .btn-action-draw:hover:not(:disabled) {
-      background: linear-gradient(180deg, #f1c40f 0%, #d68910 100%);
+      background: rgba(120, 180, 232, 0.25);
+      border-color: #ffffff;
       transform: translateY(-2px);
-      box-shadow: 0 0 24px rgba(243, 156, 18, 0.6);
-      color: #000;
+      box-shadow: 0 0 20px var(--frost-glow);
     }
 
-    .btn-action-draw:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-action-draw:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
 
     .btn-confirm-depart {
       display: none;
@@ -424,15 +498,23 @@
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 2px;
-      padding: 14px 28px;
+      padding: 12px 28px;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 3px;
       box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
       transition: all 0.2s ease;
     }
 
-    .btn-confirm-depart.active { display: inline-block; }
-    .btn-confirm-depart:hover { background: rgba(46, 204, 113, 0.4); color: #fff; transform: translateY(-2px); }
+    .btn-confirm-depart:hover {
+      background: rgba(46, 204, 113, 0.4);
+      box-shadow: 0 0 22px rgba(46, 204, 113, 0.5);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .btn-confirm-depart.active {
+      display: inline-block;
+    }
 
     .btn-reset-cycle {
       background: transparent;
@@ -441,18 +523,23 @@
       font-family: 'Cinzel', serif;
       font-size: 10px;
       letter-spacing: 1.5px;
-      padding: 13px 18px;
+      padding: 12px 18px;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 3px;
+      transition: all 0.2s ease;
     }
 
-    .btn-reset-cycle:hover { border-color: var(--vip-crimson); color: #ff9d94; }
+    .btn-reset-cycle:hover {
+      border-color: var(--vip-crimson);
+      color: #ff9d94;
+      background: rgba(153, 45, 34, 0.1);
+    }
 
     /* DECK SECTIONS */
     .deck-section {
-      background: var(--panel-bg);
+      background: var(--card-bg);
       border: 1px solid var(--frost-border);
-      border-radius: 6px;
+      border-radius: 4px;
       padding: 18px 20px;
       margin-bottom: 24px;
     }
@@ -481,7 +568,7 @@
     }
 
     .queue-tag {
-      background: rgba(7, 10, 14, 0.7);
+      background: var(--seat-bg);
       border: 1px solid rgba(120, 180, 232, 0.1);
       border-radius: 2px;
       padding: 5px 8px;
@@ -503,13 +590,15 @@
     }
 
     .history-entry {
-      background: rgba(7, 10, 14, 0.7);
+      background: var(--seat-bg);
       border: 1px solid rgba(120, 180, 232, 0.12);
       border-radius: 3px;
       padding: 10px 14px;
     }
 
-    .history-entry.rollover-entry { border-left: 3px solid var(--gold-primary); }
+    .history-entry.rollover-entry {
+      border-left: 3px solid var(--rollover-gold);
+    }
 
     .entry-top {
       display: flex;
@@ -522,6 +611,12 @@
       margin-bottom: 6px;
     }
 
+    .history-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .btn-delete-log {
       background: transparent;
       border: 1px solid rgba(153, 45, 34, 0.3);
@@ -530,6 +625,14 @@
       padding: 2px 6px;
       font-size: 11px;
       cursor: pointer;
+      line-height: 1;
+      transition: all 0.2s ease;
+    }
+
+    .btn-delete-log:hover {
+      background: rgba(153, 45, 34, 0.25);
+      border-color: var(--vip-crimson);
+      color: #ff9d94;
     }
 
     .entry-leads {
@@ -540,10 +643,14 @@
       margin-bottom: 8px;
     }
 
-    .lead-cond { color: var(--gold-light); }
-    .lead-vip { color: var(--vip-crimson); }
+    .lead-cond { color: var(--conductor-gold); }
+    .lead-vip { color: var(--vip-light); }
 
-    .entry-names { display: flex; flex-wrap: wrap; gap: 4px; }
+    .entry-names {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
 
     .passenger-pill {
       background: rgba(12, 17, 23, 0.8);
@@ -554,9 +661,21 @@
       border-radius: 2px;
     }
 
-    .passenger-pill.is-rollover { border-color: var(--gold-primary); color: var(--gold-light); }
+    .passenger-pill.is-rollover {
+      border-color: rgba(209, 138, 69, 0.4);
+      color: var(--rollover-gold);
+    }
 
-    /* MODAL PICKERS */
+    .slot-flicker {
+      animation: slotFlash 0.12s infinite alternate;
+    }
+
+    @keyframes slotFlash {
+      from { color: var(--steel-dim); }
+      to { color: var(--ice-white); }
+    }
+
+    /* MODAL ARCHITECTURE */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -569,11 +688,14 @@
       padding: 16px;
     }
 
-    .modal-backdrop.active { display: flex; }
+    .modal-backdrop.active {
+      display: flex;
+    }
 
     .picker-box {
       background: #0b1118;
       border: 1px solid var(--frost-bright);
+      box-shadow: 0 0 25px rgba(120, 180, 232, 0.25);
       border-radius: 4px;
       width: 100%;
       max-width: 440px;
@@ -591,10 +713,31 @@
       align-items: center;
     }
 
-    .picker-header h3 { font-family: 'Cinzel', serif; font-size: 13px; color: var(--ice-white); }
-    .picker-close { background: transparent; border: none; color: var(--steel-dim); font-size: 20px; cursor: pointer; }
+    .picker-header h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      color: var(--ice-white);
+    }
 
-    .picker-search-bar { padding: 12px 16px; border-bottom: 1px solid rgba(120, 180, 232, 0.1); }
+    .picker-close {
+      background: transparent;
+      border: none;
+      color: var(--steel-dim);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .picker-close:hover {
+      color: var(--ice-white);
+    }
+
+    .picker-search-bar {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(120, 180, 232, 0.1);
+    }
+
     .picker-input {
       width: 100%;
       background: rgba(7, 10, 14, 0.8);
@@ -602,25 +745,57 @@
       border-radius: 3px;
       padding: 9px 12px;
       color: var(--ice-white);
+      font-family: 'Inter', sans-serif;
       font-size: 13px;
       outline: none;
     }
 
-    .picker-list { flex: 1; overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .picker-input:focus {
+      border-color: var(--frost-bright);
+      box-shadow: 0 0 10px rgba(120, 180, 232, 0.2);
+    }
+
+    .picker-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     .picker-item {
       padding: 9px 12px;
       border-radius: 3px;
       background: rgba(12, 17, 23, 0.6);
+      border: 1px solid transparent;
       color: var(--steel-muted);
       font-size: 12px;
       cursor: pointer;
+      transition: all 0.15s ease;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .picker-item:hover { background: rgba(120, 180, 232, 0.12); color: var(--ice-white); }
-    .picker-item.auto-option { border: 1px solid var(--gold-primary); color: var(--gold-light); font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 4px; }
+    .picker-item:hover {
+      background: rgba(120, 180, 232, 0.12);
+      border-color: rgba(120, 180, 232, 0.35);
+      color: var(--ice-white);
+    }
+
+    .picker-item.auto-option {
+      border-color: rgba(209, 138, 69, 0.35);
+      color: var(--rollover-gold);
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .picker-item.auto-option:hover {
+      background: rgba(209, 138, 69, 0.15);
+      color: #ffd4a8;
+    }
   </style>
 </head>
 <body>
@@ -628,12 +803,12 @@
   <div class="train-container">
 
     <!-- HEADER -->
-    <div class="station-header">
-      <div class="sub-cap">Platform 3 • Interactive Engine[cite: 1]</div>
-      <h1>ᛟ STATION PLATFORM • THE GOLD EXPRESS ᛟ</h1>
+    <div class="train-header">
+      <div class="sub-caption">Alliance Boarding Engine</div>
+      <h1>ᛟ THE FROZEN DREADNOUGHT ᛟ</h1>
     </div>
 
-    <!-- HUD BAR -->
+    <!-- METRIC HUD BAR -->
     <div class="hud-bar">
       <div class="hud-item">
         <span class="hud-label">Current Cycle</span>
@@ -648,7 +823,7 @@
         <span class="hud-val" id="hud-boarded">0 / 100</span>
       </div>
       <div class="hud-item">
-        <span class="hud-label">Platform Status</span>
+        <span class="hud-label">Boarding Status</span>
         <span class="hud-val" id="hud-status" style="color: var(--steel-muted);">STANDBY</span>
       </div>
     </div>
@@ -656,18 +831,24 @@
     <!-- STAGING BANNER -->
     <div class="staging-banner" id="staging-banner">
       <div class="staging-text">
-        ᛟ <strong>BOARDING IN PROGRESS:</strong> Adjust berths or replace no-shows. Click <strong>CONFIRM DEPARTURE</strong> to lock into logs.
+        ᛟ <strong>BOARDING IN PROGRESS:</strong> Adjust berths or substitute no-shows. Click <strong>CONFIRM DEPARTURE</strong> when ready to commit to history.
       </div>
       <button class="btn-confirm-depart active" onclick="confirmTrainDeparture()">
         ᛟ CONFIRM DEPARTURE ᛟ
       </button>
     </div>
 
-    <!-- MODE SWITCH -->
+    <!-- SEAT SWAP PROMPT -->
+    <div class="swap-mode-indicator" id="swap-mode-indicator">
+      Select the target seat you want to swap <strong><span id="source-swap-name" style="color: #ffd4a8;">---</span></strong> with:
+      <button onclick="cancelSeatToSeatSwap()" style="margin-left: 10px; background: transparent; border: 1px solid var(--frost-bright); color: var(--ice-white); padding: 2px 8px; border-radius: 2px; cursor: pointer;">Cancel</button>
+    </div>
+
+    <!-- MODE TOGGLE SWITCH -->
     <div class="mode-switch-container">
       <div class="mode-toggle-group">
         <button type="button" class="mode-btn active" id="btn-mode-auto" onclick="setDrawMode('AUTO')">
-          <span>🎲</span> FULL AUTO DRAW (30 RNG)
+          <span>🎲</span> FULL AUTO DRAW (ALL 30 RNG)
         </button>
         <button type="button" class="mode-btn" id="btn-mode-manual" onclick="setDrawMode('MANUAL')">
           <span>⚙</span> MANUAL LEADERSHIP ASSIGN
@@ -675,84 +856,68 @@
       </div>
     </div>
 
-    <!-- VIEWPORT SPLIT: PIXI CANVAS (LEFT) & MANIFEST (RIGHT) -->
-    <div class="viewport-grid">
+    <!-- ENGINE CABIN: CONDUCTOR + VIP -->
+    <div class="engine-quarters">
       
-      <!-- PIXI 2D CANVAS CONTAINER -->
-      <div class="pixi-stage-wrapper">
-        <div id="pixi-canvas-mount"></div>
+      <!-- CONDUCTOR POD -->
+      <div class="cabin-pod conductor-pod" id="pod-conductor">
+        <div class="pod-header-row">
+          <div class="pod-label">ᛟ Train Conductor ᛟ</div>
+          <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('conductor')">
+            <span id="label-conductor-mode">[ AUTO-DRAW ]</span> &#9662;
+          </button>
+        </div>
+        <div class="pod-occupant" id="slot-conductor">--- STANDBY ---</div>
+        <div class="pod-actions-row" id="conductor-actions"></div>
       </div>
 
-      <!-- RIGHT MANIFEST STACK -->
-      <div class="manifest-panel-deck">
-        
-        <!-- LEADERSHIP COCKPIT CARD -->
-        <div class="officers-cockpit-card">
-          <div class="officer-pod conductor">
-            <div class="title-row">
-              <span>ᛟ CONDUCTOR</span>
-              <button class="pod-picker-btn disabled-mode" id="btn-cond-pick" onclick="openPicker('conductor')">
-                <span id="label-conductor-mode">[ AUTO ]</span> &#9662;
-              </button>
-            </div>
-            <div class="officer-name-val" id="slot-conductor">--- STANDBY ---</div>
-            <div class="seat-actions" id="conductor-actions" style="margin-top: 4px;"></div>
-          </div>
-
-          <div class="officer-pod vip">
-            <div class="title-row">
-              <span>★ VIP GUEST</span>
-              <button class="pod-picker-btn disabled-mode" id="btn-vip-pick" onclick="openPicker('vip')">
-                <span id="label-vip-mode">[ AUTO ]</span> &#9662;
-              </button>
-            </div>
-            <div class="officer-name-val" id="slot-vip">--- STANDBY ---</div>
-            <div class="seat-actions" id="vip-actions" style="margin-top: 4px;"></div>
-          </div>
+      <!-- VIP POD -->
+      <div class="cabin-pod vip-pod" id="pod-vip">
+        <div class="pod-header-row">
+          <div class="pod-label">★ VIP Guest ★</div>
+          <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('vip')">
+            <span id="label-vip-mode">[ AUTO-DRAW ]</span> &#9662;
+          </button>
         </div>
-
-        <!-- CARRIAGE 1 -->
-        <div class="cargo-card-pod" id="card-car-1" onmouseenter="highlightCarriage(1)" onmouseleave="unhighlightCarriage()">
-          <div class="cargo-card-header">
-            <span class="car-title">ᛟ CARRIAGE 01 • VANGUARD</span>
-            <span class="car-count" id="count-car-1">0/7 RIDERS</span>
-          </div>
-          <div class="members-seat-grid" id="car-1-row1"></div>
-          <div class="members-seat-grid row-2" id="car-1-row2"></div>
-        </div>
-
-        <!-- CARRIAGE 2 -->
-        <div class="cargo-card-pod" id="card-car-2" onmouseenter="highlightCarriage(2)" onmouseleave="unhighlightCarriage()">
-          <div class="cargo-card-header">
-            <span class="car-title">ᛟ CARRIAGE 02 • GLACIAL CAR</span>
-            <span class="car-count" id="count-car-2">0/7 RIDERS</span>
-          </div>
-          <div class="members-seat-grid" id="car-2-row1"></div>
-          <div class="members-seat-grid row-2" id="car-2-row2"></div>
-        </div>
-
-        <!-- CARRIAGE 3 -->
-        <div class="cargo-card-pod" id="card-car-3" onmouseenter="highlightCarriage(3)" onmouseleave="unhighlightCarriage()">
-          <div class="cargo-card-header">
-            <span class="car-title">ᛟ CARRIAGE 03 • SHIELDWALL</span>
-            <span class="car-count" id="count-car-3">0/7 RIDERS</span>
-          </div>
-          <div class="members-seat-grid" id="car-3-row1"></div>
-          <div class="members-seat-grid row-2" id="car-3-row2"></div>
-        </div>
-
-        <!-- CARRIAGE 4 -->
-        <div class="cargo-card-pod" id="card-car-4" onmouseenter="highlightCarriage(4)" onmouseleave="unhighlightCarriage()">
-          <div class="cargo-card-header">
-            <span class="car-title">ᛟ CARRIAGE 04 • OUTRIDER</span>
-            <span class="car-count" id="count-car-4">0/7 RIDERS</span>
-          </div>
-          <div class="members-seat-grid" id="car-4-row1"></div>
-          <div class="members-seat-grid row-2" id="car-4-row2"></div>
-        </div>
-
+        <div class="pod-occupant" id="slot-vip">--- STANDBY ---</div>
+        <div class="pod-actions-row" id="vip-actions"></div>
       </div>
 
+    </div>
+
+    <!-- CARRIAGES (4 COLUMNS) -->
+    <div class="carriages-grid">
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR I</span>
+          <span class="name">Vanguard</span>
+        </div>
+        <div class="seat-rows" id="car-1-seats"></div>
+      </div>
+
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR II</span>
+          <span class="name">Glacial Iron</span>
+        </div>
+        <div class="seat-rows" id="car-2-seats"></div>
+      </div>
+
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR III</span>
+          <span class="name">Shieldwall</span>
+        </div>
+        <div class="seat-rows" id="car-3-seats"></div>
+      </div>
+
+      <div class="carriage-module">
+        <div class="carriage-header">
+          <span class="num">CAR IV</span>
+          <span class="name">Outrider</span>
+        </div>
+        <div class="seat-rows" id="car-4-seats"></div>
+      </div>
     </div>
 
     <!-- ACTION CONTROLS -->
@@ -761,7 +926,7 @@
         ᛟ INITIATE FULL AUTO DRAW (30 SEATS) ᛟ
       </button>
       <button class="btn-confirm-depart" id="btn-confirm-depart" onclick="confirmTrainDeparture()">
-        ᛟ CONFIRM DEPARTURE & COMMIT TO HISTORY ᛟ
+        ᛟ CONFIRM DEPARTURE & RECORD TO HISTORY ᛟ
       </button>
       <button class="btn-reset-cycle" onclick="resetCycle()">RESET ROTATION</button>
     </div>
@@ -775,10 +940,10 @@
       <div class="queue-grid" id="pool-names-display"></div>
     </div>
 
-    <!-- HISTORY LOGS -->
+    <!-- DEPARTURE LOGS -->
     <div class="deck-section">
       <div class="deck-title">
-        <span>ᛟ OFFICIAL DEPARTURE LOGS</span>
+        <span>ᛟ OFFICIAL DEPARTURE LOGS (CONFIRMED)</span>
         <span id="log-counter" style="font-size: 10px; color: var(--steel-dim);">0 DRAWS LOGGED</span>
       </div>
       <div class="history-feed" id="history-feed-display"></div>
@@ -786,7 +951,7 @@
 
   </div>
 
-  <!-- SEARCHABLE PICKER MODAL -->
+  <!-- SEARCHABLE PRE-DRAW MODAL -->
   <div id="member-picker-modal" class="modal-backdrop" onclick="closePickerOnBackdrop(event)">
     <div class="picker-box">
       <div class="picker-header">
@@ -804,11 +969,11 @@
   <div id="sub-picker-modal" class="modal-backdrop" onclick="closeSubModalOnBackdrop(event)">
     <div class="picker-box">
       <div class="picker-header">
-        <h3 id="sub-modal-title">SUBSTITUTE NO-SHOW</h3>
+        <h3 id="sub-modal-title">STANDBY REPLACEMENT FROM POOL</h3>
         <button class="picker-close" onclick="closeSubModal()">&times;</button>
       </div>
       <div style="padding: 8px 16px 0; font-size: 11px; color: var(--steel-muted);">
-        Replacing: <strong id="sub-target-name" style="color: var(--gold-light);">---</strong> (returns to pool)
+        No-Show: <strong id="sub-target-name" style="color: var(--rollover-gold);">---</strong> (will return to waiting pool)
       </div>
       <div class="picker-search-bar">
         <input type="text" id="sub-search-input" class="picker-input" placeholder="Search standby in pool..." oninput="filterSubList()" />
@@ -846,381 +1011,65 @@
     let swapTargetSeat = null; 
     let carriageSwapSource = null;
 
-    /* =========================================================
-       PIXI.JS PROCEDURAL GRAPHICS & ANIMATION ENGINE
-    ========================================================= */
-    let pixiApp;
-    let trackContainer, trainConsistContainer, effectsContainer;
-    let locomotiveSprite, carSprites = [];
-    let smokeParticles = [];
-    let sparkParticles = [];
-
-    function initPixiEngine() {
-      const mount = document.getElementById("pixi-canvas-mount");
-      const width = 380;
-      const height = 660;
-
-      pixiApp = new PIXI.Application({
-        width,
-        height,
-        backgroundColor: 0xd8e2ec, // Snowy ground tint[cite: 1, 2]
-        antialias: true,
-        resolution: window.devicePixelRatio || 1,
-        autoDensity: true
-      });
-      mount.appendChild(pixiApp.view);
-
-      trackContainer = new PIXI.Container();
-      trainConsistContainer = new PIXI.Container();
-      effectsContainer = new PIXI.Container();
-
-      pixiApp.stage.addChild(trackContainer);
-      pixiApp.stage.addChild(trainConsistContainer);
-      pixiApp.stage.addChild(effectsContainer);
-
-      drawStationEnvironment(width, height);
-      buildTrainConsist(width);
-
-      // Pixi Render Loop for Steam & Rail Sparks
-      pixiApp.ticker.add((delta) => {
-        updateParticles(delta);
-      });
-    }
-
-    function drawStationEnvironment(w, h) {
-      const g = new PIXI.Graphics();
-
-      // 1. Concrete Boarding Platform on Left[cite: 1, 2]
-      g.beginFill(0x88929b);
-      g.drawRect(0, 0, 100, h);
-      g.endFill();
-
-      // Platform 3 Yellow Hazard Safety Line[cite: 1, 2]
-      g.beginFill(0xf1c40f);
-      g.drawRect(100, 0, 12, h);
-      g.endFill();
-
-      // Hazard Black Diagonal Stripes[cite: 1, 2]
-      g.lineStyle(2, 0x111111, 0.7);
-      for (let y = -20; y < h + 20; y += 16) {
-        g.moveTo(100, y);
-        g.lineTo(112, y + 10);
-      }
-
-      // 2. Wooden Railroad Ties[cite: 1, 2]
-      const trackX = 180;
-      for (let y = 0; y < h; y += 22) {
-        g.lineStyle(0);
-        g.beginFill(0x3e2723); // Wood tie[cite: 1, 2]
-        g.drawRoundedRect(trackX - 44, y, 88, 10, 2);
-        g.endFill();
-      }
-
-      // 3. Steel Rails[cite: 1, 2]
-      g.beginFill(0x95a5a6);
-      g.drawRect(trackX - 32, 0, 6, h); // Left Rail[cite: 1, 2]
-      g.drawRect(trackX + 26, 0, 6, h); // Right Rail[cite: 1, 2]
-      g.endFill();
-
-      // Steel highlights
-      g.beginFill(0xffffff, 0.6);
-      g.drawRect(trackX - 31, 0, 2, h);
-      g.drawRect(trackX + 27, 0, 2, h);
-      g.endFill();
-
-      trackContainer.addChild(g);
-    }
-
-    function buildTrainConsist(stageW) {
-      trainConsistContainer.x = 180; // Centered on rails
-      trainConsistContainer.y = 50;  // Initial resting dock
-
-      // 1. Streamlined Golden Locomotive Engine[cite: 1, 2]
-      locomotiveSprite = new PIXI.Container();
-      const locoG = new PIXI.Graphics();
-
-      // Engine Body Gold Bevel[cite: 1, 2]
-      locoG.beginFill(0xb7791f);
-      locoG.drawRoundedRect(-32, -45, 64, 90, 26);
-      locoG.endFill();
-
-      locoG.beginFill(0xf39c12);
-      locoG.drawRoundedRect(-29, -42, 58, 84, 22);
-      locoG.endFill();
-
-      // Aerodynamic Bullet Nose Highlight[cite: 1, 2]
-      locoG.beginFill(0xf1c40f);
-      locoG.drawRoundedRect(-24, -38, 48, 40, 16);
-      locoG.endFill();
-
-      // Roof Radiator Vent Grill[cite: 1, 2]
-      locoG.beginFill(0x221a08);
-      locoG.drawRoundedRect(-14, 2, 28, 24, 4);
-      locoG.endFill();
-      locoG.lineStyle(1.5, 0xfbe285);
-      for (let l = 6; l <= 22; l += 4) {
-        locoG.moveTo(-12, l);
-        locoG.lineTo(12, l);
-      }
-
-      // Officer Cap Insignia Disc[cite: 3]
-      locoG.lineStyle(2, 0xffd700);
-      locoG.beginFill(0x111111);
-      locoG.drawCircle(0, -18, 11);
-      locoG.endFill();
-
-      const capText = new PIXI.Text("👨‍✈️", { fontSize: 13 });
-      capText.anchor.set(0.5);
-      capText.y = -17;
-
-      locomotiveSprite.addChild(locoG);
-      locomotiveSprite.addChild(capText);
-      locomotiveSprite.y = 0;
-      trainConsistContainer.addChild(locomotiveSprite);
-
-      // 2. Four Golden Carriages[cite: 1, 2]
-      carSprites = [];
-      const startY = 85;
-      const carSpacing = 110;
-
-      for (let c = 0; c < 4; c++) {
-        const carCont = new PIXI.Container();
-        const cg = new PIXI.Graphics();
-
-        // Mechanical Coupler joint connecting to car above[cite: 1, 2]
-        cg.beginFill(0x1a1a1a);
-        cg.drawRect(-8, -18, 16, 18);
-        cg.endFill();
-
-        // Gilded Boxcar Outer Hull[cite: 1, 2]
-        cg.beginFill(0x8a5a12);
-        cg.drawRoundedRect(-30, 0, 60, 92, 8);
-        cg.endFill();
-
-        cg.beginFill(0xf39c12);
-        cg.drawRoundedRect(-27, 3, 54, 86, 6);
-        cg.endFill();
-
-        // Dual Roof Inspection Hatches[cite: 1, 2]
-        cg.beginFill(0xf1c40f);
-        cg.drawRoundedRect(-20, 10, 40, 32, 4);
-        cg.drawRoundedRect(-20, 48, 40, 32, 4);
-        cg.endFill();
-
-        cg.lineStyle(1, 0x8a5a12, 0.8);
-        cg.drawRoundedRect(-18, 12, 36, 28, 3);
-        cg.drawRoundedRect(-18, 50, 36, 28, 3);
-
-        carCont.addChild(cg);
-
-        // Occupancy Counter Badge (e.g. 7/7)[cite: 3]
-        const badgeCont = new PIXI.Container();
-        const bgBadge = new PIXI.Graphics();
-        bgBadge.beginFill(0x000000, 0.75);
-        bgBadge.drawRoundedRect(-18, -10, 36, 20, 4);
-        bgBadge.endFill();
-        badgeCont.addChild(bgBadge);
-
-        const countText = new PIXI.Text("0/7", {
-          fontSize: 10,
-          fill: 0xffffff,
-          fontFamily: "Arial",
-          fontWeight: "bold"
-        });
-        countText.name = "txt_count";
-        countText.anchor.set(0.5);
-        badgeCont.addChild(countText);
-
-        badgeCont.y = 45;
-        carCont.addChild(badgeCont);
-
-        // Interactive hover
-        carCont.interactive = true;
-        carCont.buttonMode = true;
-        carCont.on('pointerover', () => highlightCarriage(c + 1));
-        carCont.on('pointerout', () => unhighlightCarriage());
-
-        carCont.y = startY + (c * carSpacing);
-        trainConsistContainer.addChild(carCont);
-        carSprites.push(carCont);
-      }
-    }
-
-    function updateParticles(delta) {
-      // 1. Steam Particles
-      for (let i = smokeParticles.length - 1; i >= 0; i--) {
-        const p = smokeParticles[i];
-        p.y += p.vy * delta;
-        p.x += p.vx * delta;
-        p.alpha -= 0.018 * delta;
-        p.scale.x += 0.02 * delta;
-        p.scale.y += 0.02 * delta;
-
-        if (p.alpha <= 0) {
-          effectsContainer.removeChild(p);
-          smokeParticles.splice(i, 1);
-        }
-      }
-
-      // 2. Track Sparks
-      for (let i = sparkParticles.length - 1; i >= 0; i--) {
-        const sp = sparkParticles[i];
-        sp.y += sp.vy * delta;
-        sp.x += sp.vx * delta;
-        sp.alpha -= 0.04 * delta;
-
-        if (sp.alpha <= 0) {
-          effectsContainer.removeChild(sp);
-          sparkParticles.splice(i, 1);
-        }
-      }
-    }
-
-    function spawnSteam(x, y) {
-      const g = new PIXI.Graphics();
-      g.beginFill(0xffffff, 0.75);
-      g.drawCircle(0, 0, 8 + Math.random() * 6);
-      g.endFill();
-
-      g.x = x + (Math.random() * 6 - 3);
-      g.y = y;
-      g.vx = (Math.random() - 0.5) * 1.5;
-      g.vy = -(1.5 + Math.random() * 2);
-      effectsContainer.addChild(g);
-      smokeParticles.push(g);
-    }
-
-    function spawnSparks(x, y) {
-      const g = new PIXI.Graphics();
-      g.beginFill(0xf1c40f, 0.9);
-      g.drawCircle(0, 0, 2 + Math.random() * 2);
-      g.endFill();
-
-      g.x = x;
-      g.y = y;
-      g.vx = (Math.random() - 0.5) * 4;
-      g.vy = (Math.random() - 0.5) * 4;
-      effectsContainer.addChild(g);
-      sparkParticles.push(g);
-    }
-
-    /* ANIMATE TRAIN PULLING OUT AND RETURNING */
-    function playDepartureArrivalAnimation(callback) {
-      let phase = "EXIT"; // EXIT then RETURN
-      let speed = 2;
-      const targetRestY = 50;
-
-      const animTicker = (delta) => {
-        // Emit steam from locomotive smokestack
-        const locoWorldY = trainConsistContainer.y + locomotiveSprite.y;
-        if (Math.random() < 0.4) {
-          spawnSteam(trainConsistContainer.x, locoWorldY - 20);
-        }
-
-        // Emit wheel sparks on rails[cite: 1, 2]
-        if (Math.random() < 0.3) {
-          spawnSparks(trainConsistContainer.x - 30, locoWorldY + 30);
-          spawnSparks(trainConsistContainer.x + 30, locoWorldY + 30);
-        }
-
-        if (phase === "EXIT") {
-          speed += 0.3 * delta;
-          trainConsistContainer.y += speed * delta;
-
-          if (trainConsistContainer.y > 750) {
-            // Reset above screen to arrive downwards
-            trainConsistContainer.y = -650;
-            phase = "RETURN";
-            speed = 14;
-          }
-        } else if (phase === "RETURN") {
-          speed = Math.max(1.5, speed - 0.18 * delta);
-          trainConsistContainer.y += speed * delta;
-
-          if (trainConsistContainer.y >= targetRestY) {
-            trainConsistContainer.y = targetRestY;
-            pixiApp.ticker.remove(animTicker);
-            if (callback) callback();
-          }
-        }
-      };
-
-      pixiApp.ticker.add(animTicker);
-    }
-
-    function highlightCarriage(carNum) {
-      carSprites.forEach((cs, idx) => {
-        cs.scale.set(idx + 1 === carNum ? 1.05 : 1.0);
-      });
-      for (let c = 1; c <= 4; c++) {
-        const card = document.getElementById(`card-car-${c}`);
-        if (card) {
-          if (c === carNum) card.classList.add("focused-car");
-          else card.classList.remove("focused-car");
-        }
-      }
-    }
-
-    function unhighlightCarriage() {
-      carSprites.forEach(cs => cs.scale.set(1.0));
-      for (let c = 1; c <= 4; c++) {
-        const card = document.getElementById(`card-car-${c}`);
-        if (card) card.classList.remove("focused-car");
-      }
-    }
-
-    /* =========================================================
-       STATE & BUSINESS LOGIC
-    ========================================================= */
     function loadState() {
-      const saved = localStorage.getItem("grimm_pixi_train_v1");
+      const saved = localStorage.getItem("grimm_mainsite_train_v6");
       if (saved) siteTrainState = JSON.parse(saved);
     }
 
     function saveState() {
-      localStorage.setItem("grimm_pixi_train_v1", JSON.stringify(siteTrainState));
+      localStorage.setItem("grimm_mainsite_train_v6", JSON.stringify(siteTrainState));
     }
 
     function setDrawMode(mode) {
       currentOperationMode = mode;
+      
       const autoBtn = document.getElementById("btn-mode-auto");
       const manualBtn = document.getElementById("btn-mode-manual");
-      const condTrigger = document.getElementById("btn-cond-pick");
-      const vipTrigger = document.getElementById("btn-vip-pick");
+      const condTrigger = document.querySelector(".conductor-pod .pod-btn-trigger");
+      const vipTrigger = document.querySelector(".vip-pod .pod-btn-trigger");
 
       if (mode === "AUTO") {
         autoBtn.classList.add("active");
         manualBtn.classList.remove("active");
+
         condTrigger.classList.add("disabled-mode");
         vipTrigger.classList.add("disabled-mode");
 
         selectedConductor = null;
         selectedVIP = null;
-        document.getElementById("label-conductor-mode").innerText = "[ AUTO ]";
-        document.getElementById("label-vip-mode").innerText = "[ AUTO ]";
+        document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
+        document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
 
         if (!siteTrainState.currentTrain) {
           document.getElementById("slot-conductor").innerText = "--- AUTO-ROLL ---";
           document.getElementById("slot-vip").innerText = "--- AUTO-ROLL ---";
         }
+
         document.getElementById("btn-draw").innerText = "ᛟ INITIATE FULL AUTO DRAW (30 SEATS) ᛟ";
       } else {
         autoBtn.classList.remove("active");
         manualBtn.classList.add("active");
+
         condTrigger.classList.remove("disabled-mode");
         vipTrigger.classList.remove("disabled-mode");
+
         document.getElementById("btn-draw").innerText = "ᛟ INITIATE CUSTOM TRAIN DRAW ᛟ";
       }
     }
 
+    /* PRE-DRAW PICKER */
     function openPicker(role) {
       if (currentOperationMode !== "MANUAL") return;
       activePickerTarget = role;
-      document.getElementById("picker-title").innerText = role === 'conductor' ? 'ᛟ ASSIGN CONDUCTOR' : '★ ASSIGN VIP GUEST';
-      document.getElementById("picker-search-input").value = "";
+      const title = role === 'conductor' ? 'ᛟ ASSIGN CONDUCTOR' : '★ ASSIGN VIP GUEST';
+      document.getElementById("picker-title").innerText = title;
+      
+      const searchInput = document.getElementById("picker-search-input");
+      searchInput.value = "";
+      
       document.getElementById("member-picker-modal").classList.add("active");
       renderPickerOptions("");
-      setTimeout(() => document.getElementById("picker-search-input").focus(), 50);
+      setTimeout(() => searchInput.focus(), 50);
     }
 
     function closePicker() {
@@ -1248,11 +1097,22 @@
       list.appendChild(autoBtn);
 
       const matches = ROSTER_SEED.filter(name => name.toLowerCase().includes(query));
+
+      if (matches.length === 0) {
+        list.innerHTML += `<div style="text-align: center; color: var(--steel-dim); font-size: 11px; padding: 16px;">No members matching "${query}"</div>`;
+        return;
+      }
+
       matches.forEach(name => {
         const item = document.createElement("div");
         item.className = "picker-item";
+        
         const inPool = siteTrainState.pool.includes(name);
-        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:${inPool ? 'var(--gold-light)' : 'var(--steel-dim)'};">${inPool ? 'In Pool' : 'Rode'}</span>`;
+        const statusNote = inPool 
+          ? `<span style="font-size: 10px; color: var(--frost-bright);">In Pool</span>` 
+          : `<span style="font-size: 10px; color: var(--steel-dim);">Rode</span>`;
+
+        item.innerHTML = `<span>${name}</span> ${statusNote}`;
         item.onclick = () => selectMember(name);
         list.appendChild(item);
       });
@@ -1260,33 +1120,51 @@
 
     function selectMember(name) {
       if (activePickerTarget === 'conductor') {
-        if (name && name === selectedVIP) return alert("Conductor and VIP cannot be the same!");
+        if (name && name === selectedVIP) {
+          alert("The Conductor and VIP cannot be the exact same member!");
+          return;
+        }
         selectedConductor = name;
-        document.getElementById("label-conductor-mode").innerText = name || "[ AUTO ]";
-        document.getElementById("slot-conductor").innerText = name || "--- AUTO-ROLL ---";
-      } else {
-        if (name && name === selectedConductor) return alert("VIP and Conductor cannot be the same!");
+        document.getElementById("label-conductor-mode").innerText = name ? name : "[ AUTO-DRAW ]";
+        document.getElementById("slot-conductor").innerText = name ? name : "--- AUTO-ROLL ---";
+      } else if (activePickerTarget === 'vip') {
+        if (name && name === selectedConductor) {
+          alert("The VIP and Conductor cannot be the exact same member!");
+          return;
+        }
         selectedVIP = name;
-        document.getElementById("label-vip-mode").innerText = name || "[ AUTO ]";
-        document.getElementById("slot-vip").innerText = name || "--- AUTO-ROLL ---";
+        document.getElementById("label-vip-mode").innerText = name ? name : "[ AUTO-DRAW ]";
+        document.getElementById("slot-vip").innerText = name ? name : "--- AUTO-ROLL ---";
       }
+
       closePicker();
     }
 
+    /* STANDBY SUBSTITUTION */
     function openSeatSubstitute(type, index = null) {
-      if (!siteTrainState.currentTrain || siteTrainState.pool.length === 0) return;
+      if (!siteTrainState.currentTrain) return;
+
+      if (siteTrainState.pool.length === 0) {
+        alert("The waiting pool is currently empty. No standbys available!");
+        return;
+      }
+
       let currentName = "";
       if (type === 'conductor') currentName = siteTrainState.currentTrain.conductor;
       else if (type === 'vip') currentName = siteTrainState.currentTrain.vip;
       else currentName = siteTrainState.currentTrain.passengers[index].name;
 
       swapTargetSeat = { type, index, currentName };
+
       document.getElementById("sub-target-name").innerText = currentName;
       document.getElementById("sub-modal-title").innerText = `SUBSTITUTE ${type.toUpperCase()}`;
-      document.getElementById("sub-search-input").value = "";
+      
+      const searchInput = document.getElementById("sub-search-input");
+      searchInput.value = "";
+
       document.getElementById("sub-picker-modal").classList.add("active");
       renderSubOptions("");
-      setTimeout(() => document.getElementById("sub-search-input").focus(), 50);
+      setTimeout(() => searchInput.focus(), 50);
     }
 
     function closeSubModal() {
@@ -1306,11 +1184,18 @@
     function renderSubOptions(query) {
       const container = document.getElementById("sub-items-container");
       container.innerHTML = "";
+
       const candidates = siteTrainState.pool.filter(name => name.toLowerCase().includes(query));
+
+      if (candidates.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--steel-dim); font-size:11px; padding:16px;">No eligible standbys in pool matching "${query}"</div>`;
+        return;
+      }
+
       candidates.forEach(name => {
         const item = document.createElement("div");
         item.className = "picker-item";
-        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--gold-light);">Board Consist &rarr;</span>`;
+        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--frost-bright);">Board Train &rarr;</span>`;
         item.onclick = () => executeSeatSwapWithPool(name);
         container.appendChild(item);
       });
@@ -1321,27 +1206,143 @@
       const noShowName = swapTargetSeat.currentName;
 
       siteTrainState.pool = siteTrainState.pool.filter(name => name !== replacementName);
-      if (!siteTrainState.pool.includes(noShowName)) siteTrainState.pool.push(noShowName);
+
+      if (!siteTrainState.pool.includes(noShowName)) {
+        siteTrainState.pool.push(noShowName);
+      }
 
       siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(name => name !== noShowName);
-      if (!siteTrainState.boardedThisCycle.includes(replacementName)) siteTrainState.boardedThisCycle.push(replacementName);
+      if (!siteTrainState.boardedThisCycle.includes(replacementName)) {
+        siteTrainState.boardedThisCycle.push(replacementName);
+      }
 
-      if (swapTargetSeat.type === 'conductor') siteTrainState.currentTrain.conductor = replacementName;
-      else if (swapTargetSeat.type === 'vip') siteTrainState.currentTrain.vip = replacementName;
-      else siteTrainState.currentTrain.passengers[swapTargetSeat.index].name = replacementName;
+      if (swapTargetSeat.type === 'conductor') {
+        siteTrainState.currentTrain.conductor = replacementName;
+      } else if (swapTargetSeat.type === 'vip') {
+        siteTrainState.currentTrain.vip = replacementName;
+      } else {
+        siteTrainState.currentTrain.passengers[swapTargetSeat.index].name = replacementName;
+      }
 
       saveState();
       updateInterface();
       closeSubModal();
     }
 
+    /* SEAT-TO-SEAT SWAPPING */
+    function startSeatToSeatSwap(type, index = null) {
+      let memberName = "";
+      if (type === 'conductor') memberName = siteTrainState.currentTrain.conductor;
+      else if (type === 'vip') memberName = siteTrainState.currentTrain.vip;
+      else memberName = siteTrainState.currentTrain.passengers[index].name;
+
+      if (!carriageSwapSource) {
+        carriageSwapSource = { type, index, memberName };
+        document.getElementById("source-swap-name").innerText = memberName;
+        document.getElementById("swap-mode-indicator").classList.add("active");
+        highlightSwapTargets();
+      } else {
+        executeSeatToSeatSwap(type, index);
+      }
+    }
+
+    function cancelSeatToSeatSwap() {
+      carriageSwapSource = null;
+      document.getElementById("swap-mode-indicator").classList.remove("active");
+      clearSwapHighlights();
+    }
+
+    function executeSeatToSeatSwap(targetType, targetIndex) {
+      const src = carriageSwapSource;
+      if (!src) return;
+
+      if (src.type === targetType && src.index === targetIndex) {
+        cancelSeatToSeatSwap();
+        return;
+      }
+
+      let targetName = "";
+      let targetRollover = false;
+      if (targetType === 'conductor') {
+        targetName = siteTrainState.currentTrain.conductor;
+        targetRollover = siteTrainState.currentTrain.condIsRollover;
+      } else if (targetType === 'vip') {
+        targetName = siteTrainState.currentTrain.vip;
+        targetRollover = siteTrainState.currentTrain.vipIsRollover;
+      } else {
+        targetName = siteTrainState.currentTrain.passengers[targetIndex].name;
+        targetRollover = siteTrainState.currentTrain.passengers[targetIndex].isRollover;
+      }
+
+      let srcName = src.memberName;
+      let srcRollover = false;
+      if (src.type === 'conductor') {
+        srcRollover = siteTrainState.currentTrain.condIsRollover;
+      } else if (src.type === 'vip') {
+        srcRollover = siteTrainState.currentTrain.vipIsRollover;
+      } else {
+        srcRollover = siteTrainState.currentTrain.passengers[src.index].isRollover;
+      }
+
+      if (src.type === 'conductor') {
+        siteTrainState.currentTrain.conductor = targetName;
+        siteTrainState.currentTrain.condIsRollover = targetRollover;
+      } else if (src.type === 'vip') {
+        siteTrainState.currentTrain.vip = targetName;
+        siteTrainState.currentTrain.vipIsRollover = targetRollover;
+      } else {
+        siteTrainState.currentTrain.passengers[src.index].name = targetName;
+        siteTrainState.currentTrain.passengers[src.index].isRollover = targetRollover;
+      }
+
+      if (targetType === 'conductor') {
+        siteTrainState.currentTrain.conductor = srcName;
+        siteTrainState.currentTrain.condIsRollover = srcRollover;
+      } else if (targetType === 'vip') {
+        siteTrainState.currentTrain.vip = srcName;
+        siteTrainState.currentTrain.vipIsRollover = srcRollover;
+      } else {
+        siteTrainState.currentTrain.passengers[targetIndex].name = srcName;
+        siteTrainState.currentTrain.passengers[targetIndex].isRollover = srcRollover;
+      }
+
+      cancelSeatToSeatSwap();
+      saveState();
+      updateInterface();
+    }
+
+    function highlightSwapTargets() {
+      clearSwapHighlights();
+      if (!carriageSwapSource) return;
+
+      if (carriageSwapSource.type === 'conductor') {
+        document.getElementById("pod-conductor").classList.add("swap-target-active");
+      } else if (carriageSwapSource.type === 'vip') {
+        document.getElementById("pod-vip").classList.add("swap-target-active");
+      } else {
+        const cIdx = Math.floor(carriageSwapSource.index / 7) + 1;
+        const sIdx = (carriageSwapSource.index % 7) + 1;
+        const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
+        if (slot) slot.classList.add("swap-target-active");
+      }
+    }
+
+    function clearSwapHighlights() {
+      document.querySelectorAll(".swap-target-active").forEach(el => el.classList.remove("swap-target-active"));
+    }
+
+    /* CONFIRMATION WORKFLOW */
     function confirmTrainDeparture() {
-      if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) return;
+      if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) {
+        alert("No active train staging to confirm.");
+        return;
+      }
+
       const train = siteTrainState.currentTrain;
       const now = new Date();
       const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      siteTrainState.history.unshift({
+      const logEntry = {
         cycle: train.stagingCycle,
         day: train.stagingDay,
         time: timeStr,
@@ -1353,9 +1354,13 @@
         manualVIP: train.manualVIP,
         passengers: JSON.parse(JSON.stringify(train.passengers)),
         rollover: train.rolloverHappened
-      });
+      };
+
+      siteTrainState.history.unshift(logEntry);
 
       train.isStaged = false;
+      train.confirmedTime = timeStr;
+
       if (train.rolloverHappened) {
         siteTrainState.cycle++;
         siteTrainState.day = 2;
@@ -1365,13 +1370,15 @@
 
       saveState();
       updateInterface();
-      alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nThe Gold Express has cleared Platform 3.");
+      alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nTrain manifest is permanently recorded in official Departure Logs.");
     }
 
-    /* DRAW ENGINE */
+    /* CORE DRAW SEQUENCE */
     function executeDrawSequence() {
       if (siteTrainState.currentTrain && siteTrainState.currentTrain.isStaged) {
-        if (!confirm("A train is already boarding! Discard staging train and roll a new one?")) return;
+        if (!confirm("A train is already boarding! Discard current staging train and roll a new one?")) {
+          return;
+        }
       }
 
       const btn = document.getElementById("btn-draw");
@@ -1387,8 +1394,8 @@
       let finalVIP = manualVip;
       let condIsRollover = false;
       let vipIsRollover = false;
-      let rolloverHappened = false;
 
+      let rolloverHappened = false;
       const currentStagingCycle = siteTrainState.cycle;
       const currentStagingDay = siteTrainState.day;
 
@@ -1415,8 +1422,12 @@
         drawnMembers = pulled.map(name => ({ name, isRollover: false }));
 
         siteTrainState.boardedThisCycle.push(...pulled);
-        if (finalConductor && !siteTrainState.boardedThisCycle.includes(finalConductor)) siteTrainState.boardedThisCycle.push(finalConductor);
-        if (finalVIP && !siteTrainState.boardedThisCycle.includes(finalVIP)) siteTrainState.boardedThisCycle.push(finalVIP);
+        if (finalConductor && !siteTrainState.boardedThisCycle.includes(finalConductor)) {
+          siteTrainState.boardedThisCycle.push(finalConductor);
+        }
+        if (finalVIP && !siteTrainState.boardedThisCycle.includes(finalVIP)) {
+          siteTrainState.boardedThisCycle.push(finalVIP);
+        }
       } else {
         rolloverHappened = true;
         const carryoverGuaranteed = [...eligibleCarryover];
@@ -1470,38 +1481,75 @@
 
       selectedConductor = null;
       selectedVIP = null;
-      document.getElementById("label-conductor-mode").innerText = "[ AUTO ]";
-      document.getElementById("label-vip-mode").innerText = "[ AUTO ]";
+      document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
+      document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
 
-      // Trigger Full Pixi Canvas Departure & Arrival Animation
-      playDepartureArrivalAnimation(() => {
+      runAnimation(finalConductor, condRollover, finalVIP, vipRollover, passengers, () => {
         btn.disabled = false;
         updateInterface();
       });
     }
 
-    function buildEmptySlots() {
-      let cellCount = 0;
-      for (let car = 1; car <= 4; car++) {
-        const r1 = document.getElementById(`car-${car}-row1`);
-        const r2 = document.getElementById(`car-${car}-row2`);
-        r1.innerHTML = "";
-        r2.innerHTML = "";
+    function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
+      document.getElementById("slot-conductor").innerText = "LOCKING...";
+      document.getElementById("slot-vip").innerText = "LOCKING...";
 
-        for (let s = 1; s <= 4; s++) {
-          const c = document.createElement("div");
-          c.className = "member-cargo-cell";
-          c.id = `cargo-cell-${cellCount++}`;
-          c.innerHTML = `<div class="cell-left"><span class="cell-index">${s}</span><span class="cell-name">---</span></div>`;
-          r1.appendChild(c);
+      for (let c = 1; c <= 4; c++) {
+        for (let s = 1; s <= 7; s++) {
+          const slot = document.getElementById(`seat-c${c}-s${s}`);
+          slot.className = "seat-box";
+          slot.innerHTML = `
+            <div class="left-info">
+              <span class="seat-index">${s}</span>
+              <span class="passenger-name slot-flicker">ROLLING...</span>
+            </div>
+          `;
         }
+      }
 
-        for (let s = 5; s <= 7; s++) {
-          const c = document.createElement("div");
-          c.className = "member-cargo-cell";
-          c.id = `cargo-cell-${cellCount++}`;
-          c.innerHTML = `<div class="cell-left"><span class="cell-index">${s}</span><span class="cell-name">---</span></div>`;
-          r2.appendChild(c);
+      setTimeout(() => {
+        document.getElementById("slot-conductor").innerHTML = `${conductor} ${condRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
+      }, 500);
+
+      setTimeout(() => {
+        document.getElementById("slot-vip").innerHTML = `${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
+      }, 900);
+
+      passengers.forEach((p, idx) => {
+        const cIdx = Math.floor(idx / 7) + 1;
+        const sIdx = (idx % 7) + 1;
+        setTimeout(() => {
+          const slot = document.getElementById(`seat-c${cIdx}-s${sIdx}`);
+          slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
+          slot.innerHTML = `
+            <div class="left-info">
+              <span class="seat-index">${sIdx}</span>
+              <span class="passenger-name">${p.name}</span>
+            </div>
+          `;
+
+          if (idx === passengers.length - 1) {
+            setTimeout(callback, 300);
+          }
+        }, 1000 + (idx * 40));
+      });
+    }
+
+    function buildEmptySlots() {
+      for (let c = 1; c <= 4; c++) {
+        const carList = document.getElementById(`car-${c}-seats`);
+        carList.innerHTML = "";
+        for (let s = 1; s <= 7; s++) {
+          const seat = document.createElement("div");
+          seat.className = "seat-box";
+          seat.id = `seat-c${c}-s${s}`;
+          seat.innerHTML = `
+            <div class="left-info">
+              <span class="seat-index">${s}</span>
+              <span class="passenger-name">---</span>
+            </div>
+          `;
+          carList.appendChild(seat);
         }
       }
     }
@@ -1520,7 +1568,7 @@
 
       if (isStaged) {
         hudStatus.innerText = "BOARDING / STAGING";
-        hudStatus.style.color = "var(--gold-light)";
+        hudStatus.style.color = "var(--rollover-gold)";
         stagingBanner.classList.add("active");
         confirmBtn.classList.add("active");
       } else {
@@ -1530,7 +1578,6 @@
         confirmBtn.classList.remove("active");
       }
 
-      // Render Queue
       const queueBox = document.getElementById("pool-names-display");
       queueBox.innerHTML = "";
       siteTrainState.pool.forEach(name => {
@@ -1540,38 +1587,48 @@
         queueBox.appendChild(tag);
       });
 
-      // Update Pixi Canvas Car Occupancy Badges (7/7)[cite: 3]
-      for (let c = 0; c < 4; c++) {
-        const badgeTxt = carSprites[c].getChildByName("txt_count", true);
-        if (badgeTxt) {
-          badgeTxt.text = siteTrainState.currentTrain ? "7/7" : "0/7";
-        }
-        document.getElementById(`count-car-${c + 1}`).innerText = siteTrainState.currentTrain ? "7/7 RIDERS" : "0/7 RIDERS";
-      }
-
       if (siteTrainState.currentTrain) {
         const t = siteTrainState.currentTrain;
-        document.getElementById("slot-conductor").innerHTML = `${t.conductor} ${t.condIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-        document.getElementById("conductor-actions").innerHTML = `<button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇄ Sub</button>`;
+        document.getElementById("slot-conductor").innerHTML = `
+          ${t.conductor} 
+          ${t.condIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+        `;
 
-        document.getElementById("slot-vip").innerHTML = `${t.vip} ${t.vipIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
-        document.getElementById("vip-actions").innerHTML = `<button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇄ Sub</button>`;
+        document.getElementById("conductor-actions").innerHTML = `
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇄ Standby</button>
+          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('conductor')">⇅ Move</button>
+        `;
 
-        for (let idx = 0; idx < 28; idx++) {
-          const cell = document.getElementById(`cargo-cell-${idx}`);
-          const p = t.passengers[idx];
-          if (cell && p) {
-            cell.className = "member-cargo-cell boarded" + (p.isRollover ? " guaranteed-rollover" : "");
-            cell.innerHTML = `
-              <div class="cell-left">
-                <span class="cell-index">${(idx % 7) + 1}</span>
-                <span class="cell-name">${p.name}</span>
-              </div>
-              <div class="seat-actions">
-                ${p.isRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
-                <button type="button" class="btn-seat-action" title="Replace no-show" onclick="openSeatSubstitute('passenger', ${idx})">⇄</button>
-              </div>
-            `;
+        document.getElementById("slot-vip").innerHTML = `
+          ${t.vip} 
+          ${t.vipIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+        `;
+
+        document.getElementById("vip-actions").innerHTML = `
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇄ Standby</button>
+          <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('vip')">⇅ Move</button>
+        `;
+
+        let passIndex = 0;
+        for (let c = 1; c <= 4; c++) {
+          for (let s = 1; s <= 7; s++) {
+            const slot = document.getElementById(`seat-c${c}-s${s}`);
+            const pIdx = passIndex++;
+            const p = t.passengers[pIdx];
+            if (slot && p) {
+              slot.className = "seat-box boarded" + (p.isRollover ? " guaranteed-rollover" : "");
+              slot.innerHTML = `
+                <div class="left-info" onclick="startSeatToSeatSwap('passenger', ${pIdx})" style="cursor: pointer;" title="Click to swap seat with selected member">
+                  <span class="seat-index">${s}</span>
+                  <span class="passenger-name">${p.name}</span>
+                </div>
+                <div class="seat-actions">
+                  ${p.isRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
+                  <button type="button" class="btn-seat-action" title="Replace no-show from pool" onclick="openSeatSubstitute('passenger', ${pIdx})">⇄ Standby</button>
+                  <button type="button" class="btn-seat-action" title="Move member to another carriage seat" onclick="startSeatToSeatSwap('passenger', ${pIdx})">⇅ Move</button>
+                </div>
+              `;
+            }
           }
         }
       }
@@ -1585,7 +1642,7 @@
       feed.innerHTML = "";
 
       if (!siteTrainState.history || siteTrainState.history.length === 0) {
-        feed.innerHTML = `<div style="text-align:center; font-size:11px; color:var(--steel-dim); padding:16px;">NO DEPARTURES RECORDED YET.</div>`;
+        feed.innerHTML = `<div style="text-align:center; font-size:11px; color:var(--steel-dim); padding:16px;">NO OFFICIAL DEPARTURES RECORDED YET.</div>`;
         count.innerText = `0 DRAWS LOGGED`;
         return;
       }
@@ -1595,14 +1652,17 @@
       siteTrainState.history.forEach((entry, index) => {
         const item = document.createElement("div");
         item.className = "history-entry" + (entry.rollover ? " rollover-entry" : "");
-        const pills = entry.passengers.map(p => `<span class="passenger-pill ${p.isRollover ? 'is-rollover' : ''}">${p.name}${p.isRollover ? ' ★' : ''}</span>`).join("");
+
+        const pills = entry.passengers.map(p => 
+          `<span class="passenger-pill ${p.isRollover ? 'is-rollover' : ''}">${p.name}${p.isRollover ? ' ★' : ''}</span>`
+        ).join("");
 
         item.innerHTML = `
           <div class="entry-top">
-            <span>CYCLE ${entry.cycle} • DAY ${entry.day} ${entry.rollover ? '<strong style="color: var(--gold-light);">(ROLLOVER RESET)</strong>' : ''}</span>
-            <div style="display:flex; align-items:center; gap:8px;">
+            <span>CYCLE ${entry.cycle} • DAY ${entry.day} ${entry.rollover ? '<strong style="color: var(--rollover-gold);">(ROLLOVER RESET)</strong>' : ''}</span>
+            <div class="history-card-actions">
               <span style="color: var(--steel-dim); font-size: 10px;">${entry.time}</span>
-              <button class="btn-delete-log" onclick="deleteHistoryEntry(${index})">🗑</button>
+              <button class="btn-delete-log" title="Delete this entry (PIN Required)" onclick="deleteHistoryEntry(${index})">🗑</button>
             </div>
           </div>
           <div class="entry-leads">
@@ -1616,34 +1676,61 @@
     }
 
     function deleteHistoryEntry(index) {
-      const pin = prompt("Enter Admin PIN to delete departure log:");
-      if (pin === null || pin.trim() !== ADMIN_DELETE_PIN) return;
+      const pin = prompt("Enter Admin PIN to delete this departure log and refund members to the pool:");
+      if (pin === null) return;
+
+      if (pin.trim() !== ADMIN_DELETE_PIN) {
+        alert("Incorrect PIN. Entry deletion aborted.");
+        return;
+      }
 
       const target = siteTrainState.history[index];
-      const refunded = [target.conductor, target.vip, ...target.passengers.map(p => p.name)];
+      const isLatest = (index === 0);
 
-      refunded.forEach(name => {
-        if (!siteTrainState.pool.includes(name)) siteTrainState.pool.push(name);
+      const confirmMsg = `Confirm deletion of Cycle ${target.cycle} - Day ${target.day} (${target.time})?\n\nThis will refund all 30 members back into the waiting pool and rewind cycle progress.`;
+      if (!confirm(confirmMsg)) return;
+
+      const refundedMembers = [
+        target.conductor,
+        target.vip,
+        ...target.passengers.map(p => p.name)
+      ];
+
+      refundedMembers.forEach(name => {
+        if (!siteTrainState.pool.includes(name)) {
+          siteTrainState.pool.push(name);
+        }
       });
 
-      siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(n => !refunded.includes(n));
-      if (target.rollover && siteTrainState.cycle > 1) { siteTrainState.cycle--; siteTrainState.day = 4; }
-      else if (siteTrainState.day > 1) { siteTrainState.day--; }
+      siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(
+        name => !refundedMembers.includes(name)
+      );
+
+      if (target.rollover) {
+        if (siteTrainState.cycle > 1) siteTrainState.cycle--;
+        siteTrainState.day = 4;
+      } else {
+        if (siteTrainState.day > 1) siteTrainState.day--;
+      }
 
       siteTrainState.history.splice(index, 1);
-      if (index === 0) {
+
+      if (isLatest) {
         siteTrainState.currentTrain = null;
         buildEmptySlots();
         document.getElementById("slot-conductor").innerText = "--- STANDBY ---";
         document.getElementById("slot-vip").innerText = "--- STANDBY ---";
+        document.getElementById("conductor-actions").innerHTML = "";
+        document.getElementById("vip-actions").innerHTML = "";
       }
 
       saveState();
       updateInterface();
+      alert("Departure removed! All 30 members have been refunded to the waiting pool.");
     }
 
     function resetCycle() {
-      if (!confirm("Reset cycle to Day 1? (Historical logs are KEPT).")) return;
+      if (!confirm("Reset current cycle back to Day 1? (Confirmed history logs will be KEPT).")) return;
       siteTrainState.cycle = 1;
       siteTrainState.day = 1;
       siteTrainState.pool = [...ROSTER_SEED];
@@ -1654,14 +1741,15 @@
       buildEmptySlots();
       document.getElementById("slot-conductor").innerText = "--- STANDBY ---";
       document.getElementById("slot-vip").innerText = "--- STANDBY ---";
+      document.getElementById("conductor-actions").innerHTML = "";
+      document.getElementById("vip-actions").innerHTML = "";
       setDrawMode("AUTO");
       updateInterface();
     }
 
-    // BOOT
+    // INITIALIZATION
     loadState();
     buildEmptySlots();
-    initPixiEngine();
     setDrawMode("AUTO");
     updateInterface();
   </script>
