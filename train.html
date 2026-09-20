@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Iron Dreadnought — Train Boarding Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-dark: #070a0e;
+      --panel-bg: rgba(12, 17, 23, 0.85);
+      --card-bg: rgba(18, 24, 33, 0.9);
+      --ice-primary: #78b4e8;
+      --ice-bright: #dceeff;
+      --ice-glow: rgba(120, 180, 232, 0.35);
+      --amber-gold: #d18a45;
+      --amber-light: #ffd4a8;
+      --crimson: #992d22;
+      --crimson-light: #ff9d94;
+      --steel: #8899a6;
+      --border-subtle: rgba(120, 180, 232, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: #eaf5ff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* HEADER */
+    .train-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .train-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      letter-spacing: 3px;
+      color: var(--ice-bright);
+      text-shadow: 0 0 16px var(--ice-glow);
+    }
+
+    .train-header p {
+      font-size: 13px;
+      color: var(--steel);
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+
+    /* STATUS BAR */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 12px 20px;
+      margin-bottom: 30px;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 11px;
+    }
+
+    .badge-ice {
+      background: rgba(120, 180, 232, 0.15);
+      border: 1px solid var(--ice-primary);
+      color: var(--ice-bright);
+    }
+
+    .badge-amber {
+      background: rgba(209, 138, 69, 0.15);
+      border: 1px solid var(--amber-gold);
+      color: var(--amber-light);
+    }
+
+    /* ENGINE CABIN (CONDUCTOR + VIP) */
+    .engine-section {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 35px;
+      flex-wrap: wrap;
+    }
+
+    .cabin-card {
+      background: var(--panel-bg);
+      border-radius: 4px;
+      padding: 18px 24px;
+      min-width: 240px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .cabin-card.conductor {
+      border: 1px solid var(--amber-gold);
+      box-shadow: 0 0 16px rgba(209, 138, 69, 0.2);
+    }
+
+    .cabin-card.vip {
+      border: 1px solid var(--crimson);
+      box-shadow: 0 0 16px rgba(153, 45, 34, 0.2);
+    }
+
+    .cabin-card::after {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-dark);
+      padding: 2px 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 2px;
+    }
+
+    .cabin-card.conductor::after {
+      content: 'ᛟ CONDUCTOR ᛟ';
+      border: 1px solid var(--amber-gold);
+      color: var(--amber-light);
+    }
+
+    .cabin-card.vip::after {
+      content: '★ VIP GUEST ★';
+      border: 1px solid var(--crimson);
+      color: var(--crimson-light);
+    }
+
+    .rider-name {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .cabin-card.conductor .rider-name { color: var(--amber-light); }
+    .cabin-card.vip .rider-name { color: var(--crimson-light); }
+
+    /* CARRIAGES (4 COLUMNS) */
+    .train-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    @media (max-width: 860px) {
+      .train-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .train-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .carriage-car {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 16px 12px;
+      position: relative;
+    }
+
+    .carriage-car::after {
+      content: attr(data-carriage-title);
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-dark);
+      padding: 2px 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      color: var(--ice-bright);
+      border: 1px solid var(--ice-primary);
+      white-space: nowrap;
+    }
+
+    .seats-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .seat-slot {
+      background: var(--card-bg);
+      border: 1px solid rgba(120, 180, 232, 0.15);
+      border-radius: 3px;
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .seat-slot .seat-num {
+      font-family: 'Cinzel', serif;
+      color: var(--ice-primary);
+      font-size: 10px;
+      width: 14px;
+    }
+
+    .seat-slot .seat-name {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #9ab0c2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .seat-slot.filled {
+      border-color: rgba(120, 180, 232, 0.5);
+      background: rgba(120, 180, 232, 0.1);
+    }
+
+    .seat-slot.filled .seat-name {
+      color: var(--ice-bright);
+    }
+
+    /* CONTROLS */
+    .controls-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .btn-draw {
+      background: linear-gradient(135deg, rgba(120, 180, 232, 0.25) 0%, rgba(12, 17, 23, 0.95) 100%);
+      border: 1px solid var(--ice-primary);
+      color: var(--ice-bright);
+      padding: 12px 28px;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 3px;
+      box-shadow: 0 0 14px var(--ice-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-draw:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(120, 180, 232, 0.4) 0%, rgba(20, 30, 45, 0.95) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 0 22px var(--ice-glow);
+    }
+
+    .btn-draw:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-reset {
+      background: rgba(153, 45, 34, 0.15);
+      border: 1px solid var(--crimson);
+      color: var(--crimson-light);
+      padding: 12px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-reset:hover {
+      background: rgba(153, 45, 34, 0.3);
+    }
+
+    /* QUEUE DRAWER */
+    .queue-section {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 18px 20px;
+    }
+
+    .queue-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      color: var(--ice-primary);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .queue-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .queue-tag {
+      background: rgba(7, 10, 14, 0.8);
+      border: 1px solid rgba(120, 180, 232, 0.12);
+      border-radius: 2px;
+      padding: 5px 8px;
+      font-size: 11px;
+      color: var(--steel);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ANIMATION PULSE */
+    .slot-pulsing {
+      animation: slotFlash 0.12s infinite alternate;
+    }
+
+    @keyframes slotFlash {
+      from { color: #507090; }
+      to { color: var(--ice-bright); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="train-header">
+      <h1>ᛟ THE FROZEN DREADNOUGHT ᛟ</h1>
+      <p>DAILY ALLIANCE TRAIN • 100-MEMBER ROTATION ENGINE</p>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <div>CYCLE STATUS: <span id="cycle-day-badge" class="badge badge-amber">DAY 1 OF 4</span></div>
+      <div>ELIGIBLE IN POOL: <span id="pool-count-badge" class="badge badge-ice">100 / 100</span></div>
+      <div>TOTAL BOARDED THIS CYCLE: <span id="boarded-count-badge" class="badge badge-ice">0 / 100</span></div>
+    </div>
+
+    <!-- ENGINE CABIN -->
+    <div class="engine-section">
+      <div class="cabin-card conductor">
+        <div class="rider-name" id="slot-conductor">--- WAITING ---</div>
+      </div>
+      <div class="cabin-card vip">
+        <div class="rider-name" id="slot-vip">--- WAITING ---</div>
+      </div>
+    </div>
+
+    <!-- CARRIAGES -->
+    <div class="train-grid">
+      <div class="carriage-car" data-carriage-title="CARRIAGE I • VANGUARD">
+        <div class="seats-list" id="carriage-1-seats"></div>
+      </div>
+      <div class="carriage-car" data-carriage-title="CARRIAGE II • GLACIER">
+        <div class="seats-list" id="carriage-2-seats"></div>
+      </div>
+      <div class="carriage-car" data-carriage-title="CARRIAGE III • SHIELDWALL">
+        <div class="seats-list" id="carriage-3-seats"></div>
+      </div>
+      <div class="carriage-car" data-carriage-title="CARRIAGE IV • SENTRY">
+        <div class="seats-list" id="carriage-4-seats"></div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-wrapper">
+      <button class="btn-draw" id="btn-draw-train" onclick="executeTrainDraw()">ᛟ INITIATE TRAIN DRAW (30 SEATS) ᛟ</button>
+      <button class="btn-reset" onclick="resetEntireCycle()">RESET TO DAY 1</button>
+    </div>
+
+    <!-- WAITING QUEUE -->
+    <div class="queue-section">
+      <div class="queue-title">
+        <span>ELIGIBLE QUEUE FOR NEXT DRAW (<span id="queue-count">100</span>)</span>
+        <span style="font-size: 11px; color: var(--steel);">GUARANTEED SLOTS REMAINING</span>
+      </div>
+      <div class="queue-grid" id="queue-roster-display"></div>
+    </div>
+  </div>
+
+  <script>
+    // 1. GENERATE 100-MEMBER TEST ROSTER
+    const INITIAL_100_MEMBERS = [
+      "MOUSE [R5]",
+      "WARLORD_THOR", "RECRUITER_FREYA", "MUSE_LOKI", "BUTLER_TYR",
+      "BROTHERGRIMM"
+    ];
+    for (let i = 7; i <= 100; i++) {
+      INITIAL_100_MEMBERS.push(`MEMBER_${String(i).padStart(3, '0')}`);
+    }
+
+    // STATE STRUCTURE
+    let trainState = {
+      pool: [...INITIAL_100_MEMBERS],
+      boardedHistory: [],
+      day: 1,
+      lastTrain: null
+    };
+
+    function loadState() {
+      const saved = localStorage.getItem("grimm_train_test_state");
+      if (saved) {
+        trainState = JSON.parse(saved);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem("grimm_train_test_state", JSON.stringify(trainState));
+    }
+
+    // BUILD INITIAL SEAT SLOTS IN DOM
+    function buildEmptySeatSlots() {
+      for (let car = 1; car <= 4; car++) {
+        const container = document.getElementById(`carriage-${car}-seats`);
+        container.innerHTML = "";
+        for (let s = 1; s <= 7; s++) {
+          const seatDiv = document.createElement("div");
+          seatDiv.className = "seat-slot";
+          seatDiv.id = `seat-c${car}-s${s}`;
+          seatDiv.innerHTML = `<span class="seat-num">${s}</span><span class="seat-name">---</span>`;
+          container.appendChild(seatDiv);
+        }
+      }
+    }
+
+    // UPDATE ALL UI STATUS ELEMENTS
+    function updateUI() {
+      document.getElementById("cycle-day-badge").innerText = `DAY ${trainState.day} OF 4`;
+      document.getElementById("pool-count-badge").innerText = `${trainState.pool.length} / 100`;
+      document.getElementById("boarded-count-badge").innerText = `${trainState.boardedHistory.length} / 100`;
+      document.getElementById("queue-count").innerText = trainState.pool.length;
+
+      // Update queue roster list
+      const queueContainer = document.getElementById("queue-roster-display");
+      queueContainer.innerHTML = "";
+      trainState.pool.forEach(name => {
+        const tag = document.createElement("div");
+        tag.className = "queue-tag";
+        tag.innerText = name;
+        queueContainer.appendChild(tag);
+      });
+
+      // Restore last train if exists and not animated
+      if (trainState.lastTrain) {
+        document.getElementById("slot-conductor").innerText = trainState.lastTrain.conductor;
+        document.getElementById("slot-vip").innerText = trainState.lastTrain.vip;
+
+        let passIndex = 0;
+        for (let car = 1; car <= 4; car++) {
+          for (let s = 1; s <= 7; s++) {
+            const slot = document.getElementById(`seat-c${car}-s${s}`);
+            const passengerName = trainState.lastTrain.passengers[passIndex++];
+            if (slot && passengerName) {
+              slot.classList.add("filled");
+              slot.querySelector(".seat-name").innerText = passengerName;
+            }
+          }
+        }
+      }
+    }
+
+    // CORE DRAW LOGIC: 30 SEATS (WITH DAY 4 ROLLOVER / REFILL)
+    function executeTrainDraw() {
+      const drawBtn = document.getElementById("btn-draw-train");
+      drawBtn.disabled = true;
+
+      // 1. Determine the 30 drawn members based on the pool
+      let drawnToday = [];
+      let rolloverNotice = false;
+
+      // Shuffle helper
+      const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+      trainState.pool = shuffle(trainState.pool);
+
+      if (trainState.pool.length >= 30) {
+        // Standard draw (Day 1, Day 2, Day 3)
+        drawnToday = trainState.pool.splice(0, 30);
+      } else {
+        // Day 4 scenario: take remaining (e.g. 10), then reset pool and take the rest (20)
+        rolloverNotice = true;
+        const remaining = [...trainState.pool];
+        drawnToday = [...remaining];
+
+        // REFILL POOL WITH ALL 100 MEMBERS
+        trainState.pool = shuffle([...INITIAL_100_MEMBERS]);
+        
+        // Exclude the ones who just got their guaranteed carryover seats
+        trainState.pool = trainState.pool.filter(name => !remaining.includes(name));
+
+        // Take remaining slots to reach 30
+        const needed = 30 - remaining.length;
+        const additional = trainState.pool.splice(0, needed);
+        drawnToday = drawnToday.concat(additional);
+
+        // Reset boarded tracking for new cycle
+        trainState.boardedHistory = [];
+        trainState.day = 1;
+      }
+
+      trainState.boardedHistory.push(...drawnToday);
+      if (!rolloverNotice) {
+        trainState.day++;
+      }
+
+      const conductor = drawnToday[0];
+      const vip = drawnToday[1];
+      const passengers = drawnToday.slice(2, 30); // 28 members
+
+      trainState.lastTrain = { conductor, vip, passengers };
+      saveState();
+
+      // RUN ANIMATION SEQUENCE
+      runDrawAnimation(conductor, vip, passengers, () => {
+        drawBtn.disabled = false;
+        updateUI();
+        if (rolloverNotice) {
+          alert("ᛟ CYCLE COMPLETE! All 100 members have boarded at least once. The pool has reset for the next cycle!");
+        }
+      });
+    }
+
+    // STAGGERED SLOT REEL ANIMATION
+    function runDrawAnimation(conductor, vip, passengers, onComplete) {
+      // Clear current display
+      document.getElementById("slot-conductor").innerText = "ROLLING...";
+      document.getElementById("slot-vip").innerText = "ROLLING...";
+      for (let car = 1; car <= 4; car++) {
+        for (let s = 1; s <= 7; s++) {
+          const slot = document.getElementById(`seat-c${car}-s${s}`);
+          slot.classList.remove("filled");
+          slot.querySelector(".seat-name").innerText = "ROLLING...";
+          slot.querySelector(".seat-name").classList.add("slot-pulsing");
+        }
+      }
+
+      // Step 1: Conductor Lock-in (after 800ms)
+      setTimeout(() => {
+        document.getElementById("slot-conductor").innerText = conductor;
+      }, 800);
+
+      // Step 2: VIP Lock-in (after 1400ms)
+      setTimeout(() => {
+        document.getElementById("slot-vip").innerText = vip;
+      }, 1400);
+
+      // Step 3: Staggered Carriage Fill (from 1600ms onwards)
+      passengers.forEach((name, i) => {
+        const carIndex = Math.floor(i / 7) + 1;
+        const seatIndex = (i % 7) + 1;
+        setTimeout(() => {
+          const slot = document.getElementById(`seat-c${carIndex}-s${seatIndex}`);
+          slot.querySelector(".seat-name").classList.remove("slot-pulsing");
+          slot.querySelector(".seat-name").innerText = name;
+          slot.classList.add("filled");
+
+          if (i === passengers.length - 1) {
+            setTimeout(onComplete, 400);
+          }
+        }, 1600 + (i * 70)); // 70ms per passenger slot drop
+      });
+    }
+
+    // RESET TO FRESH CYCLE
+    function resetEntireCycle() {
+      if (!confirm("Reset the entire train cycle back to Day 1 with all 100 members in the pool?")) return;
+      trainState = {
+        pool: [...INITIAL_100_MEMBERS],
+        boardedHistory: [],
+        day: 1,
+        lastTrain: null
+      };
+      saveState();
+      buildEmptySeatSlots();
+      document.getElementById("slot-conductor").innerText = "--- WAITING ---";
+      document.getElementById("slot-vip").innerText = "--- WAITING ---";
+      updateUI();
+    }
+
+    // BOOT
+    loadState();
+    buildEmptySeatSlots();
+    updateUI();
+  </script>
+</body>
+</html>
