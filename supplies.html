@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Season 2 Live Server Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #090d12;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      color: #c9d1d9;
+      overflow: hidden;
+    }
+
+    #map { width: 100%; height: 100vh; background: #090d12; }
+
+    /* Top HUD */
+    .top-panel {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.95);
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 6px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .coord-field {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #090d13;
+      border: 1px solid #30363d;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .coord-field span { font-weight: 700; color: #58a6ff; font-size: 11px; }
+    .coord-field input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      width: 48px;
+      font-weight: 600;
+      font-size: 13px;
+      font-family: monospace;
+    }
+
+    select.type-select {
+      background: #090d13;
+      border: 1px solid #30363d;
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .btn-action {
+      background: #238636;
+      border: 1px solid #2ea043;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-action:hover { background: #2ea043; }
+
+    .btn-secondary {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-secondary:hover { background: #30363d; color: #fff; }
+
+    .hud-coords {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.9);
+      border: 1px solid #30363d;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #8b949e;
+      pointer-events: none;
+    }
+    .hud-coords b { color: #58a6ff; }
+
+    #status-msg {
+      position: absolute;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      display: none;
+      font-weight: 600;
+    }
+    .msg-error { background: #da3633; color: #fff; border: 1px solid #f85149; }
+    .msg-info { background: #1f6feb; color: #fff; }
+    .msg-success { background: #238636; color: #fff; border: 1px solid #2ea043; }
+
+    /* Pins */
+    .stronghold-pin {
+      border-radius: 50%;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.95);
+      transition: transform 0.1s ease, opacity 0.2s ease;
+    }
+    .stronghold-pin:hover {
+      transform: scale(1.6);
+      z-index: 9999 !important;
+    }
+
+    /* Globally Marked as Found */
+    .stronghold-pin.is-found {
+      opacity: 0.22 !important;
+      border-color: #484f58 !important;
+      filter: grayscale(100%);
+    }
+
+    /* Reliable CSS Filter to Hide Found Pins */
+    #map.hide-found .stronghold-pin.is-found {
+      display: none !important;
+    }
+
+    /* Popup Buttons */
+    .popup-btn {
+      display: inline-block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 6px 0;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-mark { background: #238636; color: #fff; }
+    .btn-mark:hover { background: #2ea043; }
+    .btn-unmark { background: #30363d; color: #8b949e; }
+    .btn-unmark:hover { background: #21262d; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="top-panel">
+    <div class="coord-field">
+      <span>X</span>
+      <input type="number" id="input-x" placeholder="0" min="0" max="1000" />
+    </div>
+    <div class="coord-field">
+      <span>Y</span>
+      <input type="number" id="input-y" placeholder="0" min="0" max="1000" />
+    </div>
+
+    <select id="input-type" class="type-select">
+      <option value="Level 1">Level 1</option>
+      <option value="Level 2">Level 2</option>
+      <option value="Level 3">Level 3</option>
+      <option value="Level 4">Level 4</option>
+      <option value="Level 5">Level 5</option>
+      <option value="Level 6">Level 6</option>
+      <option value="Level 7">Level 7</option>
+      <option value="Custom Spot">Custom Spot</option>
+    </select>
+
+    <button class="btn-action" onclick="submitCoordinate()">Submit / Mark</button>
+    <button class="btn-secondary" id="toggle-found-btn" onclick="toggleHideFound()">Hide Found</button>
+  </div>
+
+  <div class="hud-coords" id="hud-coords">X: 0 | Y: 0</div>
+  <div id="status-msg"></div>
+  <div id="map"></div>
+
+  <!-- Leaflet and Firebase Realtime Database -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    const FIREBASE_DB_URL = "https://season-2-supplies-default-rtdb.europe-west1.firebasedatabase.app/";
+
+    firebase.initializeApp({ databaseURL: FIREBASE_DB_URL });
+    const db = firebase.database();
+
+    const MAP_LIMIT = 1000;
+    const registeredCoords = new Map();
+    const markerInstances = new Map();
+    const globalFoundCoords = new Set();
+    let hideFoundActive = false;
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -1.5,
+      maxZoom: 3,
+      zoomSnap: 0.25,
+      zoomDelta: 0.5,
+      attributionControl: false
+    });
+
+    const bounds = [[0, 0], [MAP_LIMIT, MAP_LIMIT]];
+    L.imageOverlay('season-2-grid.png', bounds).addTo(map);
+    map.fitBounds(bounds);
+
+    map.on('mousemove', (e) => {
+      const x = Math.round(e.latlng.lng);
+      const y = Math.round(e.latlng.lat);
+      if (x >= 0 && x <= MAP_LIMIT && y >= 0 && y <= MAP_LIMIT) {
+        document.getElementById('hud-coords').innerHTML = `X: <b>${x}</b> | Y: <b>${y}</b>`;
+      }
+    });
+
+    function showStatus(text, type = 'info') {
+      const box = document.getElementById('status-msg');
+      box.className = type === 'error' ? 'msg-error' : (type === 'success' ? 'msg-success' : 'msg-info');
+      box.textContent = text;
+      box.style.display = 'block';
+      setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    window.toggleFoundFirebase = function(key) {
+      const isFound = globalFoundCoords.has(key);
+      const safeKey = key.replace(',', '_');
+
+      if (isFound) {
+        db.ref(`found_supplies/${safeKey}`).remove();
+        showStatus(`Unmarked (${key.replace('_', ',')})`, 'info');
+      } else {
+        db.ref(`found_supplies/${safeKey}`).set({
+          timestamp: Date.now()
+        });
+        showStatus(`Marked found for everyone!`, 'success');
+      }
+    };
+
+    function updateMarkerVisual(marker, key, data) {
+      const isFound = globalFoundCoords.has(key);
+
+      const icon = L.divIcon({
+        className: `stronghold-pin ${isFound ? 'is-found' : ''}`,
+        html: `<div style="width:100%;height:100%;background:${data.color};border-radius:50%;"></div>`,
+        iconSize: [11, 11],
+        iconAnchor: [5.5, 5.5]
+      });
+      marker.setIcon(icon);
+
+      const popupHtml = `
+        <div style="color: #111; font-size: 12px; font-family: -apple-system, sans-serif; min-width: 140px;">
+          <strong style="color:${data.color === '#00FF00' ? '#008800' : data.color}; font-size:13px;">${data.label}</strong><br/>
+          <span>Coords: <b>(${data.x}, ${data.y})</b></span><br/>
+          <small style="color:${isFound ? '#238636' : '#666'}; font-weight:700;">
+            ${isFound ? '✅ Found by Community' : '⭕ Unclaimed'}
+          </small>
+          <button 
+            class="popup-btn ${isFound ? 'btn-unmark' : 'btn-mark'}" 
+            onclick="toggleFoundFirebase('${key}')">
+            ${isFound ? 'Mark Unclaimed' : '✓ 1-Click Mark Found'}
+          </button>
+        </div>
+      `;
+      marker.bindPopup(popupHtml);
+    }
+
+    function createPin(x, y, label, color) {
+      const key = `${x},${y}`;
+      const marker = L.marker([y, x]).addTo(map);
+
+      markerInstances.set(key, marker);
+      updateMarkerVisual(marker, key, { x, y, label, color });
+      return marker;
+    }
+
+    window.toggleHideFound = function() {
+      hideFoundActive = !hideFoundActive;
+      const btn = document.getElementById('toggle-found-btn');
+      const mapElement = document.getElementById('map');
+
+      btn.textContent = hideFoundActive ? "Show Found" : "Hide Found";
+      btn.style.borderColor = hideFoundActive ? "#58a6ff" : "#30363d";
+
+      if (hideFoundActive) {
+        mapElement.classList.add('hide-found');
+        map.closePopup();
+      } else {
+        mapElement.classList.remove('hide-found');
+      }
+    };
+
+    function listenToFoundSupplies() {
+      db.ref('found_supplies').on('value', (snapshot) => {
+        globalFoundCoords.clear();
+        const data = snapshot.val();
+        if (data) {
+          Object.keys(data).forEach(safeKey => {
+            const key = safeKey.replace('_', ',');
+            globalFoundCoords.add(key);
+          });
+        }
+
+        markerInstances.forEach((marker, key) => {
+          const itemData = registeredCoords.get(key);
+          if (itemData) updateMarkerVisual(marker, key, itemData);
+        });
+      });
+    }
+
+    async function loadStaticData() {
+      try {
+        const res = await fetch('data.json');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.strongholds) {
+          data.strongholds.forEach(group => {
+            group.coordinates.forEach(pt => {
+              const key = `${pt.x},${pt.y}`;
+              registeredCoords.set(key, {
+                x: pt.x,
+                y: pt.y,
+                label: group.label,
+                level: group.level,
+                color: group.color
+              });
+              createPin(pt.x, pt.y, group.label, group.color);
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Error reading data.json:", err);
+      }
+    }
+
+    function listenToCustomPins() {
+      db.ref('custom_markers').on('child_added', (snapshot) => {
+        const pt = snapshot.val();
+        const key = `${pt.x},${pt.y}`;
+        if (!registeredCoords.has(key)) {
+          registeredCoords.set(key, { x: pt.x, y: pt.y, label: pt.type, color: '#ffffff' });
+          createPin(pt.x, pt.y, pt.type, '#ffffff');
+        }
+      });
+    }
+
+    async function init() {
+      await loadStaticData();
+      listenToCustomPins();
+      listenToFoundSupplies();
+    }
+    init();
+
+    function submitCoordinate() {
+      const x = parseInt(document.getElementById('input-x').value, 10);
+      const y = parseInt(document.getElementById('input-y').value, 10);
+      const type = document.getElementById('input-type').value;
+
+      if (isNaN(x) || isNaN(y)) {
+        showStatus("Please enter both X and Y coordinates.", 'error');
+        return;
+      }
+
+      const key = `${x},${y}`;
+
+      if (registeredCoords.has(key)) {
+        const marker = markerInstances.get(key);
+        map.flyTo([y, x], 2);
+        if (marker) marker.openPopup();
+
+        if (globalFoundCoords.has(key)) {
+          showStatus(`Already collected at (${x}, ${y})!`, 'error');
+        } else {
+          toggleFoundFirebase(key);
+        }
+        return;
+      }
+
+      const safeKey = `${x}_${y}`;
+      db.ref(`custom_markers/${safeKey}`).set({
+        x: x,
+        y: y,
+        type: type,
+        timestamp: Date.now()
+      });
+
+      map.flyTo([y, x], 1.6);
+      showStatus(`Saved new spot at (${x}, ${y})!`, 'success');
+    }
+  </script>
+</body>
+</html>
