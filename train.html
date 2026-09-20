@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alliance Train • Interior Plan View</title>
+  <title>Station Platform • The Gold Express</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      --bg-dark: #070a0e;
-      --panel-bg: rgba(12, 17, 23, 0.85);
+      --bg-slate: #0a0e14;
+      --panel-bg: rgba(12, 17, 23, 0.88);
       --frost-border: rgba(120, 180, 232, 0.22);
       --frost-bright: #78b4e8;
       --frost-glow: rgba(120, 180, 232, 0.25);
@@ -19,29 +19,33 @@
       --steel-muted: #9ab0c2;
       --steel-dim: #5a6e7f;
 
-      /* Plan View Golden Train Shell */
-      --train-outer-hull: #caa028;
-      --train-hull-bevel: #fbe285;
-      --train-hull-dark: #6e5210;
-      --car-interior-deck: #0d1219;
-      --aisle-track: rgba(202, 160, 40, 0.15);
-      --seat-deck-bg: rgba(20, 28, 38, 0.95);
-      --seat-active-bg: rgba(30, 44, 62, 0.95);
+      /* Last War Golden Train Colors */
+      --train-gold: #f39c12;
+      --train-gold-bright: #f1c40f;
+      --train-gold-deep: #b7791f;
+      --train-gold-dark: #66440c;
+      --train-roof: #d68910;
+      
+      /* In-Game Station Platform Orange Cards */
+      --card-frame-gold: #e67e22;
+      --card-bg-orange: rgba(26, 17, 10, 0.95);
+      --card-border-gold: #d35400;
+      --card-tab-gold: #f39c12;
 
-      --conductor-gold: #fbe285;
-      --vip-crimson: #ff7675;
-      --rollover-gold: #d18a45;
+      --conductor-gold: #ffd700;
+      --vip-crimson: #e74c3c;
+      --rollover-tag-bg: #d35400;
       --success-green: #2ecc71;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg-dark);
+      background: var(--bg-slate);
       color: var(--ice-white);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      padding: 30px 14px 90px;
+      padding: 24px 12px 90px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -50,41 +54,41 @@
 
     .train-container {
       width: 100%;
-      max-width: 1080px;
+      max-width: 1180px;
     }
 
-    /* HEADER */
-    .train-header {
+    /* TOP HEADER */
+    .station-top-header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    .train-header .sub-caption {
+    .station-top-header .badge-tag {
       font-family: 'Cinzel', serif;
       font-size: 10px;
       letter-spacing: 3px;
-      color: var(--train-hull-bevel);
+      color: var(--train-gold-bright);
       text-transform: uppercase;
       margin-bottom: 4px;
     }
 
-    .train-header h1 {
+    .station-top-header h1 {
       font-family: 'Cinzel', serif;
       font-size: 24px;
       font-weight: 800;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: var(--ice-white);
       text-shadow: 0 0 16px var(--frost-glow);
     }
 
-    /* METRIC HUD BAR */
+    /* HUD METRIC BAR */
     .hud-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       background: var(--panel-bg);
       border: 1px solid var(--frost-border);
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 12px 18px;
       margin-bottom: 20px;
     }
@@ -114,23 +118,23 @@
       color: var(--ice-white);
     }
 
-    /* STAGING BANNER */
+    /* STAGING / CONFIRM BANNER */
     .staging-banner {
       display: none;
-      background: rgba(209, 138, 69, 0.15);
-      border: 1px solid var(--train-outer-hull);
-      border-radius: 4px;
-      padding: 10px 16px;
+      background: rgba(230, 126, 34, 0.15);
+      border: 1px solid var(--train-gold);
+      border-radius: 6px;
+      padding: 12px 18px;
       margin-bottom: 20px;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       font-size: 12px;
-      box-shadow: 0 0 14px rgba(202, 160, 40, 0.3);
+      box-shadow: 0 0 16px rgba(243, 156, 18, 0.25);
     }
 
     .staging-banner.active { display: flex; }
-    .staging-text { color: #ffd4a8; font-family: 'Cinzel', serif; }
+    .staging-text { color: #fdebd0; font-family: 'Cinzel', serif; letter-spacing: 0.5px; }
 
     .swap-mode-indicator {
       display: none;
@@ -187,209 +191,348 @@
     }
 
     /* =========================================================
-       PLAN VIEW: GOLDEN TRAIN CUTAWAY INTERIOR
+       IN-GAME STATION PLATFORM & TRAIN CONSIST LAYOUT
     ========================================================= */
-    .train-chassis-plan {
+    .platform-stage {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      background: linear-gradient(90deg, #141b24 0%, #0d1218 100%);
+      border: 2px solid rgba(120, 180, 232, 0.2);
+      border-radius: 12px;
+      padding: 24px 20px;
+      position: relative;
+      margin-bottom: 35px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+      .platform-stage { grid-template-columns: 1fr; }
+    }
+
+    /* LEFT SIDE: RAIL TRACK & TRAIN ENGINE */
+    .track-column {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0px;
-      margin-bottom: 35px;
       position: relative;
+      padding: 10px 0;
     }
 
-    /* Central Coupler / Gangway between Cars */
-    .car-coupler {
-      width: 50px;
-      height: 18px;
-      background: repeating-linear-gradient(90deg, #18202c 0px, #18202c 4px, #080c11 4px, #080c11 8px);
-      border-left: 2px solid var(--train-outer-hull);
-      border-right: 2px solid var(--train-outer-hull);
-      box-shadow: inset 0 0 6px #000;
-      z-index: 2;
+    /* Iron Rail Track Backing */
+    .track-column::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 74px;
+      background: repeating-linear-gradient(180deg, #34495e 0px, #34495e 14px, #1a252f 14px, #1a252f 28px);
+      border-left: 4px solid #7f8c8d;
+      border-right: 4px solid #7f8c8d;
+      box-shadow: 0 0 15px rgba(0,0,0,0.9);
+      z-index: 1;
     }
 
-    /* CUTAWAY CAR BODY */
-    .plan-car {
+    /* The Vertical Train Consist */
+    .golden-train-consist {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       width: 100%;
-      background: var(--car-interior-deck);
-      border: 3px solid var(--train-outer-hull);
-      border-top: 5px solid var(--train-hull-bevel);
-      border-bottom: 5px solid var(--train-hull-dark);
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 18px rgba(0,0,0,0.8);
       position: relative;
-      overflow: hidden;
-      z-index: 3;
+      z-index: 2;
+      transition: transform 0.4s ease;
     }
 
-    /* Bullet Nose for Locomotive Engine */
-    .plan-car.locomotive {
-      border-radius: 32px 32px 10px 10px;
-      border-top-width: 6px;
-      margin-bottom: 0;
+    .golden-train-consist.train-shaking {
+      animation: trainChug 0.15s infinite alternate;
     }
 
-    .car-bulkhead-header {
-      background: linear-gradient(180deg, #221a08 0%, #110d04 100%);
-      border-bottom: 1px solid rgba(202, 160, 40, 0.35);
-      padding: 8px 16px;
+    @keyframes trainChug {
+      0% { transform: translateY(-3px); }
+      100% { transform: translateY(3px); }
+    }
+
+    /* 1. LOCOMOTIVE ENGINE CABIN */
+    .locomotive-engine {
+      width: 160px;
+      background: linear-gradient(180deg, #f1c40f 0%, #f39c12 40%, #b7791f 100%);
+      border: 3px solid #fbe285;
+      border-radius: 40px 40px 8px 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8), inset 0 2px 6px #fff;
+      padding: 16px 10px 14px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-    }
-
-    .car-bulkhead-header .title {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: var(--train-hull-bevel);
-    }
-
-    .car-bulkhead-header .sub-badge {
-      font-size: 9px;
-      color: var(--steel-dim);
-      letter-spacing: 1px;
-    }
-
-    /* ENGINE CABIN COCKPIT (CONDUCTOR & VIP) */
-    .cockpit-deck {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      padding: 18px 24px;
-    }
-
-    @media (max-width: 600px) { .cockpit-deck { grid-template-columns: 1fr; } }
-
-    .officer-chair {
-      background: var(--seat-deck-bg);
-      border: 1px solid rgba(202, 160, 40, 0.35);
-      border-radius: 6px;
-      padding: 14px 16px;
-      text-align: center;
       position: relative;
-      transition: all 0.2s ease;
-    }
-
-    .officer-chair.conductor-chair {
-      border-color: var(--train-outer-hull);
-      box-shadow: inset 0 0 12px rgba(202, 160, 40, 0.2);
-    }
-
-    .officer-chair.vip-chair {
-      border-color: rgba(153, 45, 34, 0.7);
-      box-shadow: inset 0 0 12px rgba(153, 45, 34, 0.2);
-    }
-
-    .officer-chair.swap-target-active {
-      border-color: #ffd4a8 !important;
-      background: rgba(209, 138, 69, 0.25) !important;
-      box-shadow: 0 0 18px rgba(255, 212, 168, 0.5) !important;
-    }
-
-    .officer-label {
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .conductor-chair .officer-label { color: var(--conductor-gold); }
-    .vip-chair .officer-label { color: var(--vip-crimson); }
-
-    .officer-name {
-      font-family: 'Cinzel', serif;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--ice-white);
-      min-height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       margin-bottom: 8px;
     }
 
-    .pod-btn-trigger {
-      background: rgba(7, 10, 14, 0.85);
-      border: 1px solid var(--train-outer-hull);
-      color: var(--train-hull-bevel);
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 3px;
+    /* Officer Conductor Hat Badge */
+    .officer-badge-cap {
+      width: 52px;
+      height: 52px;
+      background: #111;
+      border: 3px solid var(--conductor-gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7), 0 0 14px var(--conductor-gold);
+      margin-bottom: 6px;
       cursor: pointer;
     }
 
-    .pod-btn-trigger.disabled-mode {
+    .officer-title-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #3d2800;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .officer-assigned-name {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 3px 8px;
+      border-radius: 3px;
+      margin-top: 4px;
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    .officer-btn-mode {
+      background: #221401;
+      border: 1px solid var(--train-gold-bright);
+      color: var(--train-gold-bright);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .officer-btn-mode.disabled-mode {
       opacity: 0.35;
       cursor: not-allowed;
-      border-color: rgba(120, 180, 232, 0.1);
       pointer-events: none;
     }
 
-    /* PASSENGER INTERIOR FLOORPLAN (AISLE & SEATS) */
-    .car-cabin-interior {
-      padding: 12px 14px 14px;
+    /* VIP GUEST BERTH ON ENGINE */
+    .engine-vip-dock {
+      margin-top: 8px;
+      width: 100%;
+      background: rgba(153, 45, 34, 0.25);
+      border: 1px solid var(--vip-crimson);
+      border-radius: 4px;
+      padding: 4px 6px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      background-image: linear-gradient(90deg, transparent 49.5%, var(--aisle-track) 49.5%, var(--aisle-track) 50.5%, transparent 50.5%);
+      align-items: center;
     }
 
-    .seats-deck-grid {
+    .engine-vip-dock .vip-title {
+      font-size: 8px;
+      font-family: 'Cinzel', serif;
+      font-weight: 800;
+      color: #ff9999;
+      letter-spacing: 1px;
+    }
+
+    .engine-vip-dock .vip-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+      max-width: 130px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* RAIL CAR COUPLERS */
+    .train-coupler-joint {
+      width: 24px;
+      height: 12px;
+      background: #111;
+      border: 2px solid #555;
+      margin: -2px 0;
+      z-index: 3;
+    }
+
+    /* 4 GOLDEN CARRIAGES */
+    .train-boxcar {
+      width: 146px;
+      height: 124px;
+      background: linear-gradient(180deg, #f1c40f 0%, #d68910 50%, #996515 100%);
+      border: 3px solid #fbe285;
+      border-radius: 6px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .train-boxcar:hover {
+      border-color: #ffffff;
+      box-shadow: 0 0 16px rgba(241, 196, 15, 0.6);
+    }
+
+    .train-boxcar.active-focus {
+      border-color: #ffffff;
+      box-shadow: 0 0 22px rgba(241, 196, 15, 0.9);
+    }
+
+    /* Person Icon + Manifest Count: e.g. 7/7 */
+    .boxcar-occupancy-badge {
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 5px 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .boxcar-serial-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 800;
+      color: #3b2400;
+      letter-spacing: 1.5px;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    /* RIGHT SIDE: 4 CARGO MANIFEST CARDS */
+    .manifest-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    /* The Orange In-Game Reward Frame */
+    .cargo-card-pod {
+      background: var(--card-bg-orange);
+      border: 2px solid var(--card-border-gold);
+      border-radius: 8px;
+      padding: 12px 16px;
+      position: relative;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+      transition: all 0.2s ease;
+    }
+
+    .cargo-card-pod.highlighted {
+      border-color: var(--train-gold-bright);
+      box-shadow: 0 0 16px rgba(243, 156, 18, 0.4);
+    }
+
+    /* Pointer Notch connecting to the Car on Left */
+    .cargo-card-pod::before {
+      content: "";
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 10px solid var(--card-border-gold);
+    }
+
+    .cargo-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(230, 126, 34, 0.3);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .cargo-card-header .car-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--train-gold-bright);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cargo-card-header .car-count {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--steel-muted);
+    }
+
+    /* Grid of 7 Members */
+    .members-seat-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
 
-    .seats-deck-grid.secondary-row {
+    .members-seat-grid.row-2 {
       grid-template-columns: repeat(3, 1fr);
-      width: 75%;
-      margin: 0 auto;
+      margin-top: 8px;
     }
 
-    @media (max-width: 768px) {
-      .seats-deck-grid { grid-template-columns: repeat(2, 1fr); }
-      .seats-deck-grid.secondary-row { grid-template-columns: repeat(2, 1fr); width: 100%; }
+    @media (max-width: 1050px) {
+      .members-seat-grid { grid-template-columns: repeat(2, 1fr); }
+      .members-seat-grid.row-2 { grid-template-columns: repeat(2, 1fr); }
     }
 
-    .interior-seat {
-      background: var(--seat-deck-bg);
-      border: 1px solid rgba(120, 180, 232, 0.15);
+    .member-cargo-cell {
+      background: rgba(14, 20, 28, 0.85);
+      border: 1px solid rgba(230, 126, 34, 0.25);
       border-radius: 4px;
-      padding: 7px 10px;
+      padding: 6px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 36px;
+      min-height: 34px;
       transition: all 0.2s ease;
     }
 
-    .interior-seat.boarded {
-      background: var(--seat-active-bg);
-      border-color: rgba(202, 160, 40, 0.4);
+    .member-cargo-cell.boarded {
+      background: rgba(22, 32, 46, 0.95);
+      border-color: rgba(243, 156, 18, 0.45);
     }
 
-    .interior-seat.guaranteed-rollover {
-      border-color: var(--train-outer-hull);
-      background: rgba(209, 138, 69, 0.18);
+    .member-cargo-cell.guaranteed-rollover {
+      border-color: var(--train-gold-bright);
+      background: rgba(230, 126, 34, 0.18);
     }
 
-    .interior-seat.swap-target-active {
+    .member-cargo-cell.swap-target-active {
       border-color: #ffd4a8 !important;
       background: rgba(209, 138, 69, 0.35) !important;
-      box-shadow: 0 0 12px rgba(255, 212, 168, 0.4);
+      box-shadow: 0 0 10px rgba(255, 212, 168, 0.4);
     }
 
-    .seat-left {
+    .cell-left {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -397,42 +540,40 @@
       flex: 1;
     }
 
-    .seat-badge {
+    .cell-index {
       font-family: 'Cinzel', serif;
       font-size: 9px;
-      color: var(--train-outer-hull);
       font-weight: 800;
+      color: var(--train-gold-bright);
       width: 14px;
     }
 
-    .seat-rider-name {
+    .cell-name {
       font-size: 11px;
-      font-weight: 500;
       color: var(--steel-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .interior-seat.boarded .seat-rider-name {
-      color: var(--ice-white);
+    .member-cargo-cell.boarded .cell-name {
+      color: #ffffff;
       font-weight: 600;
     }
 
     .rollover-tag {
       font-family: 'Cinzel', serif;
       font-size: 7px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--train-hull-bevel);
-      border: 1px solid var(--train-outer-hull);
+      font-weight: 800;
+      color: #ffffff;
+      background: var(--rollover-tag-bg);
+      border: 1px solid var(--train-gold);
       padding: 1px 4px;
       border-radius: 2px;
       text-transform: uppercase;
       margin-right: 2px;
     }
 
-    /* ACTION BUTTONS */
     .seat-actions {
       display: flex;
       align-items: center;
@@ -440,10 +581,9 @@
     }
 
     .btn-seat-action {
-      background: rgba(202, 160, 40, 0.08);
-      border: 1px solid rgba(202, 160, 40, 0.25);
-      color: var(--train-hull-bevel);
-      font-family: 'Inter', sans-serif;
+      background: rgba(243, 156, 18, 0.12);
+      border: 1px solid rgba(243, 156, 18, 0.3);
+      color: var(--train-gold-bright);
       font-size: 9px;
       font-weight: 600;
       padding: 2px 5px;
@@ -453,11 +593,11 @@
     }
 
     .btn-seat-action:hover {
-      background: rgba(202, 160, 40, 0.3);
+      background: rgba(243, 156, 18, 0.35);
       color: #ffffff;
     }
 
-    /* ACTION CONTROLS */
+    /* ACTION PANEL */
     .action-panel {
       display: flex;
       justify-content: center;
@@ -468,24 +608,25 @@
     }
 
     .btn-action-draw {
-      background: linear-gradient(180deg, rgba(202, 160, 40, 0.25) 0%, rgba(12, 17, 23, 0.95) 100%);
-      border: 1px solid var(--train-outer-hull);
-      color: var(--train-hull-bevel);
+      background: linear-gradient(180deg, #f39c12 0%, #b7791f 100%);
+      border: 2px solid #fbe285;
+      color: #1a0f00;
       font-family: 'Cinzel', serif;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 900;
       letter-spacing: 2px;
-      padding: 12px 28px;
+      padding: 14px 34px;
       cursor: pointer;
-      border-radius: 3px;
-      box-shadow: 0 0 14px rgba(202, 160, 40, 0.3);
+      border-radius: 4px;
+      box-shadow: 0 0 18px rgba(243, 156, 18, 0.4);
       transition: all 0.2s ease;
     }
 
     .btn-action-draw:hover:not(:disabled) {
-      background: rgba(202, 160, 40, 0.4);
-      border-color: #ffffff;
+      background: linear-gradient(180deg, #f1c40f 0%, #d68910 100%);
       transform: translateY(-2px);
+      box-shadow: 0 0 24px rgba(243, 156, 18, 0.6);
+      color: #000;
     }
 
     .btn-action-draw:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -499,9 +640,9 @@
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 2px;
-      padding: 12px 28px;
+      padding: 14px 28px;
       cursor: pointer;
-      border-radius: 3px;
+      border-radius: 4px;
       box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
       transition: all 0.2s ease;
     }
@@ -516,9 +657,9 @@
       font-family: 'Cinzel', serif;
       font-size: 10px;
       letter-spacing: 1.5px;
-      padding: 12px 18px;
+      padding: 13px 18px;
       cursor: pointer;
-      border-radius: 3px;
+      border-radius: 4px;
       transition: all 0.2s ease;
     }
 
@@ -528,7 +669,7 @@
     .deck-section {
       background: var(--panel-bg);
       border: 1px solid var(--frost-border);
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 18px 20px;
       margin-bottom: 24px;
     }
@@ -585,7 +726,7 @@
       padding: 10px 14px;
     }
 
-    .history-entry.rollover-entry { border-left: 3px solid var(--train-outer-hull); }
+    .history-entry.rollover-entry { border-left: 3px solid var(--train-gold); }
 
     .entry-top {
       display: flex;
@@ -620,7 +761,7 @@
       margin-bottom: 8px;
     }
 
-    .lead-cond { color: var(--train-hull-bevel); }
+    .lead-cond { color: var(--train-gold-bright); }
     .lead-vip { color: var(--vip-crimson); }
 
     .entry-names { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -635,14 +776,14 @@
     }
 
     .passenger-pill.is-rollover {
-      border-color: var(--train-outer-hull);
-      color: var(--train-hull-bevel);
+      border-color: var(--train-gold);
+      color: var(--train-gold-bright);
     }
 
     .slot-flicker { animation: slotFlash 0.12s infinite alternate; }
-    @keyframes slotFlash { from { color: var(--steel-dim); } to { color: var(--train-hull-bevel); } }
+    @keyframes slotFlash { from { color: var(--steel-dim); } to { color: var(--train-gold-bright); } }
 
-    /* MODAL PICKERS */
+    /* MODAL ARCHITECTURE */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -739,8 +880,8 @@
     }
 
     .picker-item.auto-option {
-      border-color: var(--train-outer-hull);
-      color: var(--train-hull-bevel);
+      border-color: var(--train-gold);
+      color: var(--train-gold-bright);
       font-family: 'Cinzel', serif;
       font-weight: 700;
       margin-bottom: 4px;
@@ -752,9 +893,9 @@
   <div class="train-container">
 
     <!-- HEADER -->
-    <div class="train-header">
-      <div class="sub-caption">Platform 3 • Gold Express Consist[cite: 1]</div>
-      <h1>ᛟ THE GOLDEN DREADNOUGHT ᛟ</h1>
+    <div class="station-top-header">
+      <div class="badge-tag">Platform 3 • Gold Express Consist[cite: 1]</div>
+      <h1>ᛟ STATION PLATFORM • ALLIANCE TRAIN ᛟ</h1>
     </div>
 
     <!-- METRIC HUD BAR -->
@@ -772,7 +913,7 @@
         <span class="hud-val" id="hud-boarded">0 / 100</span>
       </div>
       <div class="hud-item">
-        <span class="hud-label">Boarding Status</span>
+        <span class="hud-label">Departure Status</span>
         <span class="hud-val" id="hud-status" style="color: var(--steel-muted);">STANDBY</span>
       </div>
     </div>
@@ -780,7 +921,7 @@
     <!-- STAGING BANNER -->
     <div class="staging-banner" id="staging-banner">
       <div class="staging-text">
-        ᛟ <strong>BOARDING IN PROGRESS:</strong> Rearrange berths or substitute no-shows. Click <strong>CONFIRM DEPARTURE</strong> to record this run in history.
+        ᛟ <strong>BOARDING AT PLATFORM:</strong> Adjust berths or substitute no-shows. Click <strong>CONFIRM DEPARTURE</strong> to record this run in history.
       </div>
       <button class="btn-confirm-depart active" onclick="confirmTrainDeparture()">
         ᛟ CONFIRM DEPARTURE ᛟ
@@ -789,7 +930,7 @@
 
     <!-- SEAT SWAP PROMPT -->
     <div class="swap-mode-indicator" id="swap-mode-indicator">
-      Click on any other berth or officer seat to swap with <strong><span id="source-swap-name" style="color: var(--train-hull-bevel);">---</span></strong>:
+      Click on any other berth or officer seat to swap with <strong><span id="source-swap-name" style="color: var(--train-gold-bright);">---</span></strong>:
       <button onclick="cancelSeatToSeatSwap()" style="margin-left: 10px; background: transparent; border: 1px solid var(--frost-bright); color: var(--ice-white); padding: 2px 8px; border-radius: 2px; cursor: pointer;">Cancel</button>
     </div>
 
@@ -806,103 +947,123 @@
     </div>
 
     <!-- =========================================================
-         THE CUTAWAY PLAN VIEW TRAIN CONSIST
+         IN-GAME PLATFORM STAGE: TRAIN (LEFT) & CARDS (RIGHT)
     ========================================================= -->
-    <div class="train-chassis-plan">
+    <div class="platform-stage">
       
-      <!-- 1. LOCOMOTIVE ENGINE CABIN (CONDUCTOR + VIP) -->
-      <div class="plan-car locomotive">
-        <div class="car-bulkhead-header">
-          <span class="title">ᛟ DIESEL ENGINE • COCKPIT CABIN ᛟ</span>
-          <span class="sub-badge">LOCOMOTIVE 01</span>
-        </div>
-        <div class="cockpit-deck">
+      <!-- LEFT TRACK COLUMN -->
+      <div class="track-column">
+        <div class="golden-train-consist" id="visual-train-consist">
           
-          <!-- Conductor -->
-          <div class="officer-chair conductor-chair" id="pod-conductor">
-            <div class="officer-label">
-              <span>CONDUCTOR CHAIR</span>
-              <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('conductor')">
-                <span id="label-conductor-mode">[ AUTO ]</span> &#9662;
-              </button>
+          <!-- 1. LOCOMOTIVE ENGINE CABIN -->
+          <div class="locomotive-engine">
+            <div class="officer-badge-cap" title="Train Conductor Officer Hat">
+              <span>👨‍✈️</span>
             </div>
-            <div class="officer-name" id="slot-conductor">--- STANDBY ---</div>
-            <div class="seat-actions" id="conductor-actions" style="justify-content: center;"></div>
-          </div>
+            <div class="officer-title-tag">CONDUCTOR</div>
+            <div class="officer-assigned-name" id="slot-conductor">--- STANDBY ---</div>
+            <button type="button" class="officer-btn-mode disabled-mode" id="btn-cond-picker" onclick="openPicker('conductor')">
+              <span id="label-conductor-mode">[ AUTO ]</span> &#9662;
+            </button>
+            <div class="seat-actions" id="conductor-actions" style="margin-top: 5px;"></div>
 
-          <!-- VIP -->
-          <div class="officer-chair vip-chair" id="pod-vip">
-            <div class="officer-label">
-              <span>VIP GUEST BERTH</span>
-              <button type="button" class="pod-btn-trigger disabled-mode" onclick="openPicker('vip')">
+            <!-- VIP Dock Below Conductor -->
+            <div class="engine-vip-dock">
+              <span class="vip-title">★ VIP BERTH</span>
+              <span class="vip-name" id="slot-vip">--- STANDBY ---</span>
+              <button type="button" class="officer-btn-mode disabled-mode" id="btn-vip-picker" onclick="openPicker('vip')">
                 <span id="label-vip-mode">[ AUTO ]</span> &#9662;
               </button>
+              <div class="seat-actions" id="vip-actions" style="margin-top: 4px;"></div>
             </div>
-            <div class="officer-name" id="slot-vip">--- STANDBY ---</div>
-            <div class="seat-actions" id="vip-actions" style="justify-content: center;"></div>
+          </div>
+
+          <div class="train-coupler-joint"></div>
+
+          <!-- CAR 1 -->
+          <div class="train-boxcar" id="boxcar-1">
+            <div class="boxcar-occupancy-badge">
+              <span>👤</span> <span id="count-car-1">0/7</span>
+            </div>
+            <div class="boxcar-serial-label">CARRIAGE 01</div>
+          </div>
+
+          <div class="train-coupler-joint"></div>
+
+          <!-- CAR 2 -->
+          <div class="train-boxcar" id="boxcar-2">
+            <div class="boxcar-occupancy-badge">
+              <span>👤</span> <span id="count-car-2">0/7</span>
+            </div>
+            <div class="boxcar-serial-label">CARRIAGE 02</div>
+          </div>
+
+          <div class="train-coupler-joint"></div>
+
+          <!-- CAR 3 -->
+          <div class="train-boxcar" id="boxcar-3">
+            <div class="boxcar-occupancy-badge">
+              <span>👤</span> <span id="count-car-3">0/7</span>
+            </div>
+            <div class="boxcar-serial-label">CARRIAGE 03</div>
+          </div>
+
+          <div class="train-coupler-joint"></div>
+
+          <!-- CAR 4 -->
+          <div class="train-boxcar" id="boxcar-4">
+            <div class="boxcar-occupancy-badge">
+              <span>👤</span> <span id="count-car-4">0/7</span>
+            </div>
+            <div class="boxcar-serial-label">CARRIAGE 04</div>
           </div>
 
         </div>
       </div>
 
-      <!-- COUPLER 1 -->
-      <div class="car-coupler"></div>
+      <!-- RIGHT MANIFEST CARGO COLUMN -->
+      <div class="manifest-column">
+        
+        <!-- CARD 1 -->
+        <div class="cargo-card-pod" id="pod-card-1">
+          <div class="cargo-card-header">
+            <span class="car-title">ᛟ CARRIAGE 01 • VANGUARD COMPARTMENT</span>
+            <span class="car-count">7 PASSENGERS</span>
+          </div>
+          <div class="members-seat-grid" id="car-1-row1"></div>
+          <div class="members-seat-grid row-2" id="car-1-row2"></div>
+        </div>
 
-      <!-- 2. CARRIAGE I -->
-      <div class="plan-car">
-        <div class="car-bulkhead-header">
-          <span class="title">CARRIAGE I • VANGUARD CABIN</span>
-          <span class="sub-badge">BERTHS 01-07</span>
+        <!-- CARD 2 -->
+        <div class="cargo-card-pod" id="pod-card-2">
+          <div class="cargo-card-header">
+            <span class="car-title">ᛟ CARRIAGE 02 • GLACIAL CAR</span>
+            <span class="car-count">7 PASSENGERS</span>
+          </div>
+          <div class="members-seat-grid" id="car-2-row1"></div>
+          <div class="members-seat-grid row-2" id="car-2-row2"></div>
         </div>
-        <div class="car-cabin-interior">
-          <div class="seats-deck-grid" id="car-1-row1"></div>
-          <div class="seats-deck-grid secondary-row" id="car-1-row2"></div>
-        </div>
-      </div>
 
-      <!-- COUPLER 2 -->
-      <div class="car-coupler"></div>
+        <!-- CARD 3 -->
+        <div class="cargo-card-pod" id="pod-card-3">
+          <div class="cargo-card-header">
+            <span class="car-title">ᛟ CARRIAGE 03 • SHIELDWALL COMPARTMENT</span>
+            <span class="car-count">7 PASSENGERS</span>
+          </div>
+          <div class="members-seat-grid" id="car-3-row1"></div>
+          <div class="members-seat-grid row-2" id="car-3-row2"></div>
+        </div>
 
-      <!-- 3. CARRIAGE II -->
-      <div class="plan-car">
-        <div class="car-bulkhead-header">
-          <span class="title">CARRIAGE II • GLACIAL CAR</span>
-          <span class="sub-badge">BERTHS 08-14</span>
+        <!-- CARD 4 -->
+        <div class="cargo-card-pod" id="pod-card-4">
+          <div class="cargo-card-header">
+            <span class="car-title">ᛟ CARRIAGE 04 • OUTRIDER CABOOSE</span>
+            <span class="car-count">7 PASSENGERS</span>
+          </div>
+          <div class="members-seat-grid" id="car-4-row1"></div>
+          <div class="members-seat-grid row-2" id="car-4-row2"></div>
         </div>
-        <div class="car-cabin-interior">
-          <div class="seats-deck-grid" id="car-2-row1"></div>
-          <div class="seats-deck-grid secondary-row" id="car-2-row2"></div>
-        </div>
-      </div>
 
-      <!-- COUPLER 3 -->
-      <div class="car-coupler"></div>
-
-      <!-- 4. CARRIAGE III -->
-      <div class="plan-car">
-        <div class="car-bulkhead-header">
-          <span class="title">CARRIAGE III • SHIELDWALL COMPARTMENT</span>
-          <span class="sub-badge">BERTHS 15-21</span>
-        </div>
-        <div class="car-cabin-interior">
-          <div class="seats-deck-grid" id="car-3-row1"></div>
-          <div class="seats-deck-grid secondary-row" id="car-3-row2"></div>
-        </div>
-      </div>
-
-      <!-- COUPLER 4 -->
-      <div class="car-coupler"></div>
-
-      <!-- 5. CARRIAGE IV -->
-      <div class="plan-car">
-        <div class="car-bulkhead-header">
-          <span class="title">CARRIAGE IV • OUTRIDER CABOOSE</span>
-          <span class="sub-badge">BERTHS 22-28</span>
-        </div>
-        <div class="car-cabin-interior">
-          <div class="seats-deck-grid" id="car-4-row1"></div>
-          <div class="seats-deck-grid secondary-row" id="car-4-row2"></div>
-        </div>
       </div>
 
     </div>
@@ -913,7 +1074,7 @@
         ᛟ INITIATE FULL AUTO DRAW (30 SEATS) ᛟ
       </button>
       <button class="btn-confirm-depart" id="btn-confirm-depart" onclick="confirmTrainDeparture()">
-        ᛟ CONFIRM DEPARTURE & COMMIT TO HISTORY ᛟ
+        ᛟ CONFIRM DEPARTURE & RECORD TO HISTORY ᛟ
       </button>
       <button class="btn-reset-cycle" onclick="resetCycle()">RESET ROTATION</button>
     </div>
@@ -938,7 +1099,7 @@
 
   </div>
 
-  <!-- SEARCHABLE PRE-DRAW MODAL -->
+  <!-- SEARCHABLE PICKER MODAL -->
   <div id="member-picker-modal" class="modal-backdrop" onclick="closePickerOnBackdrop(event)">
     <div class="picker-box">
       <div class="picker-header">
@@ -960,7 +1121,7 @@
         <button class="picker-close" onclick="closeSubModal()">&times;</button>
       </div>
       <div style="padding: 8px 16px 0; font-size: 11px; color: var(--steel-muted);">
-        Replacing: <strong id="sub-target-name" style="color: var(--train-hull-bevel);">---</strong> (will return to waiting pool)
+        Replacing: <strong id="sub-target-name" style="color: var(--train-gold-bright);">---</strong> (will return to waiting pool)
       </div>
       <div class="picker-search-bar">
         <input type="text" id="sub-search-input" class="picker-input" placeholder="Search standby in pool..." oninput="filterSubList()" />
@@ -999,12 +1160,12 @@
     let carriageSwapSource = null;
 
     function loadState() {
-      const saved = localStorage.getItem("grimm_golden_interior_v1");
+      const saved = localStorage.getItem("grimm_station_platform_v1");
       if (saved) siteTrainState = JSON.parse(saved);
     }
 
     function saveState() {
-      localStorage.setItem("grimm_golden_interior_v1", JSON.stringify(siteTrainState));
+      localStorage.setItem("grimm_station_platform_v1", JSON.stringify(siteTrainState));
     }
 
     function setDrawMode(mode) {
@@ -1012,8 +1173,8 @@
       
       const autoBtn = document.getElementById("btn-mode-auto");
       const manualBtn = document.getElementById("btn-mode-manual");
-      const condTrigger = document.querySelector(".conductor-chair .pod-btn-trigger");
-      const vipTrigger = document.querySelector(".vip-chair .pod-btn-trigger");
+      const condTrigger = document.getElementById("btn-cond-picker");
+      const vipTrigger = document.getElementById("btn-vip-picker");
 
       if (mode === "AUTO") {
         autoBtn.classList.add("active");
@@ -1096,7 +1257,7 @@
         
         const inPool = siteTrainState.pool.includes(name);
         const statusNote = inPool 
-          ? `<span style="font-size: 10px; color: var(--train-hull-bevel);">In Pool</span>` 
+          ? `<span style="font-size: 10px; color: var(--train-gold-bright);">In Pool</span>` 
           : `<span style="font-size: 10px; color: var(--steel-dim);">Rode</span>`;
 
         item.innerHTML = `<span>${name}</span> ${statusNote}`;
@@ -1182,7 +1343,7 @@
       candidates.forEach(name => {
         const item = document.createElement("div");
         item.className = "picker-item";
-        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--train-hull-bevel);">Take Berth &rarr;</span>`;
+        item.innerHTML = `<span>${name}</span> <span style="font-size:10px; color:var(--train-gold-bright);">Board Consist &rarr;</span>`;
         item.onclick = () => executeSeatSwapWithPool(name);
         container.appendChild(item);
       });
@@ -1302,13 +1463,9 @@
       clearSwapHighlights();
       if (!carriageSwapSource) return;
 
-      if (carriageSwapSource.type === 'conductor') {
-        document.getElementById("pod-conductor").classList.add("swap-target-active");
-      } else if (carriageSwapSource.type === 'vip') {
-        document.getElementById("pod-vip").classList.add("swap-target-active");
-      } else {
-        const slot = document.getElementById(`berth-seat-${carriageSwapSource.index}`);
-        if (slot) slot.classList.add("swap-target-active");
+      if (carriageSwapSource.type === 'passenger') {
+        const cell = document.getElementById(`cargo-cell-${carriageSwapSource.index}`);
+        if (cell) cell.classList.add("swap-target-active");
       }
     }
 
@@ -1352,7 +1509,7 @@
 
       saveState();
       updateInterface();
-      alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nThe Golden Dreadnought has departed Platform 3.");
+      alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nThe Gold Express has departed Platform 3.");
     }
 
     /* CORE DRAW SEQUENCE */
@@ -1460,24 +1617,29 @@
       document.getElementById("label-conductor-mode").innerText = "[ AUTO ]";
       document.getElementById("label-vip-mode").innerText = "[ AUTO ]";
 
+      // Trigger Train Engine Shake Animation
+      const visualConsist = document.getElementById("visual-train-consist");
+      visualConsist.classList.add("train-shaking");
+
       runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
+        visualConsist.classList.remove("train-shaking");
         btn.disabled = false;
         updateInterface();
       });
     }
 
     function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
-      document.getElementById("slot-conductor").innerText = "LOCKING...";
-      document.getElementById("slot-vip").innerText = "LOCKING...";
+      document.getElementById("slot-conductor").innerText = "ROLLING...";
+      document.getElementById("slot-vip").innerText = "ROLLING...";
 
       for (let i = 0; i < 28; i++) {
-        const slot = document.getElementById(`berth-seat-${i}`);
-        if (slot) {
-          slot.className = "interior-seat";
-          slot.innerHTML = `
-            <div class="seat-left">
-              <span class="seat-badge">${(i % 7) + 1}</span>
-              <span class="seat-rider-name slot-flicker">BOARDING...</span>
+        const cell = document.getElementById(`cargo-cell-${i}`);
+        if (cell) {
+          cell.className = "member-cargo-cell";
+          cell.innerHTML = `
+            <div class="cell-left">
+              <span class="cell-index">${(i % 7) + 1}</span>
+              <span class="cell-name slot-flicker">BOARDING...</span>
             </div>
           `;
         }
@@ -1493,13 +1655,13 @@
 
       passengers.forEach((p, idx) => {
         setTimeout(() => {
-          const slot = document.getElementById(`berth-seat-${idx}`);
-          if (slot) {
-            slot.className = "interior-seat boarded" + (p.isRollover ? " guaranteed-rollover" : "");
-            slot.innerHTML = `
-              <div class="seat-left" onclick="startSeatToSeatSwap('passenger', ${idx})" style="cursor:pointer;">
-                <span class="seat-badge">${(idx % 7) + 1}</span>
-                <span class="seat-rider-name">${p.name}</span>
+          const cell = document.getElementById(`cargo-cell-${idx}`);
+          if (cell) {
+            cell.className = "member-cargo-cell boarded" + (p.isRollover ? " guaranteed-rollover" : "");
+            cell.innerHTML = `
+              <div class="cell-left" onclick="startSeatToSeatSwap('passenger', ${idx})" style="cursor:pointer;">
+                <span class="cell-index">${(idx % 7) + 1}</span>
+                <span class="cell-name">${p.name}</span>
               </div>
             `;
           }
@@ -1511,9 +1673,9 @@
       });
     }
 
-    /* BUILD CUTAWAY SEATING INTERIOR (4 SEATS ROW 1 + 3 SEATS ROW 2 PER CAR) */
+    /* BUILD CARGO CARD SEATING CELLS */
     function buildEmptySlots() {
-      let seatCounter = 0;
+      let cellCount = 0;
       for (let car = 1; car <= 4; car++) {
         const r1 = document.getElementById(`car-${car}-row1`);
         const r2 = document.getElementById(`car-${car}-row2`);
@@ -1522,30 +1684,30 @@
 
         // Row 1 (4 seats)
         for (let s = 1; s <= 4; s++) {
-          const seatDiv = document.createElement("div");
-          seatDiv.className = "interior-seat";
-          seatDiv.id = `berth-seat-${seatCounter++}`;
-          seatDiv.innerHTML = `
-            <div class="seat-left">
-              <span class="seat-badge">${s}</span>
-              <span class="seat-rider-name">---</span>
+          const cellDiv = document.createElement("div");
+          cellDiv.className = "member-cargo-cell";
+          cellDiv.id = `cargo-cell-${cellCount++}`;
+          cellDiv.innerHTML = `
+            <div class="cell-left">
+              <span class="cell-index">${s}</span>
+              <span class="cell-name">---</span>
             </div>
           `;
-          r1.appendChild(seatDiv);
+          r1.appendChild(cellDiv);
         }
 
         // Row 2 (3 seats)
         for (let s = 5; s <= 7; s++) {
-          const seatDiv = document.createElement("div");
-          seatDiv.className = "interior-seat";
-          seatDiv.id = `berth-seat-${seatCounter++}`;
-          seatDiv.innerHTML = `
-            <div class="seat-left">
-              <span class="seat-badge">${s}</span>
-              <span class="seat-rider-name">---</span>
+          const cellDiv = document.createElement("div");
+          cellDiv.className = "member-cargo-cell";
+          cellDiv.id = `cargo-cell-${cellCount++}`;
+          cellDiv.innerHTML = `
+            <div class="cell-left">
+              <span class="cell-index">${s}</span>
+              <span class="cell-name">---</span>
             </div>
           `;
-          r2.appendChild(seatDiv);
+          r2.appendChild(cellDiv);
         }
       }
     }
@@ -1564,7 +1726,7 @@
 
       if (isStaged) {
         hudStatus.innerText = "BOARDING / STAGING";
-        hudStatus.style.color = "var(--train-hull-bevel)";
+        hudStatus.style.color = "var(--train-gold-bright)";
         stagingBanner.classList.add("active");
         confirmBtn.classList.add("active");
       } else {
@@ -1591,7 +1753,7 @@
         `;
 
         document.getElementById("conductor-actions").innerHTML = `
-          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇄ Standby</button>
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('conductor')">⇄ Sub</button>
           <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('conductor')">⇅ Move</button>
         `;
 
@@ -1601,19 +1763,25 @@
         `;
 
         document.getElementById("vip-actions").innerHTML = `
-          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇄ Standby</button>
+          <button type="button" class="btn-seat-action" onclick="openSeatSubstitute('vip')">⇄ Sub</button>
           <button type="button" class="btn-seat-action" onclick="startSeatToSeatSwap('vip')">⇅ Move</button>
         `;
 
+        // Update occupancy numbers on the train: 7/7
+        for (let c = 1; c <= 4; c++) {
+          document.getElementById(`count-car-${c}`).innerText = "7/7";
+        }
+
+        // Fill 28 passenger cells
         for (let idx = 0; idx < 28; idx++) {
-          const slot = document.getElementById(`berth-seat-${idx}`);
+          const cell = document.getElementById(`cargo-cell-${idx}`);
           const p = t.passengers[idx];
-          if (slot && p) {
-            slot.className = "interior-seat boarded" + (p.isRollover ? " guaranteed-rollover" : "");
-            slot.innerHTML = `
-              <div class="seat-left" onclick="startSeatToSeatSwap('passenger', ${idx})" style="cursor: pointer;" title="Click to swap seat with selected member">
-                <span class="seat-badge">${(idx % 7) + 1}</span>
-                <span class="seat-rider-name">${p.name}</span>
+          if (cell && p) {
+            cell.className = "member-cargo-cell boarded" + (p.isRollover ? " guaranteed-rollover" : "");
+            cell.innerHTML = `
+              <div class="cell-left" onclick="startSeatToSeatSwap('passenger', ${idx})" style="cursor: pointer;" title="Click to swap seat">
+                <span class="cell-index">${(idx % 7) + 1}</span>
+                <span class="cell-name">${p.name}</span>
               </div>
               <div class="seat-actions">
                 ${p.isRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
@@ -1622,6 +1790,10 @@
               </div>
             `;
           }
+        }
+      } else {
+        for (let c = 1; c <= 4; c++) {
+          document.getElementById(`count-car-${c}`).innerText = "0/7";
         }
       }
 
@@ -1651,7 +1823,7 @@
 
         item.innerHTML = `
           <div class="entry-top">
-            <span>CYCLE ${entry.cycle} • DAY ${entry.day} ${entry.rollover ? '<strong style="color: var(--train-hull-bevel);">(ROLLOVER RESET)</strong>' : ''}</span>
+            <span>CYCLE ${entry.cycle} • DAY ${entry.day} ${entry.rollover ? '<strong style="color: var(--train-gold-bright);">(ROLLOVER RESET)</strong>' : ''}</span>
             <div class="history-card-actions">
               <span style="color: var(--steel-dim); font-size: 10px;">${entry.time}</span>
               <button class="btn-delete-log" title="Delete this entry (PIN Required)" onclick="deleteHistoryEntry(${index})">🗑</button>
