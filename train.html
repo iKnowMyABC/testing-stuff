@@ -487,11 +487,36 @@
     .entry-top {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-family: 'Cinzel', serif;
       font-size: 11px;
       font-weight: 700;
       color: var(--ice-white);
       margin-bottom: 6px;
+    }
+
+    .history-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-delete-log {
+      background: transparent;
+      border: 1px solid rgba(153, 45, 34, 0.3);
+      color: #b05e5e;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 11px;
+      cursor: pointer;
+      line-height: 1;
+      transition: all 0.2s ease;
+    }
+
+    .btn-delete-log:hover {
+      background: rgba(153, 45, 34, 0.25);
+      border-color: var(--vip-crimson);
+      color: #ff9d94;
     }
 
     .entry-leads {
@@ -804,6 +829,9 @@
   </div>
 
   <script>
+    // Set your admin pin for deleting individual test logs
+    const ADMIN_DELETE_PIN = "1234";
+
     // 100 MEMBER ROSTER SEED
     const ROSTER_SEED = [
       "MOUSE [R5]",
@@ -830,12 +858,12 @@
     let selectedVIP = null;            // null = Auto
 
     function loadState() {
-      const saved = localStorage.getItem("grimm_mainsite_train_v3");
+      const saved = localStorage.getItem("grimm_mainsite_train_v4");
       if (saved) siteTrainState = JSON.parse(saved);
     }
 
     function saveState() {
-      localStorage.setItem("grimm_mainsite_train_v3", JSON.stringify(siteTrainState));
+      localStorage.setItem("grimm_mainsite_train_v4", JSON.stringify(siteTrainState));
     }
 
     // DRAW MODE TOGGLING
@@ -1000,8 +1028,8 @@
 
       // Restore active train if exists
       if (siteTrainState.currentTrain) {
-        document.getElementById("slot-conductor").innerText = siteTrainState.currentTrain.conductor;
-        document.getElementById("slot-vip").innerText = siteTrainState.currentTrain.vip;
+        document.getElementById("slot-conductor").innerHTML = `${siteTrainState.currentTrain.conductor} ${siteTrainState.currentTrain.condIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
+        document.getElementById("slot-vip").innerHTML = `${siteTrainState.currentTrain.vip} ${siteTrainState.currentTrain.vipIsRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
 
         let passIndex = 0;
         for (let c = 1; c <= 4; c++) {
@@ -1042,7 +1070,7 @@
 
       count.innerText = `${siteTrainState.history.length} DRAWS LOGGED`;
 
-      siteTrainState.history.forEach(entry => {
+      siteTrainState.history.forEach((entry, index) => {
         const item = document.createElement("div");
         item.className = "history-entry" + (entry.rollover ? " rollover-entry" : "");
 
@@ -1053,16 +1081,37 @@
         item.innerHTML = `
           <div class="entry-top">
             <span>CYCLE ${entry.cycle} • DAY ${entry.day} ${entry.rollover ? '<strong style="color: var(--rollover-gold);">(ROLLOVER RESET)</strong>' : ''}</span>
-            <span style="color: var(--steel-dim); font-size: 10px;">${entry.time}</span>
+            <div class="history-card-actions">
+              <span style="color: var(--steel-dim); font-size: 10px;">${entry.time}</span>
+              <button class="btn-delete-log" title="Delete this entry (PIN Required)" onclick="deleteHistoryEntry(${index})">🗑</button>
+            </div>
           </div>
           <div class="entry-leads">
-            <span class="lead-cond">CONDUCTOR: <strong>${entry.conductor}</strong> ${entry.manualConductor ? '(MANUAL)' : '(RNG)'}</span>
-            <span class="lead-vip">VIP: <strong>${entry.vip}</strong> ${entry.manualVIP ? '(MANUAL)' : '(RNG)'}</span>
+            <span class="lead-cond">CONDUCTOR: <strong>${entry.conductor}</strong> ${entry.manualConductor ? '(MANUAL)' : '(RNG)'}${entry.condIsRollover ? ' ★' : ''}</span>
+            <span class="lead-vip">VIP: <strong>${entry.vip}</strong> ${entry.manualVIP ? '(MANUAL)' : '(RNG)'}${entry.vipIsRollover ? ' ★' : ''}</span>
           </div>
           <div class="entry-names">${pills}</div>
         `;
         feed.appendChild(item);
       });
+    }
+
+    // PIN PROTECTED LOG ENTRY DELETION
+    function deleteHistoryEntry(index) {
+      const pin = prompt("Enter Admin PIN to delete this departure log:");
+      if (pin === null) return;
+
+      if (pin.trim() !== ADMIN_DELETE_PIN) {
+        alert("Incorrect PIN. Entry deletion aborted.");
+        return;
+      }
+
+      const target = siteTrainState.history[index];
+      if (confirm(`Confirm deletion of entry: Cycle ${target.cycle} - Day ${target.day} (${target.time})?`)) {
+        siteTrainState.history.splice(index, 1);
+        saveState();
+        renderLogs();
+      }
     }
 
     // CORE DRAW ENGINE (WITH NO-REPLACEMENT CYCLE & ROLLOVER)
@@ -1078,57 +1127,63 @@
 
       let finalConductor = manualCond;
       let finalVIP = manualVip;
-      let passengers = [];
-      let rolloverHappened = false;
+      let condIsRollover = false;
+      let vipIsRollover = false;
 
+      let rolloverHappened = false;
       const curCycle = siteTrainState.cycle;
       const curDay = siteTrainState.day;
 
-      // 1. Remove manually assigned leaders from pool if present
-      if (finalConductor) {
-        siteTrainState.pool = siteTrainState.pool.filter(name => name !== finalConductor);
-        if (!siteTrainState.boardedThisCycle.includes(finalConductor)) {
-          siteTrainState.boardedThisCycle.push(finalConductor);
-        }
-      }
-      if (finalVIP) {
-        siteTrainState.pool = siteTrainState.pool.filter(name => name !== finalVIP);
-        if (!siteTrainState.boardedThisCycle.includes(finalVIP)) {
-          siteTrainState.boardedThisCycle.push(finalVIP);
-        }
-      }
-
-      // 2. Determine number of random passengers needed
+      // 1. Calculate how many random slots are needed
       let rngNeeded = 28;
       if (!finalConductor) rngNeeded++;
       if (!finalVIP) rngNeeded++;
 
+      // 2. Identify if manual picks originated from remaining carryover pool
+      let eligibleCarryover = [...siteTrainState.pool];
+
+      if (finalConductor && eligibleCarryover.includes(finalConductor)) {
+        condIsRollover = true;
+        eligibleCarryover = eligibleCarryover.filter(name => name !== finalConductor);
+      }
+      if (finalVIP && eligibleCarryover.includes(finalVIP)) {
+        vipIsRollover = true;
+        eligibleCarryover = eligibleCarryover.filter(name => name !== finalVIP);
+      }
+
       let drawnMembers = [];
 
-      // 3. Check for Day 4 Rollover
-      if (siteTrainState.pool.length >= rngNeeded) {
+      // 3. Determine if rollover is triggered
+      if (eligibleCarryover.length >= rngNeeded) {
         // Standard Day
+        siteTrainState.pool = eligibleCarryover;
         const pulled = siteTrainState.pool.splice(0, rngNeeded);
         drawnMembers = pulled.map(name => ({ name, isRollover: false }));
+
         siteTrainState.boardedThisCycle.push(...pulled);
+        if (finalConductor && !siteTrainState.boardedThisCycle.includes(finalConductor)) {
+          siteTrainState.boardedThisCycle.push(finalConductor);
+        }
+        if (finalVIP && !siteTrainState.boardedThisCycle.includes(finalVIP)) {
+          siteTrainState.boardedThisCycle.push(finalVIP);
+        }
         siteTrainState.day++;
       } else {
-        // Day 4 Rollover Day
+        // Rollover Day
         rolloverHappened = true;
-        const carryover = [...siteTrainState.pool];
-        drawnMembers = carryover.map(name => ({ name, isRollover: true }));
+        const carryoverGuaranteed = [...eligibleCarryover];
+        drawnMembers = carryoverGuaranteed.map(name => ({ name, isRollover: true }));
 
         const freshRoster = shuffle([...ROSTER_SEED]);
-        
-        // Exclude anyone already on today's train
-        const activeOccupants = [
-          ...carryover, 
-          ...(finalConductor ? [finalConductor] : []), 
+
+        const seatedToday = [
+          ...carryoverGuaranteed,
+          ...(finalConductor ? [finalConductor] : []),
           ...(finalVIP ? [finalVIP] : [])
         ];
-        siteTrainState.pool = freshRoster.filter(name => !activeOccupants.includes(name));
+        siteTrainState.pool = freshRoster.filter(name => !seatedToday.includes(name));
 
-        const deficit = rngNeeded - carryover.length;
+        const deficit = rngNeeded - carryoverGuaranteed.length;
         const freshPicks = siteTrainState.pool.splice(0, deficit);
         drawnMembers.push(...freshPicks.map(name => ({ name, isRollover: false })));
 
@@ -1142,19 +1197,25 @@
 
       // 4. Fill Auto slots if any
       if (!finalConductor) {
-        finalConductor = drawnMembers.shift().name;
+        const condObj = drawnMembers.shift();
+        finalConductor = condObj.name;
+        condIsRollover = condObj.isRollover;
       }
       if (!finalVIP) {
-        finalVIP = drawnMembers.shift().name;
+        const vipObj = drawnMembers.shift();
+        finalVIP = vipObj.name;
+        vipIsRollover = vipObj.isRollover;
       }
 
-      // Remaining are the 28 Carriage Passengers
-      passengers = drawnMembers;
+      // Remaining 28 go to Carriages
+      const passengers = drawnMembers;
 
       // 5. Save state
       siteTrainState.currentTrain = {
         conductor: finalConductor,
+        condIsRollover,
         vip: finalVIP,
+        vipIsRollover,
         passengers,
         manualConductor: !!manualCond,
         manualVIP: !!manualVip,
@@ -1167,7 +1228,9 @@
         day: curDay,
         time: now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         conductor: finalConductor,
+        condIsRollover,
         vip: finalVIP,
+        vipIsRollover,
         manualConductor: !!manualCond,
         manualVIP: !!manualVip,
         passengers,
@@ -1182,13 +1245,13 @@
       document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
 
       // 6. Trigger Animation
-      runAnimation(finalConductor, finalVIP, passengers, () => {
+      runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
         btn.disabled = false;
         updateInterface();
       });
     }
 
-    function runAnimation(conductor, vip, passengers, callback) {
+    function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
       document.getElementById("slot-conductor").innerText = "LOCKING...";
       document.getElementById("slot-vip").innerText = "LOCKING...";
 
@@ -1205,11 +1268,11 @@
       }
 
       setTimeout(() => {
-        document.getElementById("slot-conductor").innerText = conductor;
+        document.getElementById("slot-conductor").innerHTML = `${conductor} ${condRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
       }, 500);
 
       setTimeout(() => {
-        document.getElementById("slot-vip").innerText = vip;
+        document.getElementById("slot-vip").innerHTML = `${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}`;
       }, 900);
 
       passengers.forEach((p, idx) => {
@@ -1236,17 +1299,16 @@
       });
     }
 
+    // SAFE RESET: Resets rotation and pool, keeps all history logs intact
     function resetCycle() {
-      if (!confirm("Reset the entire train cycle back to Cycle 1, Day 1 and clear history?")) return;
-      localStorage.removeItem("grimm_mainsite_train_v3");
-      siteTrainState = {
-        cycle: 1,
-        day: 1,
-        pool: [...ROSTER_SEED],
-        boardedThisCycle: [],
-        currentTrain: null,
-        history: []
-      };
+      if (!confirm("Reset the current train cycle back to Day 1? (Departure history logs will be KEPT).")) return;
+      siteTrainState.cycle = 1;
+      siteTrainState.day = 1;
+      siteTrainState.pool = [...ROSTER_SEED];
+      siteTrainState.boardedThisCycle = [];
+      siteTrainState.currentTrain = null;
+      // siteTrainState.history is preserved
+
       saveState();
       buildEmptySlots();
       document.getElementById("slot-conductor").innerText = "--- STANDBY ---";
