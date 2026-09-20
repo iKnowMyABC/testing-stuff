@@ -142,6 +142,33 @@
       letter-spacing: 1px;
     }
 
+    .staging-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-reroll-staging {
+      background: rgba(120, 180, 232, 0.15);
+      border: 1px solid var(--frost-bright);
+      color: var(--ice-white);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 9px 16px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-reroll-staging:hover {
+      background: rgba(120, 180, 232, 0.3);
+      box-shadow: 0 0 12px var(--frost-glow);
+      transform: translateY(-1px);
+    }
+
     .btn-confirm-depart {
       background: linear-gradient(180deg, rgba(46, 204, 113, 0.3) 0%, rgba(12, 17, 23, 0.9) 100%);
       border: 1px solid var(--success-green);
@@ -802,28 +829,6 @@
       background: rgba(209, 138, 69, 0.15);
       color: #ffd4a8;
     }
-
-    .btn-reroll-staging {
-      background: rgba(120, 180, 232, 0.15);
-      border: 1px solid var(--frost-bright);
-      color: var(--ice-white);
-      font-family: 'Cinzel', serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      padding: 9px 16px;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .btn-reroll-staging:hover {
-      background: rgba(120, 180, 232, 0.3);
-      box-shadow: 0 0 12px var(--frost-glow);
-      transform: translateY(-1px);
-    }
-    
   </style>
 </head>
 <body>
@@ -856,12 +861,12 @@
       </div>
     </div>
 
-    <!-- STAGING BANNER (WITH BOTH CONFIRM & REROLL) -->
+    <!-- STAGING BANNER -->
     <div class="staging-banner" id="staging-banner">
       <div class="staging-text">
         ᛟ <strong>BOARDING IN PROGRESS:</strong> Adjust berths or substitute no-shows. Click <strong>CONFIRM DEPARTURE</strong> when ready to commit to history.
       </div>
-      <div style="display: flex; gap: 8px; align-items: center;">
+      <div class="staging-actions">
         <button class="btn-reroll-staging" onclick="rerollStagingTrain()">
           🎲 REROLL STAGING
         </button>
@@ -1042,12 +1047,12 @@
     let carriageSwapSource = null;
 
     function loadState() {
-      const saved = localStorage.getItem("grimm_golden_juggernaut_v1");
+      const saved = localStorage.getItem("grimm_golden_juggernaut_v2");
       if (saved) siteTrainState = JSON.parse(saved);
     }
 
     function saveState() {
-      localStorage.setItem("grimm_golden_juggernaut_v1", JSON.stringify(siteTrainState));
+      localStorage.setItem("grimm_golden_juggernaut_v2", JSON.stringify(siteTrainState));
     }
 
     function setDrawMode(mode) {
@@ -1405,34 +1410,33 @@
       alert("ᛟ DEPARTURE CONFIRMED! ᛟ\n\nTrain manifest is permanently recorded in official Departure Logs.");
     }
 
-    // Helper to refund unconfirmed staged members back to the pool
+    /* REROLL / REFUND HELPER */
     function refundStagedTrain() {
       if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) return;
 
       const t = siteTrainState.currentTrain;
-      const stagedMembers = [
-        t.conductor,
-        t.vip,
-        ...t.passengers.map(p => p.name)
-      ];
 
-      // 1. Refund all staged members back into pool (avoiding duplicates)
-      stagedMembers.forEach(name => {
-        if (!siteTrainState.pool.includes(name)) {
-          siteTrainState.pool.push(name);
-        }
-      });
+      // Direct restoration of exact snapshot (preserves 10-member Day 4 carryover pool accurately)
+      if (t.preDrawPoolSnapshot) {
+        siteTrainState.pool = [...t.preDrawPoolSnapshot];
+        siteTrainState.boardedThisCycle = [...t.preDrawBoardedSnapshot];
+      } else {
+        const stagedMembers = [
+          t.conductor,
+          t.vip,
+          ...t.passengers.map(p => p.name)
+        ];
+        stagedMembers.forEach(name => {
+          if (!siteTrainState.pool.includes(name)) siteTrainState.pool.push(name);
+        });
+        siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(
+          name => !stagedMembers.includes(name)
+        );
+      }
 
-      // 2. Remove them from boardedThisCycle tracking
-      siteTrainState.boardedThisCycle = siteTrainState.boardedThisCycle.filter(
-        name => !stagedMembers.includes(name)
-      );
-
-      // 3. Clear current train
       siteTrainState.currentTrain = null;
     }
 
-    // One-click reroll button handler
     function rerollStagingTrain() {
       if (!siteTrainState.currentTrain || !siteTrainState.currentTrain.isStaged) return;
       refundStagedTrain();
@@ -1440,16 +1444,20 @@
       executeDrawSequence();
     }
 
-    /* CORE DRAW SEQUENCE (WITH AUTOMATIC STAGED REFUND) */
+    /* CORE DRAW SEQUENCE */
     function executeDrawSequence() {
       const btn = document.getElementById("btn-draw");
 
-      // If a train is already in staging, quietly refund those 30 members back to pool first
+      // Auto-refund staged members if initiating another draw while staged
       if (siteTrainState.currentTrain && siteTrainState.currentTrain.isStaged) {
         refundStagedTrain();
       }
 
       btn.disabled = true;
+
+      // 1. Snapshot pool & boarded lists BEFORE the draw
+      const preDrawPoolSnapshot = [...siteTrainState.pool];
+      const preDrawBoardedSnapshot = [...siteTrainState.boardedThisCycle];
 
       const manualCond = (currentOperationMode === "MANUAL") ? selectedConductor : null;
       const manualVip = (currentOperationMode === "MANUAL") ? selectedVIP : null;
@@ -1484,6 +1492,7 @@
       let drawnMembers = [];
 
       if (eligibleCarryover.length >= rngNeeded) {
+        // Standard Day (Days 1, 2, 3)
         siteTrainState.pool = eligibleCarryover;
         const pulled = siteTrainState.pool.splice(0, rngNeeded);
         drawnMembers = pulled.map(name => ({ name, isRollover: false }));
@@ -1496,6 +1505,7 @@
           siteTrainState.boardedThisCycle.push(finalVIP);
         }
       } else {
+        // Rollover Day (Day 4: carryover gets guaranteed gold tags)
         rolloverHappened = true;
         const carryoverGuaranteed = [...eligibleCarryover];
         drawnMembers = carryoverGuaranteed.map(name => ({ name, isRollover: true }));
@@ -1511,6 +1521,9 @@
         const deficit = rngNeeded - carryoverGuaranteed.length;
         const freshPicks = siteTrainState.pool.splice(0, deficit);
         drawnMembers.push(...freshPicks.map(name => ({ name, isRollover: false })));
+
+        // SHUFFLE COMBINED 30 RIDERS FOR FAIR SEATING ACROSS CABINS & CARRIAGES
+        drawnMembers = shuffle(drawnMembers);
 
         siteTrainState.boardedThisCycle = [...freshPicks];
         if (finalConductor) siteTrainState.boardedThisCycle.push(finalConductor);
@@ -1534,6 +1547,8 @@
         isStaged: true,
         stagingCycle: currentStagingCycle,
         stagingDay: currentStagingDay,
+        preDrawPoolSnapshot,
+        preDrawBoardedSnapshot,
         conductor: finalConductor,
         condIsRollover,
         vip: finalVIP,
@@ -1551,6 +1566,7 @@
       document.getElementById("label-conductor-mode").innerText = "[ AUTO-DRAW ]";
       document.getElementById("label-vip-mode").innerText = "[ AUTO-DRAW ]";
 
+      // Execute Smooth Staggered Boarding Animation
       runAnimation(finalConductor, condIsRollover, finalVIP, vipIsRollover, passengers, () => {
         btn.disabled = false;
         updateInterface();
@@ -1558,7 +1574,6 @@
     }
 
     function runAnimation(conductor, condRollover, vip, vipRollover, passengers, callback) {
-      // Clear current visual slots and start flicker
       document.getElementById("slot-conductor").innerText = "ROLLING...";
       document.getElementById("slot-vip").innerText = "ROLLING...";
       document.getElementById("conductor-actions").innerHTML = "";
@@ -1584,7 +1599,7 @@
         `;
       }, 450);
 
-      // Lock VIP
+      // Lock VIP Seat
       setTimeout(() => {
         document.getElementById("slot-vip").innerHTML = `
           ${vip} ${vipRollover ? '<span class="rollover-tag">ROLLOVER</span>' : ''}
@@ -1644,7 +1659,6 @@
       document.getElementById("hud-boarded").innerText = `${siteTrainState.boardedThisCycle.length} / 100`;
       document.getElementById("queue-counter").innerText = `${siteTrainState.pool.length} ELIGIBLE`;
 
-      // Status indicator
       const hudStatus = document.getElementById("hud-status");
       const stagingBanner = document.getElementById("staging-banner");
 
