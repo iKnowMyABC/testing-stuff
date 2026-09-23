@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Train Schedule • Weekly Roster & Guidelines</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-base: #070a0e;
+      --card-bg: rgba(12, 17, 23, 0.85);
+      --card-subtle: rgba(17, 24, 34, 0.9);
+      --frost-border: rgba(120, 180, 232, 0.22);
+      --frost-bright: #78b4e8;
+      --frost-glow: rgba(120, 180, 232, 0.25);
+      --ice-white: #eaf5ff;
+      --steel-muted: #9ab0c2;
+      --steel-dim: #5a6e7f;
+
+      --conductor-crimson: #c0392b;
+      --conductor-bright: #e74c3c;
+      --vip-gold: #f39c12;
+      --vip-gold-light: #f1c40f;
+      --success-green: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--ice-white);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 30px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: radial-gradient(circle at 50% 10%, rgba(120, 180, 232, 0.08) 0%, transparent 70%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* HEADER */
+    .schedule-header {
+      background: linear-gradient(180deg, rgba(20, 28, 40, 0.9) 0%, rgba(10, 14, 20, 0.95) 100%);
+      border: 1px solid var(--frost-border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .header-titles h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--ice-white);
+      margin-bottom: 4px;
+    }
+
+    .header-titles p {
+      font-size: 11px;
+      color: var(--steel-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .badge-roster {
+      background: rgba(120, 180, 232, 0.15);
+      border: 1px solid var(--frost-bright);
+      color: var(--frost-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+
+    /* POOLS SETUP BAR (COLLAPSIBLE TABS) */
+    .pools-config-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .panel-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--frost-bright);
+      text-transform: uppercase;
+    }
+
+    .pools-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 800px) { .pools-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .pools-grid { grid-template-columns: 1fr; } }
+
+    .pool-card {
+      background: var(--card-subtle);
+      border: 1px solid rgba(120, 180, 232, 0.12);
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pool-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--steel-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .pool-card-count {
+      color: var(--vip-gold-light);
+      font-weight: 800;
+    }
+
+    .btn-select-pool {
+      background: rgba(120, 180, 232, 0.1);
+      border: 1px solid var(--frost-border);
+      color: var(--ice-white);
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .btn-select-pool:hover {
+      background: rgba(120, 180, 232, 0.2);
+      border-color: var(--frost-bright);
+    }
+
+    /* CONTROLS BAR */
+    .controls-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .week-type-toggle {
+      display: inline-flex;
+      background: rgba(7, 10, 14, 0.85);
+      border: 1px solid var(--frost-border);
+      border-radius: 4px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .btn-toggle {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--steel-muted);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-toggle.active {
+      background: rgba(120, 180, 232, 0.18);
+      border-color: var(--frost-bright);
+      color: var(--ice-white);
+      box-shadow: 0 0 10px var(--frost-glow);
+    }
+
+    .btn-generate-main {
+      background: linear-gradient(180deg, rgba(243, 156, 18, 0.2) 0%, rgba(12, 17, 23, 0.9) 100%);
+      border: 1px solid var(--vip-gold);
+      color: #ffd4a8;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 10px 24px;
+      cursor: pointer;
+      border-radius: 4px;
+      box-shadow: 0 0 14px rgba(243, 156, 18, 0.25);
+      transition: all 0.2s;
+    }
+
+    .btn-generate-main:hover {
+      background: rgba(243, 156, 18, 0.35);
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
+    }
+
+    /* SCHEDULE TABLE & WEEKEND CARDS */
+    .schedule-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--frost-bright);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    table.schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    table.schedule-table th {
+      background: rgba(17, 24, 34, 0.9);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--frost-border);
+      color: var(--steel-muted);
+    }
+
+    table.schedule-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(120, 180, 232, 0.1);
+      vertical-align: middle;
+    }
+
+    table.schedule-table tr:last-child td { border-bottom: none; }
+
+    .day-cell {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      color: var(--ice-white);
+      width: 120px;
+    }
+
+    .criteria-sub {
+      display: block;
+      font-size: 10px;
+      color: var(--steel-dim);
+      margin-top: 2px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .slot-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      min-width: 140px;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .slot-display.conductor-slot {
+      background: rgba(192, 57, 43, 0.15);
+      border: 1px solid var(--conductor-crimson);
+      color: var(--conductor-bright);
+    }
+
+    .slot-display.vip-slot {
+      background: rgba(243, 156, 18, 0.15);
+      border: 1px solid var(--vip-gold);
+      color: var(--vip-gold-light);
+    }
+
+    .editable-input {
+      background: rgba(7, 10, 14, 0.8);
+      border: 1px solid var(--frost-border);
+      color: var(--ice-white);
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      width: 160px;
+      outline: none;
+    }
+
+    .editable-input:focus { border-color: var(--frost-bright); }
+
+    /* WEEKEND DUAL CARDS */
+    .weekend-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 640px) { .weekend-grid { grid-template-columns: 1fr; } }
+
+    .weekend-card {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      opacity: 0.5;
+      transition: all 0.2s;
+    }
+
+    .weekend-card.active-proposal {
+      opacity: 1;
+      border-color: var(--frost-bright);
+      box-shadow: 0 0 16px var(--frost-glow);
+    }
+
+    .weekend-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--frost-bright);
+      border-bottom: 1px solid rgba(120, 180, 232, 0.12);
+      padding-bottom: 6px;
+    }
+
+    .weekend-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .weekend-row span { color: var(--steel-muted); font-size: 11px; }
+
+    /* RULES & EXPORT PANEL */
+    .rules-card {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 640px) { .rules-grid { grid-template-columns: 1fr; } }
+
+    .rule-item h4 {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      color: var(--ice-white);
+      margin-bottom: 4px;
+    }
+
+    .rule-item p {
+      font-size: 11px;
+      color: var(--steel-muted);
+      line-height: 1.4;
+    }
+
+    .export-strip {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-export {
+      background: rgba(120, 180, 232, 0.1);
+      border: 1px solid var(--frost-bright);
+      color: var(--ice-white);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 10px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-export:hover {
+      background: rgba(120, 180, 232, 0.25);
+      box-shadow: 0 0 12px var(--frost-glow);
+    }
+
+    /* MULTI-SELECT PICKER MODAL */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 11, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.active { display: flex; }
+
+    .modal-box {
+      background: #0b1118;
+      border: 1px solid var(--frost-bright);
+      border-radius: 6px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 25px rgba(120, 180, 232, 0.25);
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(120, 180, 232, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      color: var(--ice-white);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--steel-dim);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .modal-search { padding: 10px 18px; border-bottom: 1px solid rgba(120, 180, 232, 0.1); }
+    .modal-input {
+      width: 100%;
+      background: rgba(7, 10, 14, 0.8);
+      border: 1px solid rgba(120, 180, 232, 0.25);
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: var(--ice-white);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .roster-pick-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(12, 17, 23, 0.6);
+      padding: 6px 10px;
+      border-radius: 3px;
+      font-size: 11px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .roster-pick-row:hover { background: rgba(120, 180, 232, 0.12); }
+    .roster-pick-row input { cursor: pointer; accent-color: var(--vip-gold); }
+
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid rgba(120, 180, 232, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="schedule-header">
+      <div class="header-titles">
+        <h1>Weekly Train Schedule & Guidelines</h1>
+        <p>Alliance Operational Policy & Rotation System</p>
+      </div>
+      <div class="badge-roster">OFFICIAL ROSTER</div>
+    </div>
+
+    <!-- POOLS SETUP (SELECTORS FOR QUALIFYING LISTS) -->
+    <div class="pools-config-panel">
+      <div class="panel-header">
+        <h2>ᛟ Weekly Qualifying Pool Selections</h2>
+        <span style="font-size: 10px; color: var(--steel-dim);">CLICK TO MANAGE WHO IS IN EACH POOL</span>
+      </div>
+      <div class="pools-grid">
+        
+        <div class="pool-card">
+          <div class="pool-card-title">
+            <span>Monday: Top 15 VS</span>
+            <span class="pool-card-count" id="count-vs">15</span>
+          </div>
+          <button class="btn-select-pool" onclick="openPoolPicker('vs')">
+            <span>Select Members</span> <span>&#9662;</span>
+          </button>
+        </div>
+
+        <div class="pool-card">
+          <div class="pool-card-title">
+            <span>Tuesday: DS Players</span>
+            <span class="pool-card-count" id="count-ds">20</span>
+          </div>
+          <button class="btn-select-pool" onclick="openPoolPicker('ds')">
+            <span>Select Members</span> <span>&#9662;</span>
+          </button>
+        </div>
+
+        <div class="pool-card">
+          <div class="pool-card-title">
+            <span>Thursday: Top 10 Donors</span>
+            <span class="pool-card-count" id="count-donors">10</span>
+          </div>
+          <button class="btn-select-pool" onclick="openPoolPicker('donors')">
+            <span>Select Members</span> <span>&#9662;</span>
+          </button>
+        </div>
+
+        <div class="pool-card">
+          <div class="pool-card-title">
+            <span>R4 Leadership Roster</span>
+            <span class="pool-card-count" id="count-r4">5</span>
+          </div>
+          <button class="btn-select-pool" onclick="openPoolPicker('r4')">
+            <span>Select Members</span> <span>&#9662;</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONTROLS: WEEK ALTERNATION & GENERATE -->
+    <div class="controls-strip">
+      <div class="week-type-toggle">
+        <button class="btn-toggle active" id="btn-even" onclick="setWeekType('EVEN')">
+          <span>📅</span> EVEN WEEK
+        </button>
+        <button class="btn-toggle" id="btn-odd" onclick="setWeekType('ODD')">
+          <span>📅</span> ODD WEEK
+        </button>
+      </div>
+
+      <button class="btn-generate-main" onclick="generateSchedule()">
+        🎲 GENERATE WEEKLY SCHEDULE (ENFORCE DUPLICATE PROTECTION)
+      </button>
+    </div>
+
+    <!-- MONDAY - FRIDAY ROTATION TABLE -->
+    <div class="schedule-section-title">
+      <span>📅</span> MONDAY – FRIDAY ROTATION
+    </div>
+    <div class="table-card">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Conductor Selection Criteria</th>
+            <th>VIP Selection Criteria</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="day-cell">Monday</td>
+            <td>
+              <div class="slot-display conductor-slot" id="slot-mon-cond">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from the <strong>Top 15 in VS</strong></span>
+            </td>
+            <td>
+              <div class="slot-display vip-slot" id="slot-mon-vip">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from the <strong>remaining 14</strong></span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="day-cell">Tuesday</td>
+            <td>
+              <div class="slot-display conductor-slot" id="slot-tue-cond">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from <strong>last week's DS players</strong></span>
+            </td>
+            <td>
+              <div class="slot-display vip-slot" id="slot-tue-vip">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from <strong>all remaining DS players</strong></span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="day-cell">Wednesday</td>
+            <td>
+              <input type="text" class="editable-input" id="input-wed-cond" placeholder="Enter Merited Member..." />
+              <span class="criteria-sub">Chosen for <strong>Special Merits</strong> (DE help, battle participation; decided by R4)</span>
+            </td>
+            <td>
+              <input type="text" class="editable-input" id="input-wed-vip" placeholder="Driver's choice..." />
+              <span class="criteria-sub"><strong>VIP's choice</strong> (Decided independently)</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="day-cell">Thursday</td>
+            <td>
+              <div class="slot-display conductor-slot" id="slot-thu-cond">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from the <strong>Top 10 Donors</strong></span>
+            </td>
+            <td>
+              <div class="slot-display vip-slot" id="slot-thu-vip">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from the <strong>remaining 9 donors</strong></span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="day-cell">Friday</td>
+            <td>
+              <div class="slot-display conductor-slot" id="slot-fri-cond">--- STANDBY ---</div>
+              <span class="criteria-sub">Random selection from the <strong>entire alliance (excluding R4)</strong></span>
+            </td>
+            <td>
+              <input type="text" class="editable-input" id="input-fri-vip" placeholder="Driver's choice..." />
+              <span class="criteria-sub"><strong>VIP's choice</strong> (Decided independently)</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- WEEKEND PROPOSAL SECTION -->
+    <div class="schedule-section-title">
+      <span>🗂</span> WEEKEND SCHEDULE PROPOSAL
+    </div>
+    <div class="weekend-grid">
+      <!-- EVEN WEEKS -->
+      <div class="weekend-card active-proposal" id="card-even-week">
+        <div class="weekend-card-title">EVEN WEEKS</div>
+        <div class="weekend-row">
+          <span>Saturday Conductor:</span>
+          <strong id="wknd-even-sat-cond" style="color: var(--conductor-bright);">R4</strong>
+        </div>
+        <div class="weekend-row">
+          <span>Saturday VIP:</span>
+          <strong id="wknd-even-sat-vip" style="color: var(--vip-gold-light);">Mouse</strong>
+        </div>
+        <div class="weekend-row">
+          <span>Sunday Conductor:</span>
+          <strong id="wknd-even-sun-cond" style="color: var(--conductor-bright);">Mouse</strong>
+        </div>
+        <div class="weekend-row">
+          <span>Sunday VIP:</span>
+          <strong id="wknd-even-sun-vip" style="color: var(--vip-gold-light);">R4</strong>
+        </div>
+      </div>
+
+      <!-- ODD WEEKS -->
+      <div class="weekend-card" id="card-odd-week">
+        <div class="weekend-card-title">ODD WEEKS</div>
+        <div class="weekend-row">
+          <span>Saturday Conductor:</span>
+          <strong id="wknd-odd-sat-cond" style="color: var(--conductor-bright);">R4</strong>
+        </div>
+        <div class="weekend-row">
+          <span>Saturday VIP:</span>
+          <strong id="wknd-odd-sat-vip" style="color: var(--vip-gold-light);">Mouse</strong>
+        </div>
+        <div class="weekend-row">
+          <span>Sunday Conductor:</span>
+          <strong id="wknd-odd-sun-cond" style="color: var(--conductor-bright);">R4</strong>
+        </div>
+        <div class="weekend-row">
+          <span>Sunday VIP:</span>
+          <strong id="wknd-odd-sun-vip" style="color: var(--vip-gold-light);">Driver's Choice</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPERATIONAL RULES & GUIDELINES -->
+    <div class="rules-card">
+      <div class="schedule-section-title" style="margin-bottom: 12px;">
+        <span>📌</span> OPERATIONAL RULES & GUIDELINES
+      </div>
+      <div class="rules-grid">
+        <div class="rule-item">
+          <h4>1. Separate Daily Lists</h4>
+          <p>Each day operates on a completely separate Conductor and VIP selection pool.</p>
+        </div>
+        <div class="rule-item">
+          <h4>2. Duplicate Protection</h4>
+          <p>If a drawn player was already scheduled on that same day last week, the next candidate is selected.</p>
+        </div>
+        <div class="rule-item">
+          <h4>3. Weekly Compilation</h4>
+          <p>The train schedule is generated every Sunday taking into account current weekly performance and results.</p>
+        </div>
+        <div class="rule-item">
+          <h4>4. Schedule Publication</h4>
+          <p>The finalized list is posted Sunday evening or Monday morning so all members know the roster in advance.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT STRIP -->
+    <div class="export-strip">
+      <button class="btn-export" onclick="copyScheduleMarkdown('discord')">
+        <span>📋</span> COPY DISCORD FORMAT
+      </button>
+      <button class="btn-export" onclick="copyScheduleMarkdown('game')">
+        <span>✉</span> COPY ALLIANCE MAIL FORMAT
+      </button>
+    </div>
+
+  </div>
+
+  <!-- MULTI-SELECT MEMBER PICKER MODAL -->
+  <div class="modal-backdrop" id="pool-modal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-pool-title">MANAGE POOL</h3>
+        <button class="modal-close" onclick="closePoolModal()">&times;</button>
+      </div>
+      <div class="modal-search">
+        <input type="text" class="modal-input" id="modal-search-input" placeholder="Search members..." oninput="filterModalRoster()" />
+      </div>
+      <div class="modal-body" id="modal-roster-list"></div>
+      <div class="modal-footer">
+        <span id="modal-selected-count" style="font-size: 11px; color: var(--vip-gold-light);">0 Selected</span>
+        <button class="btn-select-pool" style="padding: 6px 16px;" onclick="closePoolModal()">Save Selection</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Master seed alliance roster for test index
+    const ALLIANCE_ROSTER = [
+      "MOUSE [R5]", "WARLORD_THOR", "RECRUITER_FREYA", "MUSE_LOKI", "BUTLER_TYR",
+      "BROTHERGRIMM", "NIGHT_STALKER", "IRON_HEART", "VALKYRIE_99", "FROST_BITE",
+      "SHADOW_KING", "BLAZE_RUNNER", "GHOST_WALKER", "TITAN_FALL", "CHIEF_OAK",
+      "APEX_HUNTER", "STORM_SURGE", "WINTER_SOLDIER", "BLACK_LOTUS", "CYBER_WOLF",
+      "VIPER_FANG", "SILENT_BLADE", "WAR_MACHINE", "BLOOD_MOON", "DRAGON_EYE"
+    ];
+    for (let i = 26; i <= 100; i++) ALLIANCE_ROSTER.push(`MEMBER_${String(i).padStart(3, '0')}`);
+
+    // Pre-seeded pools according to criteria
+    let poolsData = {
+      vs: ALLIANCE_ROSTER.slice(0, 15),
+      ds: ALLIANCE_ROSTER.slice(5, 25),
+      donors: ALLIANCE_ROSTER.slice(1, 11),
+      r4: ["WARLORD_THOR", "RECRUITER_FREYA", "MUSE_LOKI", "BUTLER_TYR", "BROTHERGRIMM"]
+    };
+
+    let activeWeekType = "EVEN"; // EVEN or ODD
+    let currentSchedule = null;
+
+    // Rule 2 Duplicate protection: saves last week's results
+    let lastWeekSchedule = JSON.parse(localStorage.getItem("last_week_train_schedule") || "{}");
+
+    let currentEditingPool = null;
+
+    function initCounts() {
+      document.getElementById("count-vs").innerText = poolsData.vs.length;
+      document.getElementById("count-ds").innerText = poolsData.ds.length;
+      document.getElementById("count-donors").innerText = poolsData.donors.length;
+      document.getElementById("count-r4").innerText = poolsData.r4.length;
+    }
+
+    function setWeekType(type) {
+      activeWeekType = type;
+      document.getElementById("btn-even").classList.toggle("active", type === "EVEN");
+      document.getElementById("btn-odd").classList.toggle("active", type === "ODD");
+      document.getElementById("card-even-week").classList.toggle("active-proposal", type === "EVEN");
+      document.getElementById("card-odd-week").classList.toggle("active-proposal", type === "ODD");
+    }
+
+    // MULTI-SELECT MODAL ENGINE
+    function openPoolPicker(poolKey) {
+      currentEditingPool = poolKey;
+      const titles = {
+        vs: "Top 15 VS Candidates",
+        ds: "Desert Storm (DS) Roster",
+        donors: "Top 10 Donors",
+        r4: "R4 Leadership List"
+      };
+      document.getElementById("modal-pool-title").innerText = titles[poolKey];
+      document.getElementById("modal-search-input").value = "";
+      document.getElementById("pool-modal").classList.add("active");
+      renderModalRoster("");
+      updateModalCount();
+    }
+
+    function closePoolModal() {
+      document.getElementById("pool-modal").classList.remove("active");
+      currentEditingPool = null;
+      initCounts();
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === "pool-modal") closePoolModal();
+    }
+
+    function filterModalRoster() {
+      const q = document.getElementById("modal-search-input").value.trim().toLowerCase();
+      renderModalRoster(q);
+    }
+
+    function renderModalRoster(query) {
+      const container = document.getElementById("modal-roster-list");
+      container.innerHTML = "";
+      const matches = ALLIANCE_ROSTER.filter(n => n.toLowerCase().includes(query));
+
+      matches.forEach(name => {
+        const isChecked = poolsData[currentEditingPool].includes(name);
+        const row = document.createElement("label");
+        row.className = "roster-pick-row";
+        row.innerHTML = `
+          <input type="checkbox" ${isChecked ? "checked" : ""} onchange="togglePoolMember('${name}', this.checked)" />
+          <span>${name}</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function togglePoolMember(name, add) {
+      if (!currentEditingPool) return;
+      if (add) {
+        if (!poolsData[currentEditingPool].includes(name)) poolsData[currentEditingPool].push(name);
+      } else {
+        poolsData[currentEditingPool] = poolsData[currentEditingPool].filter(n => n !== name);
+      }
+      updateModalCount();
+    }
+
+    function updateModalCount() {
+      if (!currentEditingPool) return;
+      document.getElementById("modal-selected-count").innerText = `${poolsData[currentEditingPool].length} Members in Pool`;
+    }
+
+    // CORE DRAW ENGINE ENFORCING OPERATIONAL POLICY
+    function generateSchedule() {
+      const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+      // Helper for Duplicate Protection (Rule 2)
+      const drawEligible = (candidates, lastWeekDisallowed) => {
+        const shuffled = shuffle(candidates);
+        for (let i = 0; i < shuffled.length; i++) {
+          if (!lastWeekDisallowed.includes(shuffled[i])) {
+            return shuffled.splice(i, 1)[0];
+          }
+        }
+        return shuffled[0] || "---"; // fallback if pool is tiny
+      };
+
+      // 1. MONDAY: Top 15 VS
+      const vsPool = [...poolsData.vs];
+      const monLastWeek = lastWeekSchedule.monday || [];
+      const monCond = drawEligible(vsPool, monLastWeek);
+      const remainingVS = vsPool.filter(n => n !== monCond);
+      const monVip = drawEligible(remainingVS, monLastWeek);
+
+      // 2. TUESDAY: Last week DS players
+      const dsPool = [...poolsData.ds];
+      const tueLastWeek = lastWeekSchedule.tuesday || [];
+      const tueCond = drawEligible(dsPool, tueLastWeek);
+      const remainingDS = dsPool.filter(n => n !== tueCond);
+      const tueVip = drawEligible(remainingDS, tueLastWeek);
+
+      // 3. THURSDAY: Top 10 Donors
+      const donorsPool = [...poolsData.donors];
+      const thuLastWeek = lastWeekSchedule.thursday || [];
+      const thuCond = drawEligible(donorsPool, thuLastWeek);
+      const remainingDonors = donorsPool.filter(n => n !== thuCond);
+      const thuVip = drawEligible(remainingDonors, thuLastWeek);
+
+      // 4. FRIDAY: Entire Alliance excluding R4
+      const friPool = ALLIANCE_ROSTER.filter(n => !poolsData.r4.includes(n));
+      const friLastWeek = lastWeekSchedule.friday || [];
+      const friCond = drawEligible(friPool, friLastWeek);
+
+      // DOM UPDATES
+      document.getElementById("slot-mon-cond").innerText = monCond;
+      document.getElementById("slot-mon-vip").innerText = monVip;
+
+      document.getElementById("slot-tue-cond").innerText = tueCond;
+      document.getElementById("slot-tue-vip").innerText = tueVip;
+
+      document.getElementById("slot-thu-cond").innerText = thuCond;
+      document.getElementById("slot-thu-vip").innerText = thuVip;
+
+      document.getElementById("slot-fri-cond").innerText = friCond;
+
+      // Persist to current schedule
+      currentSchedule = {
+        weekType: activeWeekType,
+        monday: { cond: monCond, vip: monVip },
+        tuesday: { cond: tueCond, vip: tueVip },
+        thursday: { cond: thuCond, vip: thuVip },
+        friday: { cond: friCond }
+      };
+
+      // Save as this week's records for next week's duplicate protection
+      localStorage.setItem("last_week_train_schedule", JSON.stringify({
+        monday: [monCond, monVip],
+        tuesday: [tueCond, tueVip],
+        thursday: [thuCond, thuVip],
+        friday: [friCond]
+      }));
+    }
+
+    // EXPORT TO DISCORD / ALLIANCE MAIL FORMAT
+    function copyScheduleMarkdown(mode) {
+      const getVal = (slotId, inputId) => {
+        if (inputId) {
+          const val = document.getElementById(inputId).value.trim();
+          return val || "Driver's Choice";
+        }
+        return document.getElementById(slotId).innerText;
+      };
+
+      const monC = getVal("slot-mon-cond");
+      const monV = getVal("slot-mon-vip");
+      const tueC = getVal("slot-tue-cond");
+      const tueV = getVal("slot-tue-vip");
+      const wedC = getVal(null, "input-wed-cond");
+      const wedV = getVal(null, "input-wed-vip");
+      const thuC = getVal("slot-thu-cond");
+      const thuV = getVal("slot-thu-vip");
+      const friC = getVal("slot-fri-cond");
+      const friV = getVal(null, "input-fri-vip");
+
+      let satC, satV, sunC, sunV;
+      if (activeWeekType === "EVEN") {
+        satC = "R4"; satV = "Mouse";
+        sunC = "Mouse"; sunV = "R4";
+      } else {
+        satC = "R4"; satV = "Mouse";
+        sunC = "R4"; sunV = "Driver's Choice";
+      }
+
+      let text = "";
+      if (mode === "discord") {
+        text = `__**🚂 WEEKLY TRAIN SCHEDULE (${activeWeekType} WEEK)**__\n` +
+          `• **Monday (Top 15 VS):** Conductor: **${monC}** | VIP: **${monV}**\n` +
+          `• **Tuesday (DS Roster):** Conductor: **${tueC}** | VIP: **${tueV}**\n` +
+          `• **Wednesday (Special Merits):** Conductor: **${wedC}** | VIP: **${wedV}**\n` +
+          `• **Thursday (Top 10 Donors):** Conductor: **${thuC}** | VIP: **${thuV}**\n` +
+          `• **Friday (Alliance Lottery):** Conductor: **${friC}** | VIP: **${friV}**\n` +
+          `• **Saturday:** Conductor: **${satC}** | VIP: **${satV}**\n` +
+          `• **Sunday:** Conductor: **${sunC}** | VIP: **${sunV}**\n\n` +
+          `*Duplicate protection applied against last week's schedule.*`;
+      } else {
+        text = `[ALLIANCE TRAIN ROSTER - ${activeWeekType} WEEK]\n` +
+          `MON: Cond: ${monC} / VIP: ${monV}\n` +
+          `TUE: Cond: ${tueC} / VIP: ${tueV}\n` +
+          `WED: Cond: ${wedC} / VIP: ${wedV}\n` +
+          `THU: Cond: ${thuC} / VIP: ${thuV}\n` +
+          `FRI: Cond: ${friC} / VIP: ${friV}\n` +
+          `SAT: Cond: ${satC} / VIP: ${satV}\n` +
+          `SUN: Cond: ${sunC} / VIP: ${sunV}\n` +
+          `Check your train times and be on station platform on time!`;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Schedule copied to clipboard in " + (mode === "discord" ? "Discord" : "Game Mail") + " format!");
+      });
+    }
+
+    // BOOT
+    initCounts();
+    setWeekType("EVEN");
+  </script>
+</body>
+</html>
