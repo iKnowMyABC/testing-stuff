@@ -25,6 +25,7 @@
       --vip-gold: #f39c12;
       --vip-gold-light: #f1c40f;
       --success-green: #2ecc71;
+      --rollover-gold: #d18a45;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,7 +56,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     }
 
@@ -85,6 +86,52 @@
       padding: 6px 14px;
       border-radius: 4px;
       letter-spacing: 1px;
+    }
+
+    /* STAGING BANNER */
+    .staging-banner {
+      display: none;
+      background: rgba(209, 138, 69, 0.12);
+      border: 1px solid var(--rollover-gold);
+      border-radius: 6px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 0 16px rgba(209, 138, 69, 0.25);
+    }
+
+    .staging-banner.active { display: flex; }
+
+    .staging-text {
+      color: #ffd4a8;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .btn-confirm-publish {
+      background: linear-gradient(180deg, rgba(46, 204, 113, 0.3) 0%, rgba(12, 17, 23, 0.9) 100%);
+      border: 1px solid var(--success-green);
+      color: #bbf7d0;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 10px 22px;
+      cursor: pointer;
+      border-radius: 4px;
+      box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-confirm-publish:hover {
+      background: rgba(46, 204, 113, 0.45);
+      box-shadow: 0 0 22px rgba(46, 204, 113, 0.5);
+      color: #ffffff;
+      transform: translateY(-1px);
     }
 
     /* POOLS SETUP BAR */
@@ -225,7 +272,7 @@
       box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
     }
 
-    /* 7-DAY SCHEDULE TABLE */
+    /* FULL 7-DAY SCHEDULE TABLE */
     .schedule-section-title {
       font-family: 'Cinzel', serif;
       font-size: 12px;
@@ -235,7 +282,7 @@
       margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
     }
 
     .table-card {
@@ -319,15 +366,101 @@
       background: rgba(7, 10, 14, 0.8);
       border: 1px solid var(--frost-border);
       color: var(--ice-white);
-      padding: 4px 8px;
+      padding: 5px 8px;
       border-radius: 3px;
       font-family: 'Cinzel', serif;
       font-size: 12px;
-      width: 160px;
+      width: 170px;
       outline: none;
     }
 
     .editable-input:focus { border-color: var(--frost-bright); }
+
+    /* HISTORY ARCHIVE FEED */
+    .deck-section {
+      background: var(--card-bg);
+      border: 1px solid var(--frost-border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+
+    .history-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .history-entry {
+      background: var(--card-subtle);
+      border: 1px solid rgba(120, 180, 232, 0.12);
+      border-radius: 4px;
+      padding: 12px 16px;
+    }
+
+    .entry-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ice-white);
+      border-bottom: 1px solid rgba(120, 180, 232, 0.1);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .history-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-delete-log {
+      background: transparent;
+      border: 1px solid rgba(153, 45, 34, 0.3);
+      color: #b05e5e;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 11px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .btn-delete-log:hover {
+      background: rgba(153, 45, 34, 0.25);
+      border-color: #c0392b;
+      color: #ff9d94;
+    }
+
+    .history-schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .history-day-card {
+      background: rgba(7, 10, 14, 0.7);
+      border: 1px solid rgba(120, 180, 232, 0.08);
+      border-radius: 3px;
+      padding: 6px 8px;
+    }
+
+    .history-day-card .day-name {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 10px;
+      color: var(--frost-bright);
+      margin-bottom: 4px;
+    }
+
+    .history-day-card .c-val { color: var(--conductor-bright); }
+    .history-day-card .v-val { color: var(--vip-gold-light); }
 
     /* RULES & EXPORT PANEL */
     .rules-card {
@@ -495,6 +628,16 @@
       <div class="badge-roster">OFFICIAL ROSTER</div>
     </div>
 
+    <!-- STAGING / CONFIRMATION BANNER -->
+    <div class="staging-banner" id="staging-banner">
+      <div class="staging-text">
+        ᛟ <strong>DRAFT GENERATED:</strong> Review assignments and enter manual inputs. Click <strong>CONFIRM & PUBLISH SCHEDULE</strong> to log officially.
+      </div>
+      <button class="btn-confirm-publish" onclick="confirmWeeklySchedule()">
+        ᛟ CONFIRM & PUBLISH SCHEDULE ᛟ
+      </button>
+    </div>
+
     <!-- POOLS SETUP (SELECTORS FOR QUALIFYING LISTS) -->
     <div class="pools-config-panel">
       <div class="panel-header">
@@ -535,11 +678,11 @@
 
         <div class="pool-card">
           <div class="pool-card-title">
-            <span>R4 Rotation List</span>
+            <span>R4 Rotation Order</span>
             <span class="pool-card-count" id="count-r4">5</span>
           </div>
           <button class="btn-select-pool" onclick="openPoolPicker('r4')">
-            <span>Select Members</span> <span>&#9662;</span>
+            <span>Manage Order</span> <span>&#9662;</span>
           </button>
         </div>
 
@@ -557,14 +700,15 @@
         </button>
       </div>
 
-      <button class="btn-generate-main" onclick="generateSchedule()">
-        🎲 GENERATE FULL 7-DAY SCHEDULE (WITH R4 ROTATION)
+      <button class="btn-generate-main" onclick="generateDraftSchedule()">
+        🎲 GENERATE DRAFT SCHEDULE
       </button>
     </div>
 
     <!-- FULL 7-DAY SCHEDULE TABLE -->
     <div class="schedule-section-title">
-      <span>📅</span> OFFICIAL 7-DAY LINEUP (MONDAY – SUNDAY)
+      <span>📅 OFFICIAL 7-DAY LINEUP (MONDAY – SUNDAY)</span>
+      <span id="label-schedule-state" style="font-size: 10px; color: var(--steel-dim);">NO ACTIVE DRAFT</span>
     </div>
     <div class="table-card">
       <table class="schedule-table">
@@ -610,7 +754,7 @@
               <span class="criteria-sub">Chosen for <strong>Special Merits</strong> (DE help, battle participation; decided by R4)</span>
             </td>
             <td>
-              <input type="text" class="editable-input" id="input-wed-vip" placeholder="Driver's choice..." />
+              <input type="text" class="editable-input" id="input-wed-vip" placeholder="VIP's Choice..." />
               <span class="criteria-sub"><strong>VIP's choice</strong> (Decided independently)</span>
             </td>
           </tr>
@@ -636,7 +780,7 @@
               <span class="criteria-sub">Random selection from the <strong>entire alliance (excluding R4)</strong></span>
             </td>
             <td>
-              <input type="text" class="editable-input" id="input-fri-vip" placeholder="Driver's choice..." />
+              <input type="text" class="editable-input" id="input-fri-vip" placeholder="VIP's Choice..." />
               <span class="criteria-sub"><strong>VIP's choice</strong> (Decided independently)</span>
             </td>
           </tr>
@@ -646,11 +790,11 @@
             <td class="day-cell" style="color: #ffd4a8;">Saturday</td>
             <td>
               <div class="slot-display conductor-slot" id="slot-sat-cond">R4 (Rotating)</div>
-              <span class="criteria-sub" id="sub-sat-cond">Leadership Rotation</span>
+              <span class="criteria-sub">Strict In-Order R4 Conductor Queue</span>
             </td>
             <td>
               <div class="slot-display vip-slot" id="slot-sat-vip">Mouse [R5]</div>
-              <span class="criteria-sub" id="sub-sat-vip">Fixed Leadership Seat</span>
+              <span class="criteria-sub">Fixed Leadership Seat</span>
             </td>
           </tr>
 
@@ -665,17 +809,26 @@
               <div id="wrapper-sun-vip">
                 <div class="slot-display vip-slot" id="slot-sun-vip">R4 (Rotating)</div>
               </div>
-              <span class="criteria-sub" id="sub-sun-vip">Leadership Rotation</span>
+              <span class="criteria-sub" id="sub-sun-vip">Strict In-Order R4 VIP Queue</span>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- OPERATIONAL RULES & GUIDELINES -->
+    <!-- HISTORY LOGS / DEPARTURE ARCHIVE -->
+    <div class="deck-section">
+      <div class="schedule-section-title">
+        <span>ᛟ OFFICIAL SCHEDULE ARCHIVE (CONFIRMED DEPARTURES)</span>
+        <span id="log-counter" style="font-size: 10px; color: var(--steel-dim);">0 WEEKS LOGGED</span>
+      </div>
+      <div class="history-feed" id="history-feed-display"></div>
+    </div>
+
+    <!-- RULES PANEL -->
     <div class="rules-card">
       <div class="schedule-section-title" style="margin-bottom: 12px;">
-        <span>📌</span> OPERATIONAL RULES & GUIDELINES
+        <span>📌 OPERATIONAL RULES & GUIDELINES</span>
       </div>
       <div class="rules-grid">
         <div class="rule-item">
@@ -687,8 +840,8 @@
           <p>If a drawn player was already scheduled on that same day last week, the next candidate is selected.</p>
         </div>
         <div class="rule-item">
-          <h4>3. Weekend Leadership Rotation</h4>
-          <p>Mouse is fixed on weekends, and R4 Conductors rotate sequentially through the leadership list.</p>
+          <h4>3. Strict In-Order R4 Rotation</h4>
+          <p>R4 Conductors and VIPs rotate sequentially in fixed order without random skips.</p>
         </div>
         <div class="rule-item">
           <h4>4. Schedule Publication</h4>
@@ -699,10 +852,10 @@
 
     <!-- EXPORT STRIP -->
     <div class="export-strip">
-      <button class="btn-export" onclick="copyScheduleMarkdown('discord')">
+      <button class="btn-export" onclick="copyCurrentSchedule('discord')">
         <span>📋</span> COPY DISCORD FORMAT
       </button>
-      <button class="btn-export" onclick="copyScheduleMarkdown('game')">
+      <button class="btn-export" onclick="copyCurrentSchedule('game')">
         <span>✉</span> COPY ALLIANCE MAIL FORMAT
       </button>
     </div>
@@ -728,6 +881,8 @@
   </div>
 
   <script>
+    const ADMIN_DELETE_PIN = "1234";
+
     const ALLIANCE_ROSTER = [
       "MOUSE [R5]", "WARLORD_THOR", "RECRUITER_FREYA", "MUSE_LOKI", "BUTLER_TYR",
       "BROTHERGRIMM", "NIGHT_STALKER", "IRON_HEART", "VALKYRIE_99", "FROST_BITE",
@@ -745,8 +900,13 @@
     };
 
     let activeWeekType = "EVEN"; // EVEN or ODD
-    let lastWeekSchedule = JSON.parse(localStorage.getItem("last_week_train_schedule_v2") || "{}");
-    let nextR4Index = parseInt(localStorage.getItem("train_next_r4_idx") || "0", 10);
+    let stagedDraft = null;
+
+    // Sequential rotation indexes stored permanently
+    let r4CondIndex = parseInt(localStorage.getItem("train_r4_cond_idx") || "0", 10);
+    let r4VipIndex = parseInt(localStorage.getItem("train_r4_vip_idx") || "0", 10);
+
+    let scheduleHistory = JSON.parse(localStorage.getItem("train_schedule_history_v1") || "[]");
 
     let currentEditingPool = null;
 
@@ -761,40 +921,35 @@
       activeWeekType = type;
       document.getElementById("btn-even").classList.toggle("active", type === "EVEN");
       document.getElementById("btn-odd").classList.toggle("active", type === "ODD");
-      renderWeekendTemplate();
+      renderWeekendSlots();
     }
 
-    // Displays Saturday / Sunday according to Even / Odd week guidelines
-    function renderWeekendTemplate() {
-      const satCond = document.getElementById("slot-sat-cond");
-      const satVip = document.getElementById("slot-sat-vip");
-      const sunCond = document.getElementById("slot-sun-cond");
+    function renderWeekendSlots() {
       const sunVipWrapper = document.getElementById("wrapper-sun-vip");
+      const subSunCond = document.getElementById("sub-sun-cond");
       const subSunVip = document.getElementById("sub-sun-vip");
 
       if (activeWeekType === "EVEN") {
-        satCond.innerText = "R4 (Rotating)";
-        satVip.innerText = "MOUSE [R5]";
-        sunCond.innerText = "MOUSE [R5]";
+        document.getElementById("slot-sun-cond").innerText = "MOUSE [R5]";
+        subSunCond.innerText = "Fixed Leadership Seat";
         sunVipWrapper.innerHTML = `<div class="slot-display vip-slot" id="slot-sun-vip">R4 (Rotating)</div>`;
-        subSunVip.innerText = "Leadership Rotation";
+        subSunVip.innerText = "Strict In-Order R4 VIP Queue";
       } else {
-        satCond.innerText = "R4 (Rotating)";
-        satVip.innerText = "MOUSE [R5]";
-        sunCond.innerText = "R4 (Rotating)";
+        document.getElementById("slot-sun-cond").innerText = "R4 (Rotating)";
+        subSunCond.innerText = "Strict In-Order R4 Conductor Queue";
         sunVipWrapper.innerHTML = `<input type="text" class="editable-input" id="input-sun-vip" placeholder="Driver's choice..." />`;
         subSunVip.innerText = "Driver's choice (Decided independently)";
       }
     }
 
-    // MULTI-SELECT MODAL ENGINE
+    // MULTI-SELECT POOL MODAL
     function openPoolPicker(poolKey) {
       currentEditingPool = poolKey;
       const titles = {
         vs: "Top 15 VS Candidates",
         ds: "Desert Storm (DS) Roster",
         donors: "Top 10 Donors",
-        r4: "R4 Leadership Rotation List"
+        r4: "R4 Leadership Rotation Order"
       };
       document.getElementById("modal-pool-title").innerText = titles[poolKey];
       document.getElementById("modal-search-input").value = "";
@@ -850,83 +1005,84 @@
       document.getElementById("modal-selected-count").innerText = `${poolsData[currentEditingPool].length} Members in Pool`;
     }
 
-    // R4 SEQUENTIAL ROTATION ENGINE
-    function getNextR4() {
+    // STRICT IN-ORDER R4 ROTATION HELPERS
+    function peekNextR4Cond(offset = 0) {
       if (poolsData.r4.length === 0) return "R4";
-      if (nextR4Index >= poolsData.r4.length) nextR4Index = 0;
-      const selected = poolsData.r4[nextR4Index];
-      nextR4Index = (nextR4Index + 1) % poolsData.r4.length;
-      localStorage.setItem("train_next_r4_idx", nextR4Index);
-      return selected;
+      const idx = (r4CondIndex + offset) % poolsData.r4.length;
+      return poolsData.r4[idx];
     }
 
-    // CORE DRAW ENGINE ENFORCING OPERATIONAL POLICY
-    function generateSchedule() {
+    function peekNextR4Vip(offset = 0) {
+      if (poolsData.r4.length === 0) return "R4";
+      const idx = (r4VipIndex + offset) % poolsData.r4.length;
+      return poolsData.r4[idx];
+    }
+
+    // GENERATE DRAFT SCHEDULE (STAGING ONLY)
+    function generateDraftSchedule() {
       const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
 
-      // Helper for Duplicate Protection (Rule 2)
-      const drawEligible = (candidates, lastWeekDisallowed) => {
+      // Check last confirmed week for duplicate protection (Rule 2)
+      const lastWeek = scheduleHistory.length > 0 ? scheduleHistory[0] : null;
+
+      const drawEligible = (candidates, disallowedList = []) => {
         const shuffled = shuffle(candidates);
         for (let i = 0; i < shuffled.length; i++) {
-          if (!lastWeekDisallowed.includes(shuffled[i])) {
+          if (!disallowedList.includes(shuffled[i])) {
             return shuffled.splice(i, 1)[0];
           }
         }
         return shuffled[0] || "---";
       };
 
-      // 1. MONDAY: Top 15 VS
+      // 1. Monday (Top 15 VS)
+      const monBanned = lastWeek ? [lastWeek.monday.cond, lastWeek.monday.vip] : [];
       const vsPool = [...poolsData.vs];
-      const monLastWeek = lastWeekSchedule.monday || [];
-      const monCond = drawEligible(vsPool, monLastWeek);
+      const monCond = drawEligible(vsPool, monBanned);
       const remainingVS = vsPool.filter(n => n !== monCond);
-      const monVip = drawEligible(remainingVS, monLastWeek);
+      const monVip = drawEligible(remainingVS, monBanned);
 
-      // 2. TUESDAY: Last week DS players
+      // 2. Tuesday (DS Roster)
+      const tueBanned = lastWeek ? [lastWeek.tuesday.cond, lastWeek.tuesday.vip] : [];
       const dsPool = [...poolsData.ds];
-      const tueLastWeek = lastWeekSchedule.tuesday || [];
-      const tueCond = drawEligible(dsPool, tueLastWeek);
+      const tueCond = drawEligible(dsPool, tueBanned);
       const remainingDS = dsPool.filter(n => n !== tueCond);
-      const tueVip = drawEligible(remainingDS, tueLastWeek);
+      const tueVip = drawEligible(remainingDS, tueBanned);
 
-      // 3. THURSDAY: Top 10 Donors
+      // 3. Thursday (Top 10 Donors)
+      const thuBanned = lastWeek ? [lastWeek.thursday.cond, lastWeek.thursday.vip] : [];
       const donorsPool = [...poolsData.donors];
-      const thuLastWeek = lastWeekSchedule.thursday || [];
-      const thuCond = drawEligible(donorsPool, thuLastWeek);
+      const thuCond = drawEligible(donorsPool, thuBanned);
       const remainingDonors = donorsPool.filter(n => n !== thuCond);
-      const thuVip = drawEligible(remainingDonors, thuLastWeek);
+      const thuVip = drawEligible(remainingDonors, thuBanned);
 
-      // 4. FRIDAY: Entire Alliance excluding R4
+      // 4. Friday (Alliance Lottery excl. R4)
+      const friBanned = lastWeek ? [lastWeek.friday.cond] : [];
       const friPool = ALLIANCE_ROSTER.filter(n => !poolsData.r4.includes(n));
-      const friLastWeek = lastWeekSchedule.friday || [];
-      const friCond = drawEligible(friPool, friLastWeek);
+      const friCond = drawEligible(friPool, friBanned);
 
-      // 5. SATURDAY & SUNDAY: Sequential R4 Rotation + Mouse
-      let satCondVal, satVipVal, sunCondVal, sunVipVal;
+      // 5. Weekend (Strict Order Preview)
+      let satCondVal = peekNextR4Cond(0);
+      let satVipVal = "MOUSE [R5]";
+      let sunCondVal = "";
+      let sunVipVal = "";
+
       if (activeWeekType === "EVEN") {
-        satCondVal = getNextR4();
-        satVipVal = "MOUSE [R5]";
         sunCondVal = "MOUSE [R5]";
-        sunVipVal = getNextR4();
+        sunVipVal = peekNextR4Vip(0);
       } else {
-        satCondVal = getNextR4();
-        satVipVal = "MOUSE [R5]";
-        sunCondVal = getNextR4();
+        sunCondVal = peekNextR4Cond(1); // Next conductor in queue for Sunday
         sunVipVal = "Driver's Choice";
       }
 
-      // DOM UPDATES
+      // Populate DOM with Staged Draft
       document.getElementById("slot-mon-cond").innerText = monCond;
       document.getElementById("slot-mon-vip").innerText = monVip;
-
       document.getElementById("slot-tue-cond").innerText = tueCond;
       document.getElementById("slot-tue-vip").innerText = tueVip;
-
       document.getElementById("slot-thu-cond").innerText = thuCond;
       document.getElementById("slot-thu-vip").innerText = thuVip;
-
       document.getElementById("slot-fri-cond").innerText = friCond;
-
       document.getElementById("slot-sat-cond").innerText = satCondVal;
       document.getElementById("slot-sat-vip").innerText = satVipVal;
       document.getElementById("slot-sun-cond").innerText = sunCondVal;
@@ -935,22 +1091,188 @@
         document.getElementById("slot-sun-vip").innerText = sunVipVal;
       }
 
-      // Save for next week's duplicate protection
-      localStorage.setItem("last_week_train_schedule_v2", JSON.stringify({
-        monday: [monCond, monVip],
-        tuesday: [tueCond, tueVip],
-        thursday: [thuCond, thuVip],
-        friday: [friCond]
-      }));
+      // Activate Staging state
+      stagedDraft = {
+        weekType: activeWeekType,
+        monday: { cond: monCond, vip: monVip },
+        tuesday: { cond: tueCond, vip: tueVip },
+        thursday: { cond: thuCond, vip: thuVip },
+        friday: { cond: friCond },
+        saturday: { cond: satCondVal, vip: satVipVal },
+        sunday: { cond: sunCondVal, vip: sunVipVal }
+      };
+
+      document.getElementById("staging-banner").classList.add("active");
+      document.getElementById("label-schedule-state").innerText = "DRAFT IN STAGING (NOT COMMITTED)";
+      document.getElementById("label-schedule-state").style.color = "var(--rollover-gold)";
     }
 
-    // EXPORT TO DISCORD / ALLIANCE MAIL FORMAT
-    function copyScheduleMarkdown(mode) {
+    // CONFIRM DEPARTURE & SAVE TO HISTORY
+    function confirmWeeklySchedule() {
+      if (!stagedDraft) {
+        alert("No active draft schedule to confirm. Click GENERATE DRAFT SCHEDULE first.");
+        return;
+      }
+
+      // Read manual choices from input boxes
+      const wedCondVal = document.getElementById("input-wed-cond").value.trim() || "Merited Member";
+      const wedVipVal = document.getElementById("input-wed-vip").value.trim() || "VIP's Choice";
+      const friVipVal = document.getElementById("input-fri-vip").value.trim() || "VIP's Choice";
+
+      let sunVipVal = stagedDraft.sunday.vip;
+      if (activeWeekType === "ODD") {
+        const inputSun = document.getElementById("input-sun-vip");
+        sunVipVal = (inputSun && inputSun.value.trim()) ? inputSun.value.trim() : "Driver's Choice";
+      }
+
+      const now = new Date();
+      const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Build full confirmed week record
+      const confirmedWeek = {
+        id: Date.now(),
+        timestamp: timeStr,
+        weekType: activeWeekType,
+        monday: stagedDraft.monday,
+        tuesday: stagedDraft.tuesday,
+        wednesday: { cond: wedCondVal, vip: wedVipVal },
+        thursday: stagedDraft.thursday,
+        friday: { cond: stagedDraft.friday.cond, vip: friVipVal },
+        saturday: stagedDraft.saturday,
+        sunday: { cond: stagedDraft.sunday.cond, vip: sunVipVal },
+        // Snapshots of rotation indexes before advancement (for undo/delete)
+        savedCondIdx: r4CondIndex,
+        savedVipIdx: r4VipIndex
+      };
+
+      // ADVANCE R4 ROTATION QUEUES OFFICIALLY
+      if (activeWeekType === "EVEN") {
+        r4CondIndex = (r4CondIndex + 1) % poolsData.r4.length;
+        r4VipIndex = (r4VipIndex + 1) % poolsData.r4.length;
+      } else {
+        r4CondIndex = (r4CondIndex + 2) % poolsData.r4.length; // Sat & Sun both take R4 Conductors
+      }
+
+      localStorage.setItem("train_r4_cond_idx", r4CondIndex);
+      localStorage.setItem("train_r4_vip_idx", r4VipIndex);
+
+      // Save to official history
+      scheduleHistory.unshift(confirmedWeek);
+      localStorage.setItem("train_schedule_history_v1", JSON.stringify(scheduleHistory));
+
+      // Exit Staging
+      stagedDraft = null;
+      document.getElementById("staging-banner").classList.remove("active");
+      document.getElementById("label-schedule-state").innerText = `CONFIRMED (${timeStr})`;
+      document.getElementById("label-schedule-state").style.color = "var(--success-green)";
+
+      renderHistory();
+      alert("ᛟ SCHEDULE OFFICIALLY CONFIRMED & COMMITTED! ᛟ\n\nHistory log archived and R4 rotation queue advanced.");
+    }
+
+    // RENDER HISTORY ARCHIVE FEED
+    function renderHistory() {
+      const feed = document.getElementById("history-feed-display");
+      const count = document.getElementById("log-counter");
+      feed.innerHTML = "";
+
+      if (scheduleHistory.length === 0) {
+        feed.innerHTML = `<div style="text-align:center; font-size:11px; color:var(--steel-dim); padding:16px;">NO OFFICIAL SCHEDULES RECORDED IN ARCHIVE YET.</div>`;
+        count.innerText = "0 WEEKS LOGGED";
+        return;
+      }
+
+      count.innerText = `${scheduleHistory.length} WEEKS LOGGED`;
+
+      scheduleHistory.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "history-entry";
+
+        card.innerHTML = `
+          <div class="entry-top">
+            <span>OFFICIAL WEEKLY ROSTER • ${item.weekType} WEEK</span>
+            <div class="history-card-actions">
+              <span style="color: var(--steel-dim); font-size: 10px;">${item.timestamp}</span>
+              <button class="btn-delete-log" title="Delete record and rewind rotation" onclick="deleteHistoryEntry(${index})">🗑</button>
+            </div>
+          </div>
+          <div class="history-schedule-grid">
+            <div class="history-day-card">
+              <div class="day-name">MON</div>
+              <div>C: <strong class="c-val">${item.monday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.monday.vip}</strong></div>
+            </div>
+            <div class="history-day-card">
+              <div class="day-name">TUE</div>
+              <div>C: <strong class="c-val">${item.tuesday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.tuesday.vip}</strong></div>
+            </div>
+            <div class="history-day-card">
+              <div class="day-name">WED</div>
+              <div>C: <strong class="c-val">${item.wednesday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.wednesday.vip}</strong></div>
+            </div>
+            <div class="history-day-card">
+              <div class="day-name">THU</div>
+              <div>C: <strong class="c-val">${item.thursday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.thursday.vip}</strong></div>
+            </div>
+            <div class="history-day-card">
+              <div class="day-name">FRI</div>
+              <div>C: <strong class="c-val">${item.friday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.friday.vip}</strong></div>
+            </div>
+            <div class="history-day-card">
+              <div class="day-name">SAT</div>
+              <div>C: <strong class="c-val">${item.saturday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.saturday.vip}</strong></div>
+            </div>
+            <div class="history-day-card">
+              <div class="day-name">SUN</div>
+              <div>C: <strong class="c-val">${item.sunday.cond}</strong></div>
+              <div>V: <strong class="v-val">${item.sunday.vip}</strong></div>
+            </div>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    // DELETE LOG WITH PIN AND RESTORE R4 ROTATION ORDER
+    function deleteHistoryEntry(index) {
+      const pin = prompt("Enter Admin PIN to delete this confirmed schedule:");
+      if (pin === null) return;
+
+      if (pin.trim() !== ADMIN_DELETE_PIN) {
+        alert("Incorrect PIN. Deletion aborted.");
+        return;
+      }
+
+      if (!confirm("Are you sure? Deleting this log will also rewind the R4 rotation queues.")) return;
+
+      const target = scheduleHistory[index];
+
+      // If deleting the latest log, rewind rotation indexes
+      if (index === 0 && target.savedCondIdx !== undefined) {
+        r4CondIndex = target.savedCondIdx;
+        r4VipIndex = target.savedVipIdx;
+        localStorage.setItem("train_r4_cond_idx", r4CondIndex);
+        localStorage.setItem("train_r4_vip_idx", r4VipIndex);
+      }
+
+      scheduleHistory.splice(index, 1);
+      localStorage.setItem("train_schedule_history_v1", JSON.stringify(scheduleHistory));
+      renderHistory();
+      alert("Schedule deleted from archive and R4 rotation order rewound.");
+    }
+
+    // EXPORT TEXT TO CLIPBOARD
+    function copyCurrentSchedule(mode) {
       const getVal = (slotId, inputId) => {
         if (inputId) {
           const el = document.getElementById(inputId);
           if (el && el.value.trim()) return el.value.trim();
-          return "Driver's Choice";
+          return "VIP's Choice";
         }
         const el = document.getElementById(slotId);
         return el ? el.innerText : "---";
@@ -982,7 +1304,7 @@
           `• **Friday (Alliance Lottery):** Conductor: **${friC}** | VIP: **${friV}**\n` +
           `• **Saturday:** Conductor: **${satC}** | VIP: **${satV}**\n` +
           `• **Sunday:** Conductor: **${sunC}** | VIP: **${sunV}**\n\n` +
-          `*Duplicate protection applied against last week's schedule.*`;
+          `*Official roster confirmed & published.*`;
       } else {
         text = `[ALLIANCE TRAIN ROSTER - ${activeWeekType} WEEK]\n` +
           `MON: Cond: ${monC} / VIP: ${monV}\n` +
@@ -992,7 +1314,7 @@
           `FRI: Cond: ${friC} / VIP: ${friV}\n` +
           `SAT: Cond: ${satC} / VIP: ${satV}\n` +
           `SUN: Cond: ${sunC} / VIP: ${sunV}\n` +
-          `Check your train times and be on station platform on time!`;
+          `Official schedule. Be on time for station platform departure!`;
       }
 
       navigator.clipboard.writeText(text).then(() => {
@@ -1003,6 +1325,7 @@
     // BOOT
     initCounts();
     setWeekType("EVEN");
+    renderHistory();
   </script>
 </body>
 </html>
